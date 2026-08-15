@@ -397,6 +397,11 @@ input[type="range"] { accent-color: var(--ink); }
 .selected-rate small { color: #83928e; margin-top: 5px; font-size: 10px; }
 .cost-comparison { margin-top: 28px; }
 .rate-source { color: var(--lime); font-size: 11px; font-weight: 700; margin-top: 14px; }
+.calculator-next-step { margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.16); }
+.calculator-next-step > strong { display: block; margin-top: 10px; color: white; font-size: 22px; line-height: 1.2; letter-spacing: -.035em; }
+.calculator-next-step > p { max-width: 620px; }
+.calculator-next-step > div { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.calculator-next-step .text-link { min-height: 44px; color: #d5dcda; }
 
 .provider-pricing-page { background: var(--paper); }
 .pricing-hub-hero, .provider-hero { min-height: 470px; display: grid; align-items: center; }

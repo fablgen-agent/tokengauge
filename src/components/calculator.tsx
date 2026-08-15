@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
@@ -98,6 +99,22 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
         </div></>}
         <p>Warm cache-read scenario, not general ROI. It excludes cache writes/storage, tools, regional uplifts, retries, and quality failures. A dash means no published cache-read rate.</p>
         <a className="rate-source" href={result.baselinePrice.sourceUrl} target="_blank" rel="noreferrer">{result.baselinePrice.sourceLabel} ↗</a>
+        <div className="calculator-next-step">
+          <span className="eyebrow">NEXT STEP</span>
+          <strong>
+            {result.error
+              ? "Bring the scenario back inside the published model limits."
+              : result.amountUsd > 0
+                ? `Validate the ${formatUsd(result.amountUsd)} monthly hypothesis.`
+                : "Test a different intervention before changing production."}
+          </strong>
+          <p>The estimate is not a saving until the same workload still passes its quality bar. Compare a supported recipe in the lab, or use the evidence library to design a provider-specific test.</p>
+          <div>
+            <Link className="button button-lime" href="/lab">Run a controlled test</Link>
+            <Link className="text-link" href="/library">Browse evidence methods <span aria-hidden="true">→</span></Link>
+            <Link className="text-link" href="/#pricing">See one-time access <span aria-hidden="true">→</span></Link>
+          </div>
+        </div>
       </div>
     </div>
   );
