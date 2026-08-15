@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CostCalculator } from "@/components/calculator";
+import { CacheEpisodeCalculator } from "@/components/cache-episode-calculator";
 import { PricingDirectory } from "@/components/pricing-directory";
 import { SiteHeader } from "@/components/site-header";
 import { formatRate, priceSnapshotDate } from "@/lib/costs";
@@ -52,6 +53,7 @@ export default async function ProviderPricingPage({ params }: Props) {
   const inputRates = cards.map((card) => card.inputPerMillionUsd);
   const outputRates = cards.map((card) => card.outputPerMillionUsd);
   const cacheCards = cards.filter((card) => card.cachedInputPerMillionUsd !== null);
+  const cacheWriteCards = cacheCards.filter((card) => card.cacheWritePerMillionUsd !== undefined);
   const faq = [
     {
       question: `How current are the ${label} API prices?`,
@@ -59,7 +61,9 @@ export default async function ProviderPricingPage({ params }: Props) {
     },
     {
       question: `Does this calculator include every ${label} charge?`,
-      answer: "No. It models input, output, and a warm cache-read share. Cache writes or storage, tools, retries, regional uplifts, taxes, batch modes, and quality failures can change the final invoice.",
+      answer: cacheWriteCards.length
+        ? "No. The workload calculator models input, output, and a warm cache-read share. The separate cache-episode calculator includes published cache writes and reads, but storage, tools, retries, regional uplifts, taxes, batch modes, and quality failures can still change the invoice."
+        : "No. It models input, output, and a warm cache-read share. Cache writes or storage, tools, retries, regional uplifts, taxes, batch modes, and quality failures can change the final invoice.",
     },
     {
       question: "Are consumer chat subscriptions included?",
@@ -108,6 +112,14 @@ export default async function ProviderPricingPage({ params }: Props) {
             <div><dt>Verified</dt><dd>{priceSnapshotDate}</dd></div>
           </dl>
         </section>
+
+        {cacheWriteCards.length ? <section id="cache-economics" className="section-pad section-block calculator-section cache-episode-section">
+          <div className="section-heading split-heading">
+            <div><span className="eyebrow">CACHE AMORTIZATION</span><h2>Price writes and reads as an episode.</h2></div>
+            <p>Model a stable reusable prefix, each cache creation, and the reads that actually land inside its lifetime. The counterfactual weights every billing category at its published rate.</p>
+          </div>
+          <CacheEpisodeCalculator providerId={profile.id} />
+        </section> : null}
 
         <section id="calculator" className="section-pad section-block calculator-section provider-calculator">
           <div className="section-heading split-heading">

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   calculateBreakEvenAcceptanceRate,
+  calculateCacheEpisodeCosts,
   calculateCostPerAcceptedAnswer,
   calculateCostUsd,
   calculateSavings,
@@ -17,6 +18,40 @@ describe("cost calculations", () => {
 
   it("prices cached and uncached input separately", () => {
     expect(calculateCostUsd(terraLong, { inputTokens: 1_000_000, cachedInputTokens: 400_000, outputTokens: 100_000 })).toBeCloseTo(4.36, 8);
+  });
+
+  it("models cache writes, reads, uncached suffixes, and TTL break-even points", () => {
+    const haiku = modelPrices.find((model) => model.id === "anthropic:claude-haiku-4.5:standard")!;
+    const fiveMinute = calculateCacheEpisodeCosts(haiku, {
+      totalInputTokens: 20_000,
+      reusablePrefixTokens: 15_000,
+      writes: 100,
+      readsPerWrite: 1,
+      ttl: "5m",
+    });
+    expect(fiveMinute).toEqual({ baselineUsd: 4, cachedUsd: 3.025, breakEvenReads: 1, totalRequests: 200 });
+
+    const oneHour = calculateCacheEpisodeCosts(haiku, {
+      totalInputTokens: 20_000,
+      reusablePrefixTokens: 15_000,
+      writes: 100,
+      readsPerWrite: 2,
+      ttl: "1h",
+    });
+    expect(oneHour.baselineUsd).toBe(6);
+    expect(oneHour.cachedUsd).toBeCloseTo(4.8, 8);
+    expect(oneHour.breakEvenReads).toBe(2);
+    expect(oneHour.totalRequests).toBe(300);
+  });
+
+  it("rejects cache TTLs without a published write rate", () => {
+    expect(() => calculateCacheEpisodeCosts(terra, {
+      totalInputTokens: 10_000,
+      reusablePrefixTokens: 8_000,
+      writes: 1,
+      readsPerWrite: 2,
+      ttl: "1h",
+    })).toThrow(/does not publish/);
   });
 
   it("caps cached tokens at total input tokens", () => {
