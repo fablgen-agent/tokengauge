@@ -112,7 +112,7 @@ export default async function ProviderPricingPage({ params }: Props) {
         <section id="calculator" className="section-pad section-block calculator-section provider-calculator">
           <div className="section-heading split-heading">
             <div><span className="eyebrow">{label.toUpperCase()} WORKLOAD</span><h2>Model the calls you actually make.</h2></div>
-            <p>Enter monthly request volume and per-request tokens. The calculator automatically resolves eligible context and price bands for the selected model.</p>
+            <p>Enter monthly workload, tokens, and quality pass rates. The calculator resolves eligible price bands, then shows cost per accepted answer and the candidate break-even pass rate.</p>
           </div>
           <CostCalculator providerId={profile.id} />
           <p className="snapshot-note">{profile.billingNote}</p>

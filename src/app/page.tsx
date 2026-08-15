@@ -90,7 +90,7 @@ export default async function Home() {
         <section id="calculator" className="section-pad section-block calculator-section">
           <div className="section-heading split-heading">
             <div><span className="eyebrow">FREE SCENARIO CALCULATOR</span><h2>Price the workload,<br />then the optimization.</h2></div>
-            <p>Choose a real provider tier, enter your workload, then model shorter inputs, outputs, and warm cache reads. Every number remains an estimate until production usage confirms it.</p>
+            <p>Choose a real provider tier, enter your workload and quality pass rates, then compare raw spend with cost per accepted answer. Every number remains an estimate until a quality-gated test confirms it.</p>
           </div>
           <CostCalculator />
           <p className="snapshot-note">Official-source snapshot: {priceSnapshotDate}. API billing is separate from ChatGPT, Claude, Gemini, Grok, or Kimi consumer-plan quotas.</p>

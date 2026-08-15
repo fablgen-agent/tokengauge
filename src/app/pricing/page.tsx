@@ -9,11 +9,11 @@ import { providerLabel, providerPageProfiles, providerRateCards, uniqueProviderM
 
 export const metadata: Metadata = {
   title: `AI API pricing calculator — ${priceSnapshotDate}`,
-  description: "Compare official API token rates and calculate monthly workload costs across OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere.",
+  description: "Compare official AI API token rates, monthly workload costs, and quality-adjusted cost per accepted answer across nine providers.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "AI API pricing calculator · TokenGauge",
-    description: `Compare ${modelPrices.length} dated rate cards across nine AI providers and model a real workload.`,
+    description: `Compare ${modelPrices.length} dated rate cards across nine AI providers, then model spend and cost per accepted answer.`,
     url: "/pricing",
   },
 };
@@ -26,7 +26,7 @@ export default function PricingHub() {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     url: "https://tokengauge.enby.fish/pricing",
-    description: "A dated, official-source AI model API rate directory and token-cost scenario calculator.",
+    description: "A dated, official-source AI model API rate directory with workload and quality-adjusted cost-per-accepted-answer calculations.",
   };
 
   return (
@@ -37,7 +37,7 @@ export default function PricingHub() {
         <section className="subpage-hero section-pad pricing-hub-hero">
           <span className="eyebrow eyebrow-lime">AI API PRICING DIRECTORY</span>
           <h1>Calculate model costs without flattening the billing rules.</h1>
-          <p>Compare {modelPrices.length} official-source rate cards across nine providers. Then model requests, input, output, and warm cache reads against the exact model tier.</p>
+          <p>Compare {modelPrices.length} official-source rate cards across nine providers. Then model requests, tokens, warm cache reads, and quality pass rates against the exact model tier.</p>
           <p className="provider-snapshot">Snapshot verified {priceSnapshotDate} · USD per one million tokens · consumer chat subscriptions excluded</p>
         </section>
 
@@ -67,7 +67,7 @@ export default function PricingHub() {
         <section id="calculator" className="section-pad section-block calculator-section">
           <div className="section-heading split-heading">
             <div><span className="eyebrow">WORKLOAD CALCULATOR</span><h2>Turn rates into a monthly scenario.</h2></div>
-            <p>The result is an estimate, not an invoice or guaranteed saving. Validate cache hits, retries, tools, regional uplifts, and output quality in production.</p>
+            <p>Compare raw spend with cost per accepted answer and the candidate pass rate needed to break even. These remain estimates until a quality-gated test confirms them.</p>
           </div>
           <CostCalculator />
         </section>
