@@ -5,8 +5,10 @@ import { describe, expect, it } from "vitest";
 
 const testDirectory = mkdtempSync(join(tmpdir(), "tokengauge-test-"));
 process.env.TOKEN_GAUGE_DB_PATH = join(testDirectory, "test.sqlite");
+process.env.LWC_SECRET = "test-secret-that-is-long-enough-for-token-gauge-auth-and-vault";
 
 const db = await import("./db");
+const vault = await import("./provider-vault");
 
 describe("durable state", () => {
   it("round-trips namespaced values and expires stale ones", async () => {
@@ -48,5 +50,56 @@ describe("durable state", () => {
     expect(db.hasEntitlement("chatgpt-legacy")).toBe(false);
     expect(db.hasEntitlement("product-user")).toBe(true);
     expect(db.linkedChatGPTAccount("product-user")).toBe("chatgpt-legacy");
+  });
+
+  it("consolidates a legacy entitlement when the product account has an older tier row", () => {
+    db.upsertUser({ accountId: "chatgpt-repurchase", billingUserId: "tg-chatgpt-repurchase" });
+    db.upsertUser({ accountId: "product-repurchase", billingUserId: "tg-product-repurchase" });
+    db.grantEntitlement({ accountId: "product-repurchase", checkoutSessionId: "cs_old_product", paymentIntentId: "pi_old_product" });
+    db.revokeEntitlementByPaymentIntent("pi_old_product");
+    db.grantEntitlement({ accountId: "chatgpt-repurchase", checkoutSessionId: "cs_new_chatgpt", paymentIntentId: "pi_new_chatgpt" });
+
+    expect(db.linkChatGPTAccount({ chatgptAccountId: "chatgpt-repurchase", productAccountId: "product-repurchase" }))
+      .toEqual({ linked: true, entitlementMoved: true });
+    expect(db.hasEntitlement("chatgpt-repurchase")).toBe(false);
+    expect(db.hasEntitlement("product-repurchase")).toBe(true);
+  });
+
+  it("selects the highest active paid plan and falls back after a refund", () => {
+    db.upsertUser({ accountId: "tier-user", billingUserId: "tg-tier-user" });
+    db.grantEntitlement({ accountId: "tier-user", checkoutSessionId: "cs_pro", paymentIntentId: "pi_pro", key: "pro" });
+    db.grantEntitlement({ accountId: "tier-user", checkoutSessionId: "cs_plus", paymentIntentId: "pi_plus", key: "pro_plus" });
+    expect(db.planForAccount("tier-user")).toBe("pro_plus");
+    db.revokeEntitlementByPaymentIntent("pi_plus");
+    expect(db.planForAccount("tier-user")).toBe("pro");
+  });
+
+  it("encrypts provider credentials and never stores the plaintext key", () => {
+    db.upsertUser({ accountId: "vault-user", billingUserId: "tg-vault-user" });
+    const apiKey = "sk-test-provider-secret-value";
+    vault.saveProviderCredential({ accountId: "vault-user", providerId: "openai", apiKey });
+    const stored = db.providerConnectionRecord("vault-user", "openai");
+    expect(stored?.encrypted_key).not.toContain(apiKey);
+    expect(stored?.key_hint).toBe("alue");
+    expect(vault.getProviderCredential("vault-user", "openai")?.apiKey).toBe(apiKey);
+    expect(vault.deleteProviderCredential("vault-user", "openai")).toBe(true);
+  });
+
+  it("summarizes experiment deltas and persists optional method status", () => {
+    db.upsertUser({ accountId: "dashboard-user", billingUserId: "tg-dashboard-user" });
+    db.saveExperiment({
+      id: "experiment-one",
+      accountId: "dashboard-user",
+      providerId: "openai",
+      strategyId: "cap-output",
+      model: "gpt-5.6-luna",
+      baseline: { input: 20, output: 40, total: 60 },
+      optimized: { input: 20, output: 25, total: 45 },
+    });
+    expect(db.experimentSummaries("dashboard-user")[0]).toMatchObject({ providerId: "openai", tokenDelta: 15 });
+    db.setMethodProgress("dashboard-user", "cap-output", "testing");
+    expect(db.methodProgress("dashboard-user")).toEqual({ "cap-output": "testing" });
+    db.setMethodProgress("dashboard-user", "cap-output", "none");
+    expect(db.methodProgress("dashboard-user")).toEqual({});
   });
 });

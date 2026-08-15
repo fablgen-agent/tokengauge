@@ -26,6 +26,7 @@ export async function GET(request: Request): Promise<Response> {
           }
         : undefined,
       pro: product?.pro ?? (!product && chatgpt?.pro) ?? false,
+      accessPlan: product?.accessPlan ?? (!product && chatgpt?.accessPlan) ?? "free",
       accountSystemReady: authEmailReady(),
       chatgpt: {
         connected: Boolean(chatgpt),

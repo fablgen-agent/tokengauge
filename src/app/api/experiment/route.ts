@@ -3,10 +3,14 @@ import { streamText, type LanguageModelUsage } from "ai";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-import { requireChatGPT } from "@/lib/access";
+import { requireChatGPT, requireProductAccount, type AuthContext } from "@/lib/access";
 import { tokenTips } from "@/lib/catalog";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 import { saveExperiment } from "@/lib/db";
+import { getProviderCredential } from "@/lib/provider-vault";
+import { providerStrategyIds, runProviderText, type LabUsage } from "@/lib/provider-runner";
+import { isProviderId, providerDefinition, type ProviderId } from "@/lib/providers";
+import { planAtLeast } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +21,7 @@ const inputSchema = z.object({
   baselineInstructions: z.string().min(3).max(6_000),
   candidateInstructions: z.string().min(3).max(6_000).optional(),
   strategyId: z.string().min(1).max(100).default("custom"),
+  providerId: z.union([z.literal("chatgpt"), z.string().refine(isProviderId)]).default("chatgpt"),
 });
 
 function usageDto(usage: LanguageModelUsage) {
@@ -53,24 +58,15 @@ export async function POST(request: Request): Promise<Response> {
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (contentLength > 20_000) return Response.json({ error: "Experiment is too large." }, { status: 413 });
 
-    const account = await requireChatGPT(request);
     const rawBody = await request.text();
     if (Buffer.byteLength(rawBody, "utf8") > 20_000) {
       return Response.json({ error: "Experiment is too large." }, { status: 413 });
     }
     const input = inputSchema.parse(JSON.parse(rawBody));
     const strategy = tokenTips.find((tip) => tip.id === input.strategyId);
-    if (!strategy || strategy.experimentSupport !== "supported" || (!account.pro && strategy.access !== "free")) {
+    if (!strategy || strategy.experimentSupport !== "supported") {
       return Response.json({ error: "That strategy is not available for this account." }, { status: 403 });
     }
-
-    const handler = getChatGPTHandler();
-    const availableModels = await handler.getModels(request);
-    if (!availableModels?.includes(input.model)) {
-      return Response.json({ error: "That model is not available on this ChatGPT account." }, { status: 400 });
-    }
-
-    const provider = createChatGPTProxyProvider({ fetch: handler.proxyFetch(request) });
     const variants = [
       { key: "baseline" as const, instructions: input.baselineInstructions, settings: settingsFor(input.strategyId, "baseline") },
       { key: "candidate" as const, instructions: input.baselineInstructions, settings: settingsFor(input.strategyId, "candidate") },
@@ -78,16 +74,56 @@ export async function POST(request: Request): Promise<Response> {
     if (Math.random() < 0.5) variants.reverse();
 
     const results = new Map<"baseline" | "candidate", { text: string; usage: ReturnType<typeof usageDto>; settings: ReturnType<typeof settingsFor> }>();
-    for (const variant of variants) {
-      const result = streamText({
-        model: provider(input.model),
-        system: variant.instructions,
-        prompt: input.task,
-        maxOutputTokens: variant.settings.maxOutputTokens,
-        providerOptions: { openai: { reasoningEffort: variant.settings.reasoningEffort, textVerbosity: variant.settings.textVerbosity } },
-      });
-      const [text, usage] = await Promise.all([result.text, result.usage]);
-      results.set(variant.key, { text, usage: usageDto(usage), settings: variant.settings });
+    let account: AuthContext;
+    if (input.providerId === "chatgpt") {
+      account = await requireChatGPT(request);
+      if (!account.pro && strategy.access !== "free") {
+        return Response.json({ error: "That strategy is not available for this account." }, { status: 403 });
+      }
+      const handler = getChatGPTHandler();
+      const availableModels = await handler.getModels(request);
+      if (!availableModels?.includes(input.model)) {
+        return Response.json({ error: "That model is not available on this ChatGPT account." }, { status: 400 });
+      }
+      const provider = createChatGPTProxyProvider({ fetch: handler.proxyFetch(request) });
+      for (const variant of variants) {
+        const result = streamText({
+          model: provider(input.model),
+          system: variant.instructions,
+          prompt: input.task,
+          maxOutputTokens: variant.settings.maxOutputTokens,
+          providerOptions: { openai: { reasoningEffort: variant.settings.reasoningEffort, textVerbosity: variant.settings.textVerbosity } },
+        });
+        const [text, usage] = await Promise.all([result.text, result.usage]);
+        results.set(variant.key, { text, usage: usageDto(usage), settings: variant.settings });
+      }
+    } else {
+      const providerId = input.providerId as ProviderId;
+      account = await requireProductAccount(request);
+      const definition = providerDefinition(providerId);
+      if (!planAtLeast(account.accessPlan, definition.minimumPlan)) {
+        return Response.json({ error: `${definition.label} requires ${definition.minimumPlan === "ultimate" ? "Ultimate" : "Pro+"}.` }, { status: 403 });
+      }
+      if (!definition.models.includes(input.model)) {
+        return Response.json({ error: "That model is not supported by this adapter." }, { status: 400 });
+      }
+      if (!providerStrategyIds(providerId).includes(input.strategyId)) {
+        return Response.json({ error: "That request setting is not portable to the selected provider." }, { status: 400 });
+      }
+      const credential = getProviderCredential(account.accountId, providerId);
+      if (!credential) return Response.json({ error: `Connect ${definition.label} in Settings first.` }, { status: 409 });
+      for (const variant of variants) {
+        const result = await runProviderText({
+          providerId,
+          apiKey: credential.apiKey,
+          configuration: credential.configuration,
+          model: input.model,
+          instructions: variant.instructions,
+          task: input.task,
+          settings: variant.settings,
+        });
+        results.set(variant.key, { text: result.text, usage: result.usage as LabUsage, settings: variant.settings });
+      }
     }
 
     const baseline = results.get("baseline");
@@ -99,12 +135,13 @@ export async function POST(request: Request): Promise<Response> {
       accountId: account.accountId,
       strategyId: input.strategyId,
       model: input.model,
+      providerId: input.providerId,
       baseline: baseline.usage,
       optimized: candidate.usage,
     });
 
     return Response.json(
-      { baseline, candidate, executionOrder: variants.map((variant) => variant.key) },
+      { baseline, candidate, providerId: input.providerId, executionOrder: variants.map((variant) => variant.key) },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {

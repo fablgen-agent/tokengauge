@@ -34,7 +34,9 @@ export function SiteHeader() {
         <Link href="/#calculator">Calculator</Link>
         <Link href="/library">Methods</Link>
         <Link href="/lab">Lab</Link>
+        <Link href="/dashboard">Dashboard</Link>
         <Link href="/account">Account</Link>
+        <Link href="/settings">Settings</Link>
         {access === "pro" ? (
           <Link className="nav-cta nav-cta-active" href="/account" aria-label="TokenGauge Pro access is active">Pro active</Link>
         ) : access === "free" ? (

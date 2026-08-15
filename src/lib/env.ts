@@ -2,6 +2,8 @@ import "server-only";
 
 import { createHmac } from "node:crypto";
 
+import type { PaidPlanId } from "@/lib/plans";
+
 export type StripeMode = "test" | "live";
 
 function read(name: string): string | undefined {
@@ -43,11 +45,18 @@ export function getStripeConfig(): {
   mode: StripeMode;
   apiKey: string;
   priceId?: string;
+  priceIds: Partial<Record<PaidPlanId, string>>;
+  upgradeCouponIds: { pro?: string; pro_plus?: string };
   webhookSecret?: string;
 } {
   const mode = getStripeMode();
   const apiKey = read(mode === "live" ? "STRIPE_API_KEY" : "STRIPE_TEST_API_KEY");
   const priceId = read(mode === "live" ? "STRIPE_LIVE_PRICE_ID" : "STRIPE_TEST_PRICE_ID");
+  const priceIds: Partial<Record<PaidPlanId, string>> = {
+    pro: priceId,
+    pro_plus: read(mode === "live" ? "STRIPE_LIVE_PRO_PLUS_PRICE_ID" : "STRIPE_TEST_PRO_PLUS_PRICE_ID"),
+    ultimate: read(mode === "live" ? "STRIPE_LIVE_ULTIMATE_PRICE_ID" : "STRIPE_TEST_ULTIMATE_PRICE_ID"),
+  };
   const webhookSecret = read(
     mode === "live" ? "STRIPE_LIVE_WEBHOOK_SECRET" : "STRIPE_TEST_WEBHOOK_SECRET",
   );
@@ -60,14 +69,30 @@ export function getStripeConfig(): {
     throw new Error("Stripe test mode requires a test API key.");
   }
 
-  return { mode, apiKey, priceId, webhookSecret };
+  return {
+    mode,
+    apiKey,
+    priceId,
+    priceIds,
+    upgradeCouponIds: {
+      pro: read("STRIPE_PRO_CREDIT_COUPON_ID"),
+      pro_plus: read("STRIPE_PRO_PLUS_CREDIT_COUPON_ID"),
+    },
+    webhookSecret,
+  };
 }
 
 export function getPublicRuntimeStatus() {
   const mode = getStripeMode();
   const priceName = mode === "live" ? "STRIPE_LIVE_PRICE_ID" : "STRIPE_TEST_PRICE_ID";
+  const prefix = mode === "live" ? "STRIPE_LIVE" : "STRIPE_TEST";
   return {
     stripeMode: mode,
     checkoutReady: Boolean(read(priceName)),
+    checkoutPlans: {
+      pro: Boolean(read(priceName)),
+      pro_plus: Boolean(read(`${prefix}_PRO_PLUS_PRICE_ID`)),
+      ultimate: Boolean(read(`${prefix}_ULTIMATE_PRICE_ID`)),
+    },
   } as const;
 }

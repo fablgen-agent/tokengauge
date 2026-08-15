@@ -8,6 +8,7 @@ import {
   setStripeCustomer,
 } from "@/lib/db";
 import { getStripeConfig } from "@/lib/env";
+import { isPaidPlanId } from "@/lib/plans";
 
 let singleton: Stripe | undefined;
 let singletonKey: string | undefined;
@@ -31,11 +32,10 @@ export async function fulfilCheckoutSession(
   expectedBillingUserId?: string,
 ): Promise<{
   fulfilled: boolean;
+  plan?: string;
   reason?: string;
 }> {
   const config = getStripeConfig();
-  if (!config.priceId) return { fulfilled: false, reason: "Checkout price is not configured." };
-
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["line_items", "customer", "payment_intent"],
@@ -44,9 +44,12 @@ export async function fulfilCheckoutSession(
   if (session.mode !== "payment" || session.payment_status !== "paid") {
     return { fulfilled: false, reason: "Payment is not complete." };
   }
-  if (session.metadata?.entitlement !== "pro") {
+  const entitlement = session.metadata?.entitlement;
+  if (!isPaidPlanId(entitlement)) {
     return { fulfilled: false, reason: "Unexpected entitlement." };
   }
+  const expectedPriceId = config.priceIds[entitlement];
+  if (!expectedPriceId) return { fulfilled: false, reason: "Checkout price is not configured." };
   const billingUserId = session.client_reference_id;
   if (!billingUserId) return { fulfilled: false, reason: "Missing account reference." };
   if (expectedBillingUserId && billingUserId !== expectedBillingUserId) {
@@ -54,7 +57,7 @@ export async function fulfilCheckoutSession(
   }
 
   const lines = session.line_items?.data ?? [];
-  const hasExpectedPrice = lines.some((line) => line.price?.id === config.priceId && line.quantity === 1);
+  const hasExpectedPrice = lines.some((line) => line.price?.id === expectedPriceId && line.quantity === 1);
   if (!hasExpectedPrice) return { fulfilled: false, reason: "Unexpected checkout item." };
 
   const accountId = findAccountByBillingId(billingUserId);
@@ -64,8 +67,9 @@ export async function fulfilCheckoutSession(
     accountId,
     checkoutSessionId: session.id,
     paymentIntentId: idOf(session.payment_intent),
+    key: entitlement,
   });
   const customerId = idOf(session.customer);
   if (customerId) setStripeCustomer(accountId, customerId);
-  return { fulfilled: true };
+  return { fulfilled: true, plan: entitlement };
 }

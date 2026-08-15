@@ -38,8 +38,9 @@ export async function POST(request: Request): Promise<Response> {
         throw new Error(result.reason);
       }
     } else if (event.type === "charge.refunded") {
-      const paymentIntentId = idOf((event.data.object as Stripe.Charge).payment_intent);
-      if (paymentIntentId) revokeEntitlementByPaymentIntent(paymentIntentId);
+      const charge = event.data.object as Stripe.Charge;
+      const paymentIntentId = idOf(charge.payment_intent);
+      if (charge.refunded && paymentIntentId) revokeEntitlementByPaymentIntent(paymentIntentId);
     }
 
     markStripeEvent(event.id, event.type);

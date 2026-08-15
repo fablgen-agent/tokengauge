@@ -2,9 +2,11 @@
 
 import QRCode from "qrcode";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
+import { AccountPanel } from "@/components/account-panel";
 import { ChatGPTPanel } from "@/components/chatgpt-panel";
 
 type Enrollment = { totpURI: string; backupCodes: string[] };
@@ -139,7 +141,7 @@ export function AccountCenter({ accountSystemReady }: { accountSystemReady: bool
         <h2>{user.name}</h2>
         <p>{user.email}</p>
         <div className="account-badges"><span>✓ Email verified</span><span>{user.twoFactorEnabled ? "✓ 2FA active" : "2FA optional"}</span></div>
-        <button className="button button-dark" type="button" onClick={() => void authClient.signOut().then(() => session.refetch())}>Sign out</button>
+        <div className="security-actions"><Link className="button button-lime" href="/dashboard">Dashboard</Link><Link className="button button-dark" href="/settings">Settings</Link><button className="text-button" type="button" onClick={() => void authClient.signOut().then(() => session.refetch())}>Sign out</button></div>
       </section>
 
       <section className="account-card security-card">
@@ -164,7 +166,7 @@ export function AccountCenter({ accountSystemReady }: { accountSystemReady: bool
         {error ? <p className="form-error" role="alert">{error}</p> : null}
       </section>
 
-      <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan.</p><ChatGPTPanel compact /></section>
+      <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan. If your earlier test purchase belongs to ChatGPT, explicitly move it to this verified account here.</p><ChatGPTPanel compact /><AccountPanel compact /></section>
     </div>
   );
 }

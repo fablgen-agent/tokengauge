@@ -16,10 +16,11 @@ export function CheckoutVerifier({ sessionId }: { sessionId?: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId }),
     }).then(async (response) => {
-      const data = (await response.json()) as { fulfilled?: boolean; reason?: string; error?: string };
+      const data = (await response.json()) as { fulfilled?: boolean; plan?: string; reason?: string; error?: string };
       if (!response.ok || !data.fulfilled) throw new Error(data.reason || data.error || "Payment is not ready yet.");
       setStatus("ready");
-      setMessage("Your Pro access is active.");
+      const label = data.plan === "ultimate" ? "Ultimate" : data.plan === "pro_plus" ? "Pro+" : "Pro";
+      setMessage(`Your ${label} access is active.`);
     }).catch((cause) => {
       setStatus("error");
       setMessage(cause instanceof Error ? cause.message : "We could not confirm the payment.");
@@ -31,7 +32,7 @@ export function CheckoutVerifier({ sessionId }: { sessionId?: string }) {
       <span className="success-mark" aria-hidden="true">{status === "checking" ? "…" : status === "ready" ? "✓" : "!"}</span>
       <h1>{status === "ready" ? "You’re in." : status === "checking" ? "One moment." : "Not confirmed yet."}</h1>
       <p>{message}</p>
-      {status === "ready" ? <Link className="button button-lime" href="/library">Open the full library</Link> : <Link className="button button-dark" href="/">Return home</Link>}
+      {status === "ready" ? <Link className="button button-lime" href="/dashboard">Open your dashboard</Link> : <Link className="button button-dark" href="/">Return home</Link>}
     </div>
   );
 }

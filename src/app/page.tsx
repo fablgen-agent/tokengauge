@@ -8,10 +8,21 @@ import { SiteHeader } from "@/components/site-header";
 import { TipCard } from "@/components/tip-card";
 import { evidenceLabels, proTips, publicTips, tokenTips } from "@/lib/catalog";
 import { modelPrices, priceProviders, priceSnapshotDate } from "@/lib/costs";
+import { paidPlans } from "@/lib/plans";
 
 export default function Home() {
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "TokenGauge",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: "Official AI model rate cards, evidence-backed token-saving methods, and controlled multi-provider A/B experiments.",
+    offers: paidPlans.map((plan) => ({ "@type": "Offer", name: `TokenGauge ${plan.name}`, price: plan.priceGbp, priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://tokengauge.enby.fish/#pricing" })),
+  };
   return (
     <div className="page-shell">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <SiteHeader />
       <main>
         <section className="hero section-pad">
@@ -79,26 +90,21 @@ export default function Home() {
           </ol>
         </section>
 
-        <section id="pricing" className="section-pad section-block pricing-section">
+        <section id="pricing" className="section-pad section-block pricing-section pricing-tiers-section">
           <div className="pricing-copy">
-            <span className="eyebrow eyebrow-lime">ONE-TIME PRO ACCESS</span><h2>The complete operating manual.</h2>
-            <p>Unlock the full maintained catalogue with one payment. The public rate directory, free methods, and supported A/B recipes stay free.</p>
+            <span className="eyebrow eyebrow-lime">ONE-TIME ACCESS</span><h2>Choose the workbench you will actually use.</h2>
+            <p>Start with the evidence library, add an encrypted bring-your-own-key lab, or unlock every supported provider adapter. These are one-time purchases, not subscriptions.</p>
             <ul>
-              <li>All {tokenTips.length} evidence cards</li><li>Provider profiles across nine rate sources</li>
-              <li>Usage retained; prompts and outputs discarded</li><li>14-day refund policy; statutory rights unaffected</li>
+              <li>The public rate directory and free methods remain open</li><li>API credits are never bundled or resold</li>
+              <li>Usage totals retained; prompts and outputs discarded</li><li>14-day refund policy; statutory rights unaffected</li>
             </ul>
           </div>
-          <div className="price-card">
-            <div><span>Pro access</span><strong><sup>£</sup>9</strong><small>one time · no subscription</small></div>
-            <ol className="checkout-flow"><li>Create or sign in to a verified TokenGauge account</li><li>Review the £9 Stripe checkout</li><li>Receive Pro access</li></ol>
-            <AccountPanel />
-            <p>No API credits included. Lab requests use your connected ChatGPT plan and count against its limits. Savings are not guaranteed.</p>
-          </div>
+          <div className="pricing-tier-grid">{paidPlans.map((plan) => <article className={`price-card price-card-${plan.id}`} key={plan.id}><div><span>{plan.name} access</span><strong><sup>£</sup>{plan.priceGbp}</strong><small>one time · no subscription</small></div><p>{plan.summary}</p><ul>{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><AccountPanel targetPlan={plan.id} /><p>No API credits included. Provider requests use your own connection and billing. Savings are not guaranteed.</p></article>)}</div>
         </section>
       </main>
       <footer className="site-footer section-pad">
         <div><span className="brand"><span className="brand-mark">T</span>TokenGauge</span><p>Measure the cost. Preserve the answer.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link><Link href="/account">Account</Link></nav>
+        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link><Link href="/dashboard">Dashboard</Link><Link href="/settings">Settings</Link></nav>
         <p>Independent software. Not affiliated with or endorsed by any listed model provider.</p>
       </footer>
     </div>

@@ -3,8 +3,9 @@ import "server-only";
 import { createHmac } from "node:crypto";
 
 import { getChatGPTHandler } from "@/lib/chatgpt";
-import { hasEntitlement, upsertUser } from "@/lib/db";
+import { planForAccount, upsertUser } from "@/lib/db";
 import { getLoginSecret } from "@/lib/env";
+import { planAtLeast, type PlanId } from "@/lib/plans";
 import { billingIdForProductUser, getProductAuth, productAccountId } from "@/lib/product-auth";
 
 export type AuthContext = {
@@ -13,6 +14,7 @@ export type AuthContext = {
   name?: string;
   email?: string;
   plan?: string;
+  accessPlan: PlanId;
   pro: boolean;
   kind: "product" | "chatgpt";
   emailVerified?: boolean;
@@ -29,6 +31,7 @@ export async function getChatGPTContext(request: Request): Promise<AuthContext |
 
   const { accountId, name, email, plan } = session.user;
   const billingUserId = billingIdForAccount(accountId);
+  const accessPlan = planForAccount(accountId);
   upsertUser({ accountId, billingUserId, name, email });
 
   return {
@@ -37,7 +40,8 @@ export async function getChatGPTContext(request: Request): Promise<AuthContext |
     name,
     email,
     plan,
-    pro: hasEntitlement(accountId),
+    accessPlan,
+    pro: planAtLeast(accessPlan, "pro"),
     kind: "chatgpt",
   };
 }
@@ -48,6 +52,7 @@ export async function getProductAccountContext(request: Request): Promise<AuthCo
 
   const accountId = productAccountId(session.user.id);
   const billingUserId = billingIdForProductUser(session.user.id);
+  const accessPlan = planForAccount(accountId);
   upsertUser({
     accountId,
     billingUserId,
@@ -60,7 +65,8 @@ export async function getProductAccountContext(request: Request): Promise<AuthCo
     billingUserId,
     name: session.user.name,
     email: session.user.email,
-    pro: hasEntitlement(accountId),
+    accessPlan,
+    pro: planAtLeast(accessPlan, "pro"),
     kind: "product",
     emailVerified: session.user.emailVerified,
     twoFactorEnabled: Boolean(session.user.twoFactorEnabled),

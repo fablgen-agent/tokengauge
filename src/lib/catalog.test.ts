@@ -82,10 +82,11 @@ describe("strategy catalogue", () => {
 
   it("exposes only implemented controlled recipes in the lab", () => {
     expect(tokenTips.filter((tip) => tip.experimentSupport === "supported").map((tip) => tip.id).sort()).toEqual([
+      "cap-output",
       "low-verbosity",
       "lower-reasoning-effort",
     ]);
-    expect(tokenTips.find((tip) => tip.id === "cap-output")).toMatchObject({ experimentType: "request_config", experimentSupport: "not-supported" });
+    expect(tokenTips.find((tip) => tip.id === "cap-output")).toMatchObject({ experimentType: "request_config", experimentSupport: "supported" });
     expect(tokenTips.find((tip) => tip.id === "stop-at-known-delimiter")).toMatchObject({ experimentType: "request_config", experimentSupport: "not-supported" });
     expect(proTips.every((tip) => tip.experimentSupport !== "supported")).toBe(true);
   });

@@ -6,10 +6,13 @@ type Usage = { input: number; cachedRead: number; cachedWrite: number; output: n
 type Variant = { text: string; usage: Usage; settings: { maxOutputTokens: number; reasoningEffort: string; textVerbosity: string } };
 type ExperimentResult = { baseline: Variant; candidate: Variant; executionOrder: string[] };
 type StrategyOption = { id: string; title: string; action: string };
+type LabSource = { id: string; label: string };
 
-export function LabWorkbench({ strategies }: { strategies: readonly StrategyOption[] }) {
+export function LabWorkbench({ strategies, sources }: { strategies: readonly StrategyOption[]; sources: readonly LabSource[] }) {
   const [models, setModels] = useState<string[]>([]);
   const [model, setModel] = useState("");
+  const [providerId, setProviderId] = useState(sources[0]?.id ?? "chatgpt");
+  const [strategyIds, setStrategyIds] = useState<string[]>([]);
   const [strategyId, setStrategyId] = useState(strategies[0]?.id ?? "");
   const [task, setTask] = useState("Explain why prompt-prefix stability matters to an engineering manager in three concise bullets.");
   const [baselineInstructions, setBaselineInstructions] = useState("You are a helpful AI assistant. Preserve every required fact.");
@@ -18,16 +21,32 @@ export function LabWorkbench({ strategies }: { strategies: readonly StrategyOpti
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    void fetch("/api/models", { cache: "no-store" })
+    const controller = new AbortController();
+    void fetch(`/api/models?provider=${encodeURIComponent(providerId)}`, { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const data = (await response.json()) as { models?: string[]; error?: string };
+        const data = (await response.json()) as { models?: string[]; strategyIds?: string[]; error?: string };
         if (!response.ok) throw new Error(data.error || "Models could not be loaded.");
         const nextModels = data.models ?? [];
         setModels(nextModels);
         setModel(nextModels[0] ?? "");
+        const nextStrategyIds = data.strategyIds ?? [];
+        setStrategyIds(nextStrategyIds);
+        setStrategyId((current) => nextStrategyIds.includes(current) ? current : nextStrategyIds[0] ?? "");
       })
-      .catch((cause) => setError(cause instanceof Error ? cause.message : "Models could not be loaded."));
-  }, []);
+      .catch((cause) => {
+        if (cause instanceof DOMException && cause.name === "AbortError") return;
+        setError(cause instanceof Error ? cause.message : "Models could not be loaded.");
+      });
+    return () => controller.abort();
+  }, [providerId]);
+
+  function changeProvider(nextProviderId: string) {
+    setModels([]);
+    setModel("");
+    setStrategyIds([]);
+    setError(undefined);
+    setProviderId(nextProviderId);
+  }
 
   async function run(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,7 +57,7 @@ export function LabWorkbench({ strategies }: { strategies: readonly StrategyOpti
       const response = await fetch("/api/experiment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model, task, baselineInstructions, strategyId }),
+        body: JSON.stringify({ providerId, model, task, baselineInstructions, strategyId }),
       });
       const data = (await response.json()) as ExperimentResult & { error?: string };
       if (!response.ok) throw new Error(data.error || "Experiment failed.");
@@ -55,9 +74,14 @@ export function LabWorkbench({ strategies }: { strategies: readonly StrategyOpti
       <h2>Controlled request-setting test</h2>
       <p className="retention-note">The task and instructions stay byte-for-byte identical. Only the selected request setting changes between arms.</p>
       <form className="lab-form" onSubmit={run}>
+        <label>Connection
+          <select value={providerId} onChange={(event) => changeProvider(event.target.value)} required>
+            {sources.map((source) => <option value={source.id} key={source.id}>{source.label}</option>)}
+          </select>
+        </label>
         <label>Strategy
           <select value={strategyId} onChange={(event) => setStrategyId(event.target.value)} required>
-            {strategies.map((strategy) => <option value={strategy.id} key={strategy.id}>{strategy.title}</option>)}
+            {strategies.filter((strategy) => strategyIds.includes(strategy.id)).map((strategy) => <option value={strategy.id} key={strategy.id}>{strategy.title}</option>)}
           </select>
         </label>
         <label>Model
@@ -72,7 +96,7 @@ export function LabWorkbench({ strategies }: { strategies: readonly StrategyOpti
         <label>Shared instructions for both variants
           <textarea value={baselineInstructions} onChange={(event) => setBaselineInstructions(event.target.value)} minLength={3} maxLength={6000} required />
         </label>
-        <button className="button button-dark" type="submit" disabled={busy || !model}>{busy ? "Running two requests…" : "Run randomized A/B test"}</button>
+        <button className="button button-dark" type="submit" disabled={busy || !model || !strategyId}>{busy ? "Running two requests…" : "Run randomized A/B test"}</button>
       </form>
       {error ? <p className="form-error" role="alert">{error}</p> : null}
       {result ? <ExperimentResults result={result} /> : null}

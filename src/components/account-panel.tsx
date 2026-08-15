@@ -3,17 +3,21 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { planAtLeast, planDefinition, type PaidPlanId, type PlanId } from "@/lib/plans";
+
 type Account = {
   authenticated: boolean;
   user?: { name?: string; email?: string; emailVerified?: boolean; twoFactorEnabled?: boolean };
   pro: boolean;
+  accessPlan: PlanId;
   accountSystemReady: boolean;
   chatgpt: { connected: boolean; plan?: string; linked: boolean; legacyPro: boolean };
   stripeMode: "test" | "live";
   checkoutReady: boolean;
+  checkoutPlans: Record<PaidPlanId, boolean>;
 };
 
-export function AccountPanel({ compact = false }: { compact?: boolean }) {
+export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?: boolean; targetPlan?: PaidPlanId }) {
   const [account, setAccount] = useState<Account>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -26,11 +30,14 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
     return () => { ignored = true; };
   }, []);
 
+  const target = planDefinition(targetPlan);
+  const upgradePrice = account ? Math.max(0, target.priceGbp - planDefinition(account.accessPlan).priceGbp) : target.priceGbp;
+
   async function checkout() {
     setBusy(true);
     setError(undefined);
     try {
-      const response = await fetch("/api/checkout", { method: "POST" });
+      const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: targetPlan }) });
       const data = (await response.json()) as { url?: string; error?: string };
       if (!response.ok || !data.url) throw new Error(data.error || "Checkout could not be started.");
       window.location.assign(data.url);
@@ -59,12 +66,12 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`account-panel ${compact ? "compact" : ""}`}>
       {account?.authenticated ? (
-        account.pro ? (
+        planAtLeast(account.accessPlan, targetPlan) ? (
           <div className="entitled-note">
-            <span>Pro access active</span>
-            <Link className="button button-lime" href="/library">Open the library</Link>
+            <span>{target.name} access active</span>
+            <Link className="button button-lime" href={targetPlan === "pro" ? "/library" : "/dashboard"}>Open {targetPlan === "pro" ? "the library" : "dashboard"}</Link>
           </div>
-        ) : account.chatgpt.connected && account.chatgpt.legacyPro ? (
+        ) : targetPlan === "pro" && account.chatgpt.connected && account.chatgpt.legacyPro ? (
           <div className="checkout-stack">
             <button className="button button-lime" type="button" disabled={busy} onClick={linkChatGPT}>
               {busy ? "Linking access…" : "Move existing Pro access here"}
@@ -73,13 +80,13 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
           </div>
         ) : (
           <div className="checkout-stack">
-            <button className="button button-lime" type="button" disabled={busy || !account.checkoutReady} onClick={checkout}>
-              {busy ? "Opening secure checkout…" : account.checkoutReady ? "Get Pro access — £9 once" : "Checkout setup in progress"}
+            <button className="button button-lime" type="button" disabled={busy || !account.checkoutPlans?.[targetPlan]} onClick={checkout}>
+              {busy ? "Opening secure checkout…" : account.checkoutPlans?.[targetPlan] ? `${account.accessPlan === "free" ? "Get" : "Upgrade to"} ${target.name} — £${upgradePrice} once` : "Checkout setup in progress"}
             </button>
-            <small>{account.stripeMode === "test" ? "Test mode — no real charges" : "One-time payment via Stripe"}</small>
+            <small>{account.stripeMode === "test" ? "Test mode — no real charges" : account.accessPlan === "free" ? "One-time payment via Stripe" : "Your existing paid tier is credited automatically"}</small>
           </div>
         )
-      ) : account?.pro && account.chatgpt.legacyPro ? (
+      ) : targetPlan === "pro" && account?.pro && account.chatgpt.legacyPro ? (
         <div className="checkout-stack">
           <span className="status-chip">Pro currently attached to ChatGPT</span>
           <Link className="button button-lime" href="/account">Create an account and move access</Link>

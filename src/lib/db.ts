@@ -1,9 +1,11 @@
 import "server-only";
 
 import type { KeyValueStore } from "@opencoredev/loginwithchatgpt-core";
-import { mkdirSync } from "node:fs";
+import { chmodSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+
+import { highestPlan, type PaidPlanId, type PlanId } from "@/lib/plans";
 
 let singleton: DatabaseSync | undefined;
 
@@ -16,8 +18,13 @@ export function getDatabase(): DatabaseSync {
 
   const path = databasePath();
   mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+  chmodSync(dirname(path), 0o700);
   singleton = new DatabaseSync(path);
   singleton.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
+  chmodSync(path, 0o600);
+  for (const suffix of ["-wal", "-shm"]) {
+    try { chmodSync(`${path}${suffix}`, 0o600); } catch { /* SQLite creates sidecars lazily. */ }
+  }
   singleton.exec(`
     CREATE TABLE IF NOT EXISTS kv_store (
       namespace TEXT NOT NULL,
@@ -72,7 +79,30 @@ export function getDatabase(): DatabaseSync {
       FOREIGN KEY (chatgpt_account_id) REFERENCES users(account_id) ON DELETE CASCADE,
       FOREIGN KEY (product_account_id) REFERENCES users(account_id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS provider_connections (
+      account_id TEXT NOT NULL,
+      provider_id TEXT NOT NULL,
+      encrypted_key TEXT NOT NULL,
+      key_hint TEXT NOT NULL,
+      configuration TEXT NOT NULL DEFAULT '{}',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (account_id, provider_id),
+      FOREIGN KEY (account_id) REFERENCES users(account_id) ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS method_progress (
+      account_id TEXT NOT NULL,
+      method_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (account_id, method_id),
+      FOREIGN KEY (account_id) REFERENCES users(account_id) ON DELETE CASCADE
+    );
   `);
+  const experimentColumns = singleton.prepare("PRAGMA table_info(experiments)").all() as { name: string }[];
+  if (!experimentColumns.some((column) => column.name === "provider_id")) {
+    singleton.exec("ALTER TABLE experiments ADD COLUMN provider_id TEXT NOT NULL DEFAULT 'chatgpt'");
+  }
   return singleton;
 }
 
@@ -135,11 +165,18 @@ export function hasEntitlement(accountId: string, key = "pro"): boolean {
   return row?.active === 1;
 }
 
+export function planForAccount(accountId: string): PlanId {
+  const rows = getDatabase()
+    .prepare("SELECT entitlement_key FROM entitlements WHERE account_id = ? AND active = 1")
+    .all(accountId) as { entitlement_key: string }[];
+  return highestPlan(rows.map((row) => row.entitlement_key));
+}
+
 export function grantEntitlement(input: {
   accountId: string;
   checkoutSessionId: string;
   paymentIntentId?: string;
-  key?: string;
+  key?: PaidPlanId;
 }): void {
   getDatabase()
     .prepare(`
@@ -197,22 +234,24 @@ export function saveExperiment(input: {
   accountId: string;
   strategyId: string;
   model: string;
+  providerId?: string;
   baseline: { input: number; output: number; total: number };
   optimized: { input: number; output: number; total: number };
 }): void {
   getDatabase()
     .prepare(`
       INSERT INTO experiments (
-        id, account_id, strategy_id, model,
+        id, account_id, strategy_id, model, provider_id,
         baseline_input, baseline_output, baseline_total,
         optimized_input, optimized_output, optimized_total, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .run(
       input.id,
       input.accountId,
       input.strategyId,
       input.model,
+      input.providerId ?? "chatgpt",
       input.baseline.input,
       input.baseline.output,
       input.baseline.total,
@@ -221,6 +260,121 @@ export function saveExperiment(input: {
       input.optimized.total,
       Date.now(),
     );
+}
+
+export type ProviderConnectionRecord = {
+  account_id: string;
+  provider_id: string;
+  encrypted_key: string;
+  key_hint: string;
+  configuration: string;
+  created_at: number;
+  updated_at: number;
+};
+
+export function listProviderConnectionRecords(accountId: string): ProviderConnectionRecord[] {
+  return getDatabase()
+    .prepare("SELECT * FROM provider_connections WHERE account_id = ? ORDER BY provider_id")
+    .all(accountId) as ProviderConnectionRecord[];
+}
+
+export function providerConnectionRecord(accountId: string, providerId: string): ProviderConnectionRecord | undefined {
+  return getDatabase()
+    .prepare("SELECT * FROM provider_connections WHERE account_id = ? AND provider_id = ?")
+    .get(accountId, providerId) as ProviderConnectionRecord | undefined;
+}
+
+export function saveProviderConnectionRecord(input: {
+  accountId: string;
+  providerId: string;
+  encryptedKey: string;
+  keyHint: string;
+  configuration?: Record<string, string>;
+}): void {
+  const now = Date.now();
+  getDatabase().prepare(`
+    INSERT INTO provider_connections (
+      account_id, provider_id, encrypted_key, key_hint, configuration, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(account_id, provider_id) DO UPDATE SET
+      encrypted_key = excluded.encrypted_key,
+      key_hint = excluded.key_hint,
+      configuration = excluded.configuration,
+      updated_at = excluded.updated_at
+  `).run(
+    input.accountId,
+    input.providerId,
+    input.encryptedKey,
+    input.keyHint,
+    JSON.stringify(input.configuration ?? {}),
+    now,
+    now,
+  );
+}
+
+export function deleteProviderConnectionRecord(accountId: string, providerId: string): boolean {
+  return getDatabase()
+    .prepare("DELETE FROM provider_connections WHERE account_id = ? AND provider_id = ?")
+    .run(accountId, providerId).changes === 1;
+}
+
+export type ExperimentSummary = {
+  id: string;
+  providerId: string;
+  model: string;
+  strategyId: string;
+  baselineTotal: number;
+  optimizedTotal: number;
+  tokenDelta: number;
+  createdAt: number;
+};
+
+export function experimentSummaries(accountId: string, limit = 100): ExperimentSummary[] {
+  const boundedLimit = Math.max(1, Math.min(1_000, Math.trunc(limit)));
+  const rows = getDatabase().prepare(`
+    SELECT id, provider_id, model, strategy_id, baseline_total, optimized_total, created_at
+    FROM experiments
+    WHERE account_id = ?
+    ORDER BY created_at DESC
+    LIMIT ?
+  `).all(accountId, boundedLimit) as Array<{
+    id: string;
+    provider_id: string;
+    model: string;
+    strategy_id: string;
+    baseline_total: number;
+    optimized_total: number;
+    created_at: number;
+  }>;
+  return rows.map((row) => ({
+    id: row.id,
+    providerId: row.provider_id,
+    model: row.model,
+    strategyId: row.strategy_id,
+    baselineTotal: row.baseline_total,
+    optimizedTotal: row.optimized_total,
+    tokenDelta: row.baseline_total - row.optimized_total,
+    createdAt: row.created_at,
+  }));
+}
+
+export function methodProgress(accountId: string): Record<string, string> {
+  const rows = getDatabase()
+    .prepare("SELECT method_id, status FROM method_progress WHERE account_id = ?")
+    .all(accountId) as { method_id: string; status: string }[];
+  return Object.fromEntries(rows.map((row) => [row.method_id, row.status]));
+}
+
+export function setMethodProgress(accountId: string, methodId: string, status: "planned" | "testing" | "adopted" | "dismissed" | "none"): void {
+  if (status === "none") {
+    getDatabase().prepare("DELETE FROM method_progress WHERE account_id = ? AND method_id = ?").run(accountId, methodId);
+    return;
+  }
+  getDatabase().prepare(`
+    INSERT INTO method_progress (account_id, method_id, status, updated_at)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(account_id, method_id) DO UPDATE SET status = excluded.status, updated_at = excluded.updated_at
+  `).run(accountId, methodId, status, Date.now());
 }
 
 export function linkChatGPTAccount(input: {
@@ -249,17 +403,31 @@ export function linkChatGPTAccount(input: {
       VALUES (?, ?, ?)
     `).run(input.chatgptAccountId, input.productAccountId, Date.now());
 
-    const legacyEntitlement = db
-      .prepare("SELECT 1 AS present FROM entitlements WHERE account_id = ? AND entitlement_key = 'pro' AND active = 1")
-      .get(input.chatgptAccountId) as { present: number } | undefined;
-    const productEntitlement = db
-      .prepare("SELECT 1 AS present FROM entitlements WHERE account_id = ? AND entitlement_key = 'pro' AND active = 1")
-      .get(input.productAccountId) as { present: number } | undefined;
-    if (legacyEntitlement && !productEntitlement) {
-      db.prepare("UPDATE entitlements SET account_id = ? WHERE account_id = ? AND entitlement_key = 'pro'")
-        .run(input.productAccountId, input.chatgptAccountId);
-      moved = true;
+    const legacyEntitlements = db
+      .prepare("SELECT entitlement_key FROM entitlements WHERE account_id = ? AND active = 1")
+      .all(input.chatgptAccountId) as { entitlement_key: string }[];
+    for (const entitlement of legacyEntitlements) {
+      const productEntitlement = db
+        .prepare("SELECT active FROM entitlements WHERE account_id = ? AND entitlement_key = ?")
+        .get(input.productAccountId, entitlement.entitlement_key) as { active: number } | undefined;
+      if (!productEntitlement) {
+        db.prepare("UPDATE entitlements SET account_id = ? WHERE account_id = ? AND entitlement_key = ?")
+          .run(input.productAccountId, input.chatgptAccountId, entitlement.entitlement_key);
+        moved = true;
+      } else if (productEntitlement.active === 0) {
+        db.prepare("DELETE FROM entitlements WHERE account_id = ? AND entitlement_key = ?")
+          .run(input.productAccountId, entitlement.entitlement_key);
+        db.prepare("UPDATE entitlements SET account_id = ? WHERE account_id = ? AND entitlement_key = ?")
+          .run(input.productAccountId, input.chatgptAccountId, entitlement.entitlement_key);
+        moved = true;
+      } else {
+        db.prepare("UPDATE entitlements SET active = 0, revoked_at = ? WHERE account_id = ? AND entitlement_key = ?")
+          .run(Date.now(), input.chatgptAccountId, entitlement.entitlement_key);
+        moved = true;
+      }
     }
+    db.prepare("UPDATE experiments SET account_id = ? WHERE account_id = ?")
+      .run(input.productAccountId, input.chatgptAccountId);
     db.exec("COMMIT");
   } catch (error) {
     db.exec("ROLLBACK");
