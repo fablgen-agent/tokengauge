@@ -8,7 +8,7 @@ import {
 } from "@opencoredev/loginwithchatgpt-server";
 
 import { SqliteKeyValueStore } from "@/lib/db";
-import { getLoginSecret } from "@/lib/env";
+import { getAppUrl, getLoginSecret } from "@/lib/env";
 
 let singleton: ChatGPTHandler | undefined;
 
@@ -18,6 +18,7 @@ export function getChatGPTHandler(): ChatGPTHandler {
   singleton = createChatGPTHandler({
     basePath: "/api/chatgpt",
     secret: getLoginSecret(),
+    allowedOrigins: [getAppUrl()],
     sessionStore: new SqliteKeyValueStore<StoredSession>("chatgpt-session"),
     sessionTtlMs: 7 * 24 * 60 * 60 * 1000,
     cookie: {
