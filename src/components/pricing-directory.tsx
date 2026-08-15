@@ -13,8 +13,8 @@ import {
 type ProviderFilter = "all" | ProviderId;
 type SortKey = "provider" | "input" | "cache" | "output";
 
-export function PricingDirectory() {
-  const [provider, setProvider] = useState<ProviderFilter>("all");
+export function PricingDirectory({ initialProvider = "all" }: { initialProvider?: ProviderFilter } = {}) {
+  const [provider, setProvider] = useState<ProviderFilter>(initialProvider);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("provider");
 

@@ -74,7 +74,7 @@ export default async function Home() {
               <div><dt>Rate cards</dt><dd>{modelPrices.length}</dd></div>
               <div><dt>Evidence cards</dt><dd>{tokenTips.length}</dd></div>
             </dl>
-            <div className="provider-list">{priceProviders.map((provider) => <span key={provider.id}>{provider.label}</span>)}</div>
+            <div className="provider-list">{priceProviders.map((provider) => <Link href={`/pricing/${provider.id}`} key={provider.id}>{provider.label}</Link>)}</div>
             <p>Rates link to the provider’s own page. Region, context tier, cache mode, and effective dates stay visible.</p>
           </aside>
         </section>
