@@ -28,8 +28,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "TokenGauge — Evidence-backed AI cost optimization",
     description,
-    openGraph: { title: "TokenGauge Launch 100", description },
-    twitter: { title: "TokenGauge Launch 100", description },
+    openGraph: {
+      title: "TokenGauge Launch 100",
+      description,
+      images: [{ url: "/images/tokengauge-launch-social.jpg", width: 1270, height: 760, alt: "TokenGauge model-cost measurement workbench" }],
+    },
+    twitter: { title: "TokenGauge Launch 100", description, images: ["/images/tokengauge-launch-social.jpg"] },
   };
 }
 
