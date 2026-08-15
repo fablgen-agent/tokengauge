@@ -9,20 +9,30 @@ import {
   formatUsd,
   getSelectableModelPrices,
   resolvePriceForInput,
+  type ProviderId,
 } from "@/lib/costs";
 
-const selectableModels = getSelectableModelPrices();
-const defaultModel = selectableModels.find((model) => model.modelId === "gpt-5.6-terra") ?? selectableModels[0];
-const groupedModels = Array.from(
-  selectableModels.reduce((groups, model) => {
-    const entries = groups.get(model.providerLabel) ?? [];
-    entries.push(model);
-    groups.set(model.providerLabel, entries);
-    return groups;
-  }, new Map<string, typeof selectableModels[number][]>()),
-);
+const allSelectableModels = getSelectableModelPrices();
+const allDefaultModel = allSelectableModels.find((model) => model.modelId === "gpt-5.6-terra") ?? allSelectableModels[0];
 
-export function CostCalculator() {
+export function CostCalculator({ providerId }: { providerId?: ProviderId } = {}) {
+  const selectableModels = useMemo(
+    () => providerId ? allSelectableModels.filter((model) => model.provider === providerId) : allSelectableModels,
+    [providerId],
+  );
+  const defaultModel = useMemo(
+    () => providerId ? selectableModels[0] : allDefaultModel,
+    [providerId, selectableModels],
+  );
+  const groupedModels = useMemo(
+    () => Array.from(selectableModels.reduce((groups, model) => {
+      const entries = groups.get(model.providerLabel) ?? [];
+      entries.push(model);
+      groups.set(model.providerLabel, entries);
+      return groups;
+    }, new Map<string, typeof selectableModels[number][]>())),
+    [selectableModels],
+  );
   const [priceId, setPriceId] = useState(defaultModel.id);
   const [calls, setCalls] = useState(10_000);
   const [inputTokens, setInputTokens] = useState(3_000);
@@ -47,7 +57,7 @@ export function CostCalculator() {
       outputTokens: optimizedOutput,
     });
     return { baseline, optimized, baselinePrice, optimizedPrice, error: undefined, ...calculateSavings(baseline, optimized) };
-  }, [calls, cachedShare, inputReduction, inputTokens, outputReduction, outputTokens, priceId]);
+  }, [calls, cachedShare, defaultModel, inputReduction, inputTokens, outputReduction, outputTokens, priceId, selectableModels]);
 
   return (
     <div className="calculator-shell">

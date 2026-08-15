@@ -21,6 +21,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 ## What is included
 
 - A 15 August 2026 pricing snapshot with 52 pricing cards across nine providers. Cards can represent model, context-tier, region, or effective-date variants; this is not a claim of 52 distinct models.
+- A crawlable pricing hub plus dedicated OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere workload calculators that preserve each provider's billing caveats and source links.
 - 120 evidence cards, including 12 open cards. These are catalogue entries and provider-specific profiles, not 120 distinct optimization methods.
 - A cost calculator for input, output, caching, and request-volume scenarios.
 - Login with ChatGPT via [`@opencoredev/loginwithchatgpt`](https://github.com/opencoredev/login-with-chatgpt).
