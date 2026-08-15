@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Evidence-backed AI token-cost strategies and a free scenario calculator.">
+  <title>TokenGauge — Free AI cost calculator</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="#top"><span>T</span>TokenGauge</a>
+    <nav><a href="#calculator">Calculator</a><a href="#library">Library</a><a class="pill" href="https://tokengauge.2a01-4f8-10a-cac--1-63.nip.io/">Open full app ↗</a></nav>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div><small>THE TOKEN ECONOMICS WORKBENCH</small><h1>Spend tokens on answers. <em>Not overhead.</em></h1><p>Evidence-backed strategies and honest scenario math for teams building with language models.</p><a class="button" href="#calculator">Calculate your waste</a></div>
+      <aside><small>ACCEPTED-ANSWER COST</small><strong>−37.4%</strong><i><b></b></i><span>Illustrative scenario—not a promise</span></aside>
+    </section>
+    <section class="metrics"><div><b>33</b><span>Documented strategies</span></div><div><b>3</b><span>Evidence grades</span></div><div><b>0</b><span>Prompts stored here</span></div></section>
+    <section class="section" id="calculator">
+      <small>FREE COST CALCULATOR</small><h2>Make the invisible line item visible.</h2>
+      <div class="calculator">
+        <form id="cost-form">
+          <label>Model<select id="model"><option value="sol">GPT-5.6 Sol</option><option value="terra" selected>GPT-5.6 Terra</option><option value="luna">GPT-5.6 Luna</option></select></label>
+          <label>Requests / month<input id="calls" type="number" min="1" value="10000"></label>
+          <label>Input tokens / request<input id="input" type="number" min="0" value="3000"></label>
+          <label>Output tokens / request<input id="output" type="number" min="0" value="500"></label>
+          <label class="range">Input reduction <output id="input-reduction-value">25%</output><input id="input-reduction" type="range" min="0" max="90" step="5" value="25"></label>
+          <label class="range">Output reduction <output id="output-reduction-value">20%</output><input id="output-reduction" type="range" min="0" max="90" step="5" value="20"></label>
+          <label class="range">Cache-read share <output id="cache-value">30%</output><input id="cache" type="range" min="0" max="90" step="5" value="30"></label>
+        </form>
+        <div class="result" aria-live="polite"><small>ESTIMATED MONTHLY API SPEND</small><div><span>Before<strong id="before">$150.00</strong></span><b>→</b><span>After<strong id="after">$101.06</strong></span></div><mark id="saving">Potential saving: $48.94 (32.6%)</mark><p>Scenario math only. Validate quality, retries, tools, and cache hits against real traffic.</p></div>
+      </div>
+      <p class="note">API price snapshot: 15 August 2026. ChatGPT plan usage is quota-based and is not an API invoice.</p>
+    </section>
+    <section class="section cream" id="library">
+      <small>THE OPEN LIBRARY</small><h2>Advice you can audit.</h2>
+      <div class="cards">
+        <article><span>Caching · Official fact</span><h3>Put stable prompt content first</h3><p>Place durable instructions, examples, tool schemas, and shared context before changing request data. Measure actual cache-read ratio.</p><a href="https://developers.openai.com/api/docs/guides/prompt-caching">Primary source ↗</a></article>
+        <article><span>Caching · Official fact</span><h3>Cross the threshold deliberately</h3><p>Measure the stable prefix separately. Do not assume a repeated but tiny instruction block qualifies for prompt caching.</p><a href="https://developers.openai.com/api/docs/guides/prompt-caching">Primary source ↗</a></article>
+        <article><span>Routing · Official fact</span><h3>Route by measured difficulty</h3><p>Test cheaper models against the same acceptance rubric and count retries or escalations in cost per accepted answer.</p><a href="https://developers.openai.com/api/docs/guides/model-selection">Primary source ↗</a></article>
+        <article><span>Reasoning · Official fact</span><h3>Lower effort one step at a time</h3><p>Compare one reasoning level lower on representative work. Track reasoning tokens, latency, and quality-pass rate together.</p><a href="https://developers.openai.com/api/docs/guides/latest-model">Primary source ↗</a></article>
+        <article><span>Output · Official fact</span><h3>Give responses an output ceiling</h3><p>Set task-appropriate limits and track truncation. A ceiling is not a saving if it causes another call.</p><a href="https://developers.openai.com/api/docs/guides/latest-model">Primary source ↗</a></article>
+        <article><span>Processing · Official fact</span><h3>Batch delay-tolerant work</h3><p>Move evaluations and enrichment off interactive paths when completion within 24 hours is acceptable.</p><a href="https://developers.openai.com/api/docs/guides/batch">Primary source ↗</a></article>
+      </div>
+      <div class="unlock"><div><h3>27 more sourced strategies</h3><p>The complete library and private A/B lab run in the full application.</p></div><a class="dark-button" href="https://tokengauge.2a01-4f8-10a-cac--1-63.nip.io/">Open TokenGauge ↗</a></div>
+    </section>
+  </main>
+  <footer><span class="brand"><span>T</span>TokenGauge</span><p>Independent software. Not affiliated with or endorsed by OpenAI. <a href="https://github.com/fablgen-agent/tokengauge">Source on GitHub</a>.</p></footer>
+  <script src="calculator.js"></script>
+</body>
+</html>
