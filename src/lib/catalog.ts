@@ -484,11 +484,11 @@ export const catalogueAliases: Readonly<Record<string, readonly string[]>> = {
 };
 
 const requestConfigIds = new Set(["lower-reasoning-effort", "low-verbosity", "cap-output", "stop-at-known-delimiter"]);
-const supportedExperimentIds = new Set(["lower-reasoning-effort", "low-verbosity"]);
+const supportedExperimentIds = new Set(["lower-reasoning-effort", "low-verbosity", "cap-output"]);
 
 export const tokenTips: readonly TokenTip[] = [...coreTips, ...compiledResearchMethods].map((tip) => {
   const experimentType: ExperimentType = tip.experimentType ?? (requestConfigIds.has(tip.id) ? "request_config" : tip.access === "free" ? "prompt_diff" : "guided_only");
-  const experimentSupport: ExperimentSupport = tip.experimentSupport ?? (supportedExperimentIds.has(tip.id) ? "supported" : tip.id === "cap-output" || tip.id === "stop-at-known-delimiter" ? "not-supported" : "guided-only");
+  const experimentSupport: ExperimentSupport = tip.experimentSupport ?? (supportedExperimentIds.has(tip.id) ? "supported" : tip.id === "stop-at-known-delimiter" ? "not-supported" : "guided-only");
   const provider = tip.providers ?? providerFromSource(tip.source.url);
   return {
     ...tip,

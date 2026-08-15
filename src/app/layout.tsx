@@ -20,6 +20,22 @@ export const metadata: Metadata = {
     template: "%s · TokenGauge",
   },
   description: "Measure token costs, test optimization strategies, and pay for fewer wasted model calls.",
+  applicationName: "TokenGauge",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "TokenGauge",
+    title: "TokenGauge — Evidence-backed AI cost optimization",
+    description: "Compare official model rates, test token-saving methods, and measure paired experiments without storing prompts or outputs.",
+    images: [{ url: "/images/tokengauge-launch-social.jpg", width: 1270, height: 760, alt: "TokenGauge model-cost measurement workbench" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TokenGauge — Measure AI cost changes",
+    description: "Official rate cards, evidence-backed methods, and controlled multi-provider A/B tests.",
+    images: ["/images/tokengauge-launch-social.jpg"],
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,6 +1,6 @@
 # TokenGauge
 
-TokenGauge is an evidence-backed LLM cost-intelligence workbench. The maintained application combines a dated API-rate directory, an auditable evidence catalogue, a scenario calculator, and a private A/B lab that uses a customer’s own ChatGPT plan.
+TokenGauge is an evidence-backed LLM cost-intelligence workbench. The maintained application combines a dated API-rate directory, an auditable evidence catalogue, a scenario calculator, a measured-savings dashboard, and a private A/B lab that uses a customer’s own ChatGPT plan or encrypted provider connections.
 
 - Primary live application: <https://tokengauge.enby.fish/>
 - Lightweight GitHub Pages mirror: <https://fablgen-agent.github.io/tokengauge/>
@@ -15,6 +15,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 - Supported lab recipes are labelled individually. Other catalogue cards provide guided protocols rather than pretending to have an automated adapter.
 - Lab prompts and outputs pass through the server but are never stored; only token metrics are retained.
 - ChatGPT credentials stay encrypted in the server-side session store and raw-token export is disabled.
+- User-supplied API keys are encrypted per account with AES-256-GCM, never returned after storage, and used only for user-initiated lab requests.
 - Stripe billing identity is an HMAC-derived opaque identifier, separate from the ChatGPT account ID.
 
 ## What is included
@@ -23,9 +24,14 @@ The project is independent software and is not affiliated with or endorsed by Op
 - 120 evidence cards, including 12 open cards. These are catalogue entries and provider-specific profiles, not 120 distinct optimization methods.
 - A cost calculator for input, output, caching, and request-volume scenarios.
 - Login with ChatGPT via [`@opencoredev/loginwithchatgpt`](https://github.com/opencoredev/login-with-chatgpt).
+- Verified-email accounts with password recovery, authenticator-app 2FA, recovery codes, session controls, and separate ChatGPT linking.
+- ChatGPT can also be the primary TokenGauge sign-in, so a separate product password is optional. A previously linked ChatGPT identity resolves to the same underlying owner account.
 - Randomized paired A/B experiments for recipes explicitly marked as supported; other cards include guided measurement protocols.
+- Pro includes encrypted API connections for OpenAI, Anthropic, Gemini, xAI, DeepSeek, Kimi, Qwen, Mistral, and Cohere. Higher tiers expand experiment history and export depth rather than gating providers.
+- A dashboard that reports paired-test token deltas—not production savings or invoice totals—and an optional method-status queue.
 - Connecting ChatGPT does not itself charge the user. Lab requests use the connected plan and count against that plan’s limits.
-- £9 one-time Pro payment for hosted, maintained catalogue access while the service remains available; it is not a subscription and includes no API credits.
+- One-time Pro (£9), Pro+ (£19), and Ultimate (£39) access. Existing paid tiers are credited during upgrades. No tier includes API credits.
+- The first 100 authenticated identities receive persistent launch pricing of £5 Pro, £15 Pro+, or £20 Ultimate. Allocation is transactional and belongs to the identity rather than an abandoned Checkout Session.
 - Stripe Checkout with signed, idempotent webhook fulfilment and refund revocation.
 - Durable SQLite sessions, rate counters, users, entitlements, webhook events, and token-only experiment records.
 - A no-backend GitHub Pages mirror that summarizes the current public data surface and directs users to the maintained live application.
@@ -46,7 +52,15 @@ LWC_SECRET=a-stable-random-secret-at-least-32-characters
 STRIPE_MODE=test
 STRIPE_TEST_API_KEY=sk_test_...
 STRIPE_TEST_PRICE_ID=price_...
+STRIPE_TEST_PRO_PLUS_PRICE_ID=price_...
+STRIPE_TEST_ULTIMATE_PRICE_ID=price_...
 STRIPE_TEST_WEBHOOK_SECRET=whsec_...
+AUTH_SMTP_HOST=smtp.example
+AUTH_SMTP_PORT=587
+AUTH_SMTP_SECURE=false
+AUTH_SMTP_USER=accounts@example
+AUTH_SMTP_PASS=dedicated-smtp-token
+AUTH_EMAIL_FROM="TokenGauge <accounts@example>"
 APP_URL=https://your-host.example
 ```
 

@@ -1,4 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 import { AccountPanel } from "@/components/account-panel";
 import { CostCalculator } from "@/components/calculator";
@@ -7,12 +10,53 @@ import { SiteHeader } from "@/components/site-header";
 import { TipCard } from "@/components/tip-card";
 import { evidenceLabels, proTips, publicTips, tokenTips } from "@/lib/catalog";
 import { modelPrices, priceProviders, priceSnapshotDate } from "@/lib/costs";
+import { launchOfferStatus } from "@/lib/db";
+import { getOwnerAccountContext } from "@/lib/access";
+import { launchPricesGbp, paidPlans } from "@/lib/plans";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const request = new Request("http://tokengauge.internal/", { headers: await headers() });
+  const owner = await getOwnerAccountContext(request);
+  const offer = launchOfferStatus(owner?.accountId);
+  const description = offer.eligible
+    ? "Your Launch 100 account can get Pro £5, Pro+ £15, or Ultimate £20."
+    : offer.remaining > 0
+      ? `Launch 100: Pro £5, Pro+ £15, or Ultimate £20 for the first 100 authenticated accounts. ${offer.remaining} places currently remain.`
+    : "Compare official model rates, test token-saving methods, and measure paired experiments without storing prompts or outputs.";
+  return {
+    title: "TokenGauge — Evidence-backed AI cost optimization",
+    description,
+    openGraph: {
+      title: "TokenGauge Launch 100",
+      description,
+      images: [{ url: "/images/tokengauge-launch-social.jpg", width: 1270, height: 760, alt: "TokenGauge model-cost measurement workbench" }],
+    },
+    twitter: { title: "TokenGauge Launch 100", description, images: ["/images/tokengauge-launch-social.jpg"] },
+  };
+}
+
+export default async function Home() {
+  const request = new Request("http://tokengauge.internal/", { headers: await headers() });
+  const owner = await getOwnerAccountContext(request);
+  const launchOffer = launchOfferStatus(owner?.accountId);
+  const launchActive = launchOffer.eligible || launchOffer.remaining > 0;
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "TokenGauge",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: "Official AI model rate cards, evidence-backed token-saving methods, and controlled multi-provider A/B experiments.",
+    offers: paidPlans.map((plan) => ({ "@type": "Offer", name: `TokenGauge ${plan.name}`, price: launchActive ? launchPricesGbp[plan.id] : plan.priceGbp, priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://tokengauge.enby.fish/#pricing" })),
+  };
   return (
-    <div className="page-shell">
+    <div className={`page-shell ${launchActive ? "has-launch" : ""}`}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <SiteHeader />
       <main>
+        {launchActive ? <aside className="launch-banner" aria-label="Launch offer"><strong>LAUNCH 100</strong><span>First 100 authenticated accounts: Pro £5 · Pro+ £15 · Ultimate £20</span><span>{launchOffer.eligible ? `Signup ${launchOffer.ordinal} price secured` : `${launchOffer.remaining} places remain`}</span><Link href={launchOffer.eligible ? "/#pricing" : "/account"}>{launchOffer.eligible ? "Use your launch price" : "Secure your account price"} <span aria-hidden="true">→</span></Link></aside> : null}
         <section className="hero section-pad">
           <div className="hero-copy">
             <span className="eyebrow eyebrow-lime">LLM COST INTELLIGENCE</span>
@@ -69,6 +113,7 @@ export default function Home() {
 
         <section className="section-pad section-block method-section">
           <div className="section-heading"><span className="eyebrow">EXPERIMENT STANDARD</span><h2>A cheaper answer only wins<br />when it still works.</h2></div>
+          <figure className="method-visual"><Image src="/images/token-flow-workbench.webp" alt="Abstract token tiles moving through a calibrated gauge and emerging as a smaller organized set" width={1536} height={1024} sizes="(max-width: 620px) 100vw, 1240px" /></figure>
           <ol className="method-grid">
             <li><span>01</span><h3>Declare quality</h3><p>Set the acceptance rubric and allowed regression before looking at the outputs.</p></li>
             <li><span>02</span><h3>Pair the trials</h3><p>Run the same inputs through baseline and candidate, recording exact model and cache state.</p></li>
@@ -77,26 +122,21 @@ export default function Home() {
           </ol>
         </section>
 
-        <section id="pricing" className="section-pad section-block pricing-section">
+        <section id="pricing" className="section-pad section-block pricing-section pricing-tiers-section">
           <div className="pricing-copy">
-            <span className="eyebrow eyebrow-lime">ONE-TIME PRO ACCESS</span><h2>The complete operating manual.</h2>
-            <p>Unlock the full maintained catalogue with one payment. The public rate directory, free methods, and supported A/B recipes stay free.</p>
+            <span className="eyebrow eyebrow-lime">ONE-TIME ACCESS</span><h2>Choose the workbench you will actually use.</h2>
+            <p>Pro includes the evidence library and every encrypted bring-your-own-key adapter. Higher tiers expand dashboard and export depth instead of withholding providers.</p>
             <ul>
-              <li>All {tokenTips.length} evidence cards</li><li>Provider profiles across nine rate sources</li>
-              <li>Usage retained; prompts and outputs discarded</li><li>14-day refund policy; statutory rights unaffected</li>
+              <li>The public rate directory and free methods remain open</li><li>API credits are never bundled or resold</li>
+              <li>Usage totals retained; prompts and outputs discarded</li><li>14-day refund policy; statutory rights unaffected</li>
             </ul>
           </div>
-          <div className="price-card">
-            <div><span>Pro access</span><strong><sup>£</sup>9</strong><small>one time · no subscription</small></div>
-            <ol className="checkout-flow"><li>Connect ChatGPT—no charge</li><li>Review the £9 Stripe checkout</li><li>Receive Pro access</li></ol>
-            <AccountPanel />
-            <p>No API credits included. Lab requests use your connected ChatGPT plan and count against its limits. Savings are not guaranteed.</p>
-          </div>
+          <div className="pricing-tier-grid">{paidPlans.map((plan) => { const shownPrice = launchActive ? launchPricesGbp[plan.id] : plan.priceGbp; return <article className={`price-card price-card-${plan.id}`} key={plan.id}><div><span>{plan.name} access</span><strong><sup>£</sup>{shownPrice}</strong><small>{launchActive ? <><s>£{plan.priceGbp}</s> · launch signup price</> : <>one time · no subscription</>}</small></div><p>{plan.summary}</p><ul>{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><AccountPanel targetPlan={plan.id} /><p>No API credits included. Provider requests use your own connection and billing. Savings are not guaranteed.</p></article>; })}</div>
         </section>
       </main>
       <footer className="site-footer section-pad">
         <div><span className="brand"><span className="brand-mark">T</span>TokenGauge</span><p>Measure the cost. Preserve the answer.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link></nav>
+        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link><Link href="/dashboard">Dashboard</Link><Link href="/settings">Settings</Link></nav>
         <p>Independent software. Not affiliated with or endorsed by any listed model provider.</p>
       </footer>
     </div>
