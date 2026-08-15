@@ -18,7 +18,8 @@ export default async function DashboardPage() {
   const account = await getProductAccountContext(request);
   if (!account) return <div className="subpage"><SiteHeader /><main><section className="subpage-hero section-pad"><span className="eyebrow eyebrow-lime">DASHBOARD</span><h1>Your measured workbench.</h1><p>Sign in to keep experiment totals and an optional method queue under your TokenGauge identity.</p></section><section className="gate-card"><AccountPanel /></section></main></div>;
 
-  const experiments = experimentSummaries(account.accountId, account.accessPlan === "ultimate" ? 1_000 : 100);
+  const experimentLimit = account.accessPlan === "ultimate" ? 1_000 : planAtLeast(account.accessPlan, "pro_plus") ? 250 : 100;
+  const experiments = experimentSummaries(account.accountId, experimentLimit);
   const progress = methodProgress(account.accountId);
   const baselineTokens = experiments.reduce((total, experiment) => total + experiment.baselineTotal, 0);
   const candidateTokens = experiments.reduce((total, experiment) => total + experiment.optimizedTotal, 0);

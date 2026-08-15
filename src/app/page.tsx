@@ -93,7 +93,7 @@ export default function Home() {
         <section id="pricing" className="section-pad section-block pricing-section pricing-tiers-section">
           <div className="pricing-copy">
             <span className="eyebrow eyebrow-lime">ONE-TIME ACCESS</span><h2>Choose the workbench you will actually use.</h2>
-            <p>Start with the evidence library, add an encrypted bring-your-own-key lab, or unlock every supported provider adapter. These are one-time purchases, not subscriptions.</p>
+            <p>Pro includes the evidence library and every encrypted bring-your-own-key adapter. Higher tiers expand dashboard and export depth instead of withholding providers.</p>
             <ul>
               <li>The public rate directory and free methods remain open</li><li>API credits are never bundled or resold</li>
               <li>Usage totals retained; prompts and outputs discarded</li><li>14-day refund policy; statutory rights unaffected</li>

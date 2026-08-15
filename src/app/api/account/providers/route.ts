@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireProductAccount } from "@/lib/access";
 import { deleteProviderCredential, listProviderCredentials, saveProviderCredential } from "@/lib/provider-vault";
 import { isProviderId, providerConfiguration, providerDefinition, providerDefinitions } from "@/lib/providers";
-import { planAtLeast } from "@/lib/plans";
+import { planAtLeast, planDefinition } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export async function PUT(request: Request): Promise<Response> {
     const input = mutationSchema.parse(await request.json());
     const provider = providerDefinition(input.providerId);
     if (!planAtLeast(account.accessPlan, provider.minimumPlan)) {
-      return Response.json({ error: `${provider.label} requires ${provider.minimumPlan === "ultimate" ? "Ultimate" : "Pro+"}.` }, { status: 403 });
+      return Response.json({ error: `${provider.label} requires ${planDefinition(provider.minimumPlan).name}.` }, { status: 403 });
     }
     saveProviderCredential({
       accountId: account.accountId,

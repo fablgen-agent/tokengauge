@@ -10,7 +10,7 @@ import { saveExperiment } from "@/lib/db";
 import { getProviderCredential } from "@/lib/provider-vault";
 import { providerStrategyIds, runProviderText, type LabUsage } from "@/lib/provider-runner";
 import { isProviderId, providerDefinition, type ProviderId } from "@/lib/providers";
-import { planAtLeast } from "@/lib/plans";
+import { planAtLeast, planDefinition } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -102,7 +102,7 @@ export async function POST(request: Request): Promise<Response> {
       account = await requireProductAccount(request);
       const definition = providerDefinition(providerId);
       if (!planAtLeast(account.accessPlan, definition.minimumPlan)) {
-        return Response.json({ error: `${definition.label} requires ${definition.minimumPlan === "ultimate" ? "Ultimate" : "Pro+"}.` }, { status: 403 });
+        return Response.json({ error: `${definition.label} requires ${planDefinition(definition.minimumPlan).name}.` }, { status: 403 });
       }
       if (!definition.models.includes(input.model)) {
         return Response.json({ error: "That model is not supported by this adapter." }, { status: 400 });

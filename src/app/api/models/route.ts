@@ -3,7 +3,7 @@ import { getChatGPTHandler } from "@/lib/chatgpt";
 import { getProviderCredential } from "@/lib/provider-vault";
 import { providerStrategyIds } from "@/lib/provider-runner";
 import { isProviderId, providerDefinition } from "@/lib/providers";
-import { planAtLeast } from "@/lib/plans";
+import { planAtLeast, planDefinition } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export async function GET(request: Request): Promise<Response> {
     const account = await requireProductAccount(request);
     const definition = providerDefinition(providerId);
     if (!planAtLeast(account.accessPlan, definition.minimumPlan)) {
-      return Response.json({ error: `${definition.label} requires ${definition.minimumPlan === "ultimate" ? "Ultimate" : "Pro+"}.` }, { status: 403 });
+      return Response.json({ error: `${definition.label} requires ${planDefinition(definition.minimumPlan).name}.` }, { status: 403 });
     }
     if (!getProviderCredential(account.accountId, providerId)) {
       return Response.json({ error: `Connect ${definition.label} in Settings first.` }, { status: 409 });

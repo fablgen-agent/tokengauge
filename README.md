@@ -26,7 +26,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 - Login with ChatGPT via [`@opencoredev/loginwithchatgpt`](https://github.com/opencoredev/login-with-chatgpt).
 - Verified-email accounts with password recovery, authenticator-app 2FA, recovery codes, session controls, and separate ChatGPT linking.
 - Randomized paired A/B experiments for recipes explicitly marked as supported; other cards include guided measurement protocols.
-- Optional encrypted API connections for OpenAI, Anthropic, Gemini, xAI, DeepSeek, Kimi, Qwen, Mistral, and Cohere, gated by the displayed plan.
+- Pro includes encrypted API connections for OpenAI, Anthropic, Gemini, xAI, DeepSeek, Kimi, Qwen, Mistral, and Cohere. Higher tiers expand experiment history and export depth rather than gating providers.
 - A dashboard that reports paired-test token deltas—not production savings or invoice totals—and an optional method-status queue.
 - Connecting ChatGPT does not itself charge the user. Lab requests use the connected plan and count against that plan’s limits.
 - One-time Pro (£9), Pro+ (£19), and Ultimate (£39) access. Existing paid tiers are credited during upgrades. No tier includes API credits.

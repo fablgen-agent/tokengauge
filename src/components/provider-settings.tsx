@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import type { PlanId } from "@/lib/plans";
+
 type ProviderView = {
   id: string;
   label: string;
-  minimumPlan: "pro_plus" | "ultimate";
+  minimumPlan: PlanId;
   keyUrl: string;
   allowed: boolean;
   connection?: { keyHint: string; configuration: Record<string, string>; updatedAt: number };
@@ -105,7 +107,7 @@ export function ProviderSettings() {
         {data?.providers.map((provider) => (
           <article className={`provider-setting-card ${provider.connection ? "connected" : ""}`} key={provider.id}>
             <div className="provider-setting-heading">
-              <div><h3>{provider.label}</h3><span>{provider.minimumPlan === "ultimate" ? "Ultimate" : "Pro+"}</span></div>
+              <div><h3>{provider.label}</h3><span>Included with Pro</span></div>
               {provider.connection ? <strong>Connected · ••••{provider.connection.keyHint}</strong> : <strong>Not connected</strong>}
             </div>
             {provider.allowed ? (
@@ -127,7 +129,7 @@ export function ProviderSettings() {
                 </div>
               </form>
             ) : (
-              <div className="provider-upgrade"><p>Upgrade to {provider.minimumPlan === "ultimate" ? "Ultimate" : "Pro+"} to use this adapter.</p><Link className="button button-dark" href="/#pricing">Compare plans</Link></div>
+              <div className="provider-upgrade"><p>Pro includes every supported provider adapter. API usage is still billed by the provider.</p><Link className="button button-dark" href="/#pricing">Get Pro</Link></div>
             )}
           </article>
         ))}
