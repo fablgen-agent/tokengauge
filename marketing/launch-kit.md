@@ -28,17 +28,33 @@ Independence disclosure:
 
 - Wide social/gallery image: `public/images/tokengauge-launch-social.jpg` (1270×760)
 - Square thumbnail: `public/images/tokengauge-launch-square.jpg` (800×800)
+- Pricing-hub product screenshot: `marketing/product-hunt/01-pricing-hub.jpg` (1270×760)
+- Workload-calculator product screenshot: `marketing/product-hunt/02-workload-calculator.jpg` (1270×760)
 - Text-free source artwork: `public/images/tokengauge-launch-art.png` (1672×941)
 
 The artwork was generated for TokenGauge and then composed with deterministic brand typography. It contains no provider logos or third-party marks.
 
-## Suggested categories
+Suggested Product Hunt gallery order:
 
-- AI infrastructure
-- Developer tools
-- LLMs
-- Prompt engineering
-- Cost optimization
+1. `public/images/tokengauge-launch-social.jpg` — product promise and visual identity
+2. `marketing/product-hunt/01-pricing-hub.jpg` — live nine-provider pricing discovery surface
+3. `marketing/product-hunt/02-workload-calculator.jpg` — real workload inputs, dated rate resolution, and quality-validation path
+4. `public/images/token-flow-workbench.webp` — evidence and token-flow concept
+5. `public/images/account-security-workbench.webp` — account and encrypted provider-connection concept
+
+## Product Hunt fields
+
+Pricing tag: Paid (with a free plan)
+
+Launch tags — choose the closest three current options:
+
+- Artificial Intelligence
+- Developer Tools
+- SaaS
+
+Promo: use the Launch 100 copy above; do not invent a separate coupon or scarcity count. The live page supplies the current remaining-place count.
+
+Submission boundary: Product Hunt's current rules require a real personal account that is at least one week old. Company or bot accounts cannot post. Ask people for feedback, never for upvotes.
 
 ## Claims boundary
 
