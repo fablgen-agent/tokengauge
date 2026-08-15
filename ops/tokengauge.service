@@ -12,6 +12,7 @@ EnvironmentFile=/home/admin/.env
 EnvironmentFile=/home/admin/.config/tokengauge/runtime.env
 EnvironmentFile=/home/admin/.config/tokengauge/secret.env
 EnvironmentFile=/home/admin/.config/tokengauge/stripe-webhook.env
+EnvironmentFile=/home/admin/.config/tokengauge/stripe-live-webhook.env
 ExecStart=/opt/node-v24.19.0/bin/node /home/admin/tokengauge/.next/standalone/server.js
 Restart=on-failure
 RestartSec=5

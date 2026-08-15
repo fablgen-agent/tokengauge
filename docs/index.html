@@ -3,52 +3,105 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Evidence-backed AI token-cost strategies and a free scenario calculator.">
-  <title>TokenGauge — Free AI cost calculator</title>
+  <meta name="description" content="A read-only overview of TokenGauge's dated LLM pricing snapshot, evidence catalogue, and quality-gated cost workflow.">
+  <title>TokenGauge — public data mirror</title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <a class="brand" href="#top"><span>T</span>TokenGauge</a>
-    <nav><a href="#calculator">Calculator</a><a href="#library">Library</a><a class="pill" href="https://tokengauge.enby.fish/">Open full app ↗</a></nav>
+  <header class="site-header">
+    <a class="brand" href="#top"><span aria-hidden="true">T</span>TokenGauge</a>
+    <nav aria-label="Primary navigation">
+      <a href="#snapshot">Snapshot</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#access">Access</a>
+      <a class="header-link" href="https://tokengauge.enby.fish/">Open live app <span aria-hidden="true">↗</span></a>
+    </nav>
   </header>
   <main id="top">
-    <section class="hero">
-      <div><small>THE TOKEN ECONOMICS WORKBENCH</small><h1>Spend tokens on answers. <em>Not overhead.</em></h1><p>Evidence-backed strategies and honest scenario math for teams building with language models.</p><a class="button" href="#calculator">Calculate your waste</a></div>
-      <aside><small>ACCEPTED-ANSWER COST</small><strong>−37.4%</strong><i><b></b></i><span>Illustrative scenario—not a promise</span></aside>
-    </section>
-    <section class="metrics"><div><b>33</b><span>Documented strategies</span></div><div><b>3</b><span>Evidence grades</span></div><div><b>0</b><span>Prompts stored here</span></div></section>
-    <section class="section" id="calculator">
-      <small>FREE COST CALCULATOR</small><h2>Make the invisible line item visible.</h2>
-      <div class="calculator">
-        <form id="cost-form">
-          <label>Model<select id="model"><option value="sol">GPT-5.6 Sol</option><option value="terra" selected>GPT-5.6 Terra</option><option value="luna">GPT-5.6 Luna</option></select></label>
-          <label>Requests / month<input id="calls" type="number" min="1" value="10000"></label>
-          <label>Input tokens / request<input id="input" type="number" min="0" value="3000"></label>
-          <label>Output tokens / request<input id="output" type="number" min="0" value="500"></label>
-          <label class="range">Input reduction <output id="input-reduction-value">25%</output><input id="input-reduction" type="range" min="0" max="90" step="5" value="25"></label>
-          <label class="range">Output reduction <output id="output-reduction-value">20%</output><input id="output-reduction" type="range" min="0" max="90" step="5" value="20"></label>
-          <label class="range">Cache-read share <output id="cache-value">30%</output><input id="cache" type="range" min="0" max="90" step="5" value="30"></label>
-        </form>
-        <div class="result" aria-live="polite"><small>ESTIMATED MONTHLY API SPEND</small><div><span>Before<strong id="before">$150.00</strong></span><b>→</b><span>After<strong id="after">$101.06</strong></span></div><mark id="saving">Potential saving: $48.94 (32.6%)</mark><p>Scenario math only. Validate quality, retries, tools, and cache hits against real traffic.</p></div>
+    <section class="hero page-width">
+      <div class="hero-copy">
+        <span class="eyebrow">PUBLIC DATA MIRROR · VERIFIED 15 AUGUST 2026</span>
+        <h1>A clearer ledger for LLM cost decisions.</h1>
+        <p>TokenGauge keeps provider pricing, evidence strength, and experiment limits visible. This static page is a read-only overview; calculations, source filtering, and account features live in the maintained application.</p>
+        <div class="actions">
+          <a class="button" href="https://tokengauge.enby.fish/">Open the maintained app <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="#snapshot">Review the snapshot <span aria-hidden="true">↓</span></a>
+        </div>
       </div>
-      <p class="note">API price snapshot: 15 August 2026. ChatGPT plan usage is quota-based and is not an API invoice.</p>
+      <aside class="ledger" aria-label="Current data coverage">
+        <div class="ledger-heading"><span>Coverage ledger</span><strong>Current snapshot</strong></div>
+        <dl>
+          <div><dt>Provider sources</dt><dd>9</dd></div>
+          <div><dt>Pricing cards</dt><dd>52</dd></div>
+          <div><dt>Evidence cards</dt><dd>120</dd></div>
+          <div><dt>Open evidence cards</dt><dd>12</dd></div>
+        </dl>
+        <p>Cards include model tiers, regional variants, and provider-specific profiles. They are not counts of distinct models or methods.</p>
+      </aside>
     </section>
-    <section class="section cream" id="library">
-      <small>THE OPEN LIBRARY</small><h2>Advice you can audit.</h2>
-      <div class="cards">
-        <article><span>Caching · Official fact</span><h3>Put stable prompt content first</h3><p>Place durable instructions, examples, tool schemas, and shared context before changing request data. Measure actual cache-read ratio.</p><a href="https://developers.openai.com/api/docs/guides/prompt-caching">Primary source ↗</a></article>
-        <article><span>Caching · Official fact</span><h3>Cross the threshold deliberately</h3><p>Measure the stable prefix separately. Do not assume a repeated but tiny instruction block qualifies for prompt caching.</p><a href="https://developers.openai.com/api/docs/guides/prompt-caching">Primary source ↗</a></article>
-        <article><span>Routing · Official fact</span><h3>Route by measured difficulty</h3><p>Test cheaper models against the same acceptance rubric and count retries or escalations in cost per accepted answer.</p><a href="https://developers.openai.com/api/docs/guides/model-selection">Primary source ↗</a></article>
-        <article><span>Reasoning · Official fact</span><h3>Lower effort one step at a time</h3><p>Compare one reasoning level lower on representative work. Track reasoning tokens, latency, and quality-pass rate together.</p><a href="https://developers.openai.com/api/docs/guides/latest-model">Primary source ↗</a></article>
-        <article><span>Output · Official fact</span><h3>Give responses an output ceiling</h3><p>Set task-appropriate limits and track truncation. A ceiling is not a saving if it causes another call.</p><a href="https://developers.openai.com/api/docs/guides/latest-model">Primary source ↗</a></article>
-        <article><span>Processing · Official fact</span><h3>Batch delay-tolerant work</h3><p>Move evaluations and enrichment off interactive paths when completion within 24 hours is acceptable.</p><a href="https://developers.openai.com/api/docs/guides/batch">Primary source ↗</a></article>
+    <section class="section page-width" id="snapshot">
+      <div class="section-heading">
+        <span class="eyebrow">PRICING SNAPSHOT</span>
+        <h2>Nine sources, kept separate.</h2>
+        <p>The current live directory contains 52 pricing cards across nine provider families. A card may represent a context band, region, cache mode, or effective-date variant—not a distinct model.</p>
       </div>
-      <div class="unlock"><div><h3>27 more sourced strategies</h3><p>The complete library and private A/B lab run in the full application.</p></div><a class="dark-button" href="https://tokengauge.enby.fish/">Open TokenGauge ↗</a></div>
+      <ul class="provider-grid" aria-label="Pricing providers">
+        <li><span>01</span>OpenAI</li>
+        <li><span>02</span>Anthropic</li>
+        <li><span>03</span>Google Gemini</li>
+        <li><span>04</span>xAI Grok</li>
+        <li><span>05</span>DeepSeek</li>
+        <li><span>06</span>Kimi</li>
+        <li><span>07</span>Qwen</li>
+        <li><span>08</span>Mistral</li>
+        <li><span>09</span>Cohere</li>
+      </ul>
+      <div class="annotation">
+        <span>Snapshot discipline</span>
+        <p>Rates are dated and source-linked. Provider-specific context thresholds, regions, cache modes, effective dates, tool fees, and storage charges are not flattened into a universal comparison.</p>
+        <a href="https://tokengauge.enby.fish/#rates">Inspect the live rate directory <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+    <section class="section section-tint" id="evidence">
+      <div class="page-width">
+        <div class="section-heading split-heading">
+          <div><span class="eyebrow">EVIDENCE CATALOGUE</span><h2>Cards are evidence units, not inflated method claims.</h2></div>
+          <p>The maintained catalogue contains 120 evidence cards, including 12 open cards. Provider-specific profiles and related protocols can describe the same broader intervention, so TokenGauge does not call these 120 distinct methods.</p>
+        </div>
+        <div class="evidence-grid">
+          <article><span>01 · Official observation</span><h3>Start with the primary source.</h3><p>Provider mechanics and pricing claims link to the provider’s own documentation and remain scoped to the relevant model or API.</p></article>
+          <article><span>02 · Derived analysis</span><h3>Show the calculation.</h3><p>Break-even math and comparisons are labelled as analysis, not repackaged as provider promises.</p></article>
+          <article><span>03 · Test protocol</span><h3>Measure accepted-answer cost.</h3><p>Supported lab recipes are labelled individually. Other cards remain guided protocols until a real adapter exists.</p></article>
+        </div>
+        <div class="quality-rule"><strong>No guaranteed savings.</strong><p>A smaller token count only wins if quality, retries, fallbacks, tools, latency, and rejected answers still produce a lower cost per accepted result.</p></div>
+      </div>
+    </section>
+    <section class="section page-width" id="access">
+      <div class="section-heading"><span class="eyebrow">HOSTED ACCESS</span><h2>The public data stays useful. Pro stays simple.</h2></div>
+      <div class="access-grid">
+        <article>
+          <span class="tier-label">Open access</span>
+          <h3>Public rate directory and 12 open evidence cards</h3>
+          <p>Browse the current snapshot and open catalogue in the live app. Supported A/B recipes are identified individually and remain available after connection.</p>
+          <a class="text-link" href="https://tokengauge.enby.fish/">Go to the live application <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="pro-card">
+          <span class="tier-label">Pro access</span>
+          <div class="price"><strong><sup>£</sup>9</strong><span>one time<br>no subscription</span></div>
+          <p>One payment provides hosted, maintained access to the full evidence catalogue while the service remains available. No API credits or consumer-plan allowance are included.</p>
+          <a class="button button-dark" href="https://tokengauge.enby.fish/#pricing">Review Pro access <span aria-hidden="true">↗</span></a>
+        </article>
+      </div>
+      <div class="connection-note"><strong>Connecting ChatGPT does not itself charge you.</strong><p>Connection enables the supported lab and account-linked access. Lab requests use your connected ChatGPT plan and count against that plan’s limits; Stripe checkout is a separate step.</p></div>
     </section>
   </main>
-  <footer><span class="brand"><span>T</span>TokenGauge</span><p>Independent software. Not affiliated with or endorsed by OpenAI. <a href="https://github.com/fablgen-agent/tokengauge">Source on GitHub</a>.</p></footer>
-  <script src="calculator.js"></script>
+  <footer class="site-footer">
+    <div class="page-width footer-inner">
+      <div><span class="brand"><span aria-hidden="true">T</span>TokenGauge</span><p>Measure the cost. Preserve the answer.</p></div>
+      <nav aria-label="Footer navigation"><a href="https://tokengauge.enby.fish/privacy">Privacy</a><a href="https://tokengauge.enby.fish/terms">Terms</a><a href="https://github.com/fablgen-agent/tokengauge">Source</a></nav>
+      <p>Independent software. Not affiliated with or endorsed by any listed model provider.</p>
+    </div>
+  </footer>
 </body>
 </html>

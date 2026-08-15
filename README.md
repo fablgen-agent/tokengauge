@@ -1,30 +1,34 @@
 # TokenGauge
 
-TokenGauge is an evidence-backed AI cost-optimization workbench. It combines a free API-cost calculator, an auditable strategy catalogue, and a private A/B lab that compares prompt variants using a customer’s own ChatGPT plan.
+TokenGauge is an evidence-backed LLM cost-intelligence workbench. The maintained application combines a dated API-rate directory, an auditable evidence catalogue, a scenario calculator, and a private A/B lab that uses a customer’s own ChatGPT plan.
 
-- Public mirror: <https://fablgen-agent.github.io/tokengauge/>
-- Full application: <https://tokengauge.enby.fish/>
+- Primary live application: <https://tokengauge.enby.fish/>
+- Lightweight GitHub Pages mirror: <https://fablgen-agent.github.io/tokengauge/>
 
 The project is independent software and is not affiliated with or endorsed by OpenAI.
 
 ## Product principles
 
 - Every strategy is labelled as an official fact, derived math, or a test protocol.
-- Savings are reported as hypotheses until a quality-gated benchmark supports them.
+- Savings are never guaranteed. Calculator results and strategy savings remain hypotheses until a quality-gated benchmark supports them on the intended workload.
 - The calculator shows a dated pricing snapshot rather than pretending rates are timeless.
+- Supported lab recipes are labelled individually. Other catalogue cards provide guided protocols rather than pretending to have an automated adapter.
 - Lab prompts and outputs pass through the server but are never stored; only token metrics are retained.
 - ChatGPT credentials stay encrypted in the server-side session store and raw-token export is disabled.
 - Stripe billing identity is an HMAC-derived opaque identifier, separate from the ChatGPT account ID.
 
 ## What is included
 
-- 33 sourced optimization cards: 6 free and 27 behind a server-side entitlement gate.
-- A client-side cost calculator for input, output, caching, and request volume scenarios.
+- A 15 August 2026 pricing snapshot with 52 pricing cards across nine providers. Cards can represent model, context-tier, region, or effective-date variants; this is not a claim of 52 distinct models.
+- 120 evidence cards, including 12 open cards. These are catalogue entries and provider-specific profiles, not 120 distinct optimization methods.
+- A cost calculator for input, output, caching, and request-volume scenarios.
 - Login with ChatGPT via [`@opencoredev/loginwithchatgpt`](https://github.com/opencoredev/login-with-chatgpt).
-- Randomized paired A/B experiments with request-size, model, output, and rate limits.
-- One-time Stripe Checkout with signed, idempotent webhook fulfilment and refund revocation.
+- Randomized paired A/B experiments for recipes explicitly marked as supported; other cards include guided measurement protocols.
+- Connecting ChatGPT does not itself charge the user. Lab requests use the connected plan and count against that plan’s limits.
+- £9 one-time Pro payment for hosted, maintained catalogue access while the service remains available; it is not a subscription and includes no API credits.
+- Stripe Checkout with signed, idempotent webhook fulfilment and refund revocation.
 - Durable SQLite sessions, rate counters, users, entitlements, webhook events, and token-only experiment records.
-- A no-backend GitHub Pages mirror for the free calculator and library.
+- A no-backend GitHub Pages mirror that summarizes the current public data surface and directs users to the maintained live application.
 
 ## Local development
 

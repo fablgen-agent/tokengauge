@@ -2,7 +2,15 @@ import researchMethods from "@/data/research-methods.json";
 
 export type EvidenceGrade = "official" | "derived" | "experiment";
 export type TipAccess = "free" | "pro";
-export type ExperimentType = "request_config" | "prompt_diff" | "guided";
+export type ExperimentType =
+  | "request_config"
+  | "prompt_diff"
+  | "model_route"
+  | "cache_sequence"
+  | "schema_diff"
+  | "context_diff"
+  | "processing_diff"
+  | "guided_only";
 export type ExperimentSupport = "supported" | "guided-only" | "not-supported";
 
 type TipSource = { label: string; url: string };
@@ -461,7 +469,7 @@ const coreTips: readonly TipInput[] = [
 
 const compiledResearchMethods = researchMethods as readonly TipInput[];
 
-const aliases: Readonly<Record<string, readonly string[]>> = {
+export const catalogueAliases: Readonly<Record<string, readonly string[]>> = {
   "cache-key-partition": ["research-pc-08"],
   "research-pc-15": ["research-ca-06"],
   "research-ctx-10": ["research-pd-09"],
@@ -475,18 +483,18 @@ const aliases: Readonly<Record<string, readonly string[]>> = {
   "stop-at-known-delimiter": ["research-oc-03"],
 };
 
-const requestConfigIds = new Set(["lower-reasoning-effort", "low-verbosity", "cap-output"]);
+const requestConfigIds = new Set(["lower-reasoning-effort", "low-verbosity", "cap-output", "stop-at-known-delimiter"]);
 const supportedExperimentIds = new Set(["lower-reasoning-effort", "low-verbosity"]);
 
 export const tokenTips: readonly TokenTip[] = [...coreTips, ...compiledResearchMethods].map((tip) => {
-  const experimentType: ExperimentType = tip.experimentType ?? (requestConfigIds.has(tip.id) ? "request_config" : tip.access === "free" ? "prompt_diff" : "guided");
+  const experimentType: ExperimentType = tip.experimentType ?? (requestConfigIds.has(tip.id) ? "request_config" : tip.access === "free" ? "prompt_diff" : "guided_only");
   const experimentSupport: ExperimentSupport = tip.experimentSupport ?? (supportedExperimentIds.has(tip.id) ? "supported" : tip.id === "cap-output" || tip.id === "stop-at-known-delimiter" ? "not-supported" : "guided-only");
   const provider = tip.providers ?? providerFromSource(tip.source.url);
   return {
     ...tip,
     canonicalId: tip.canonicalId ?? tip.id,
     intervention: tip.intervention ?? tip.action,
-    aliases: tip.aliases ?? aliases[tip.id] ?? [],
+    aliases: tip.aliases ?? catalogueAliases[tip.id] ?? [],
     providers: provider,
     sources: tip.sources ?? [tip.source],
     lastVerified: tip.lastVerified ?? "2026-08-15",

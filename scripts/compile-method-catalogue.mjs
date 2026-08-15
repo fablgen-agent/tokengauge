@@ -16,11 +16,11 @@ const sources = [
   },
   {
     file: "research/agents/06-methods-routing-batch-evals.md",
-    include: new Set(["MRE-002", "MRE-003", "MRE-004", "MRE-006", "MRE-020", "MRE-026", "MRE-041", "MRE-045", "MRE-052"]),
+    include: new Set(["MRE-002", "MRE-003", "MRE-004", "MRE-006", "MRE-020", "MRE-026", "MRE-041", "MRE-045", "MRE-046", "MRE-051", "MRE-052"]),
   },
   {
     file: "research/agents/07-provider-specific-methods.md",
-    include: new Set(["PS-XA-04", "PS-DS-02", "PS-DS-04", "PS-KI-04", "PS-QW-03", "PS-MI-03", "PS-CO-01", "PS-CO-04"]),
+    include: new Set(["PS-XA-04", "PS-DS-02", "PS-DS-04", "PS-QW-03", "PS-MI-03", "PS-CO-01"]),
   },
 ];
 
@@ -34,12 +34,23 @@ for (const source of sources) {
   }
 }
 
-if (methods.length !== 85) {
-  throw new Error(`Expected 85 canonical compiled methods, found ${methods.length}. Review the curated include/exclude registry.`);
+if (methods.length < 77) {
+  throw new Error(`Expected at least 77 canonical compiled Pro methods, found ${methods.length}. Review the curated include/exclude registry.`);
 }
 
 const ids = new Set(methods.map((method) => method.id));
 if (ids.size !== methods.length) throw new Error("Compiled research method IDs are not unique.");
+
+const requiredReplacementIds = sources.flatMap((source) => [...(source.include ?? [])]);
+const compiledResearchIds = new Set(methods.map((method) => method.researchId));
+for (const researchId of requiredReplacementIds) {
+  if (!compiledResearchIds.has(researchId)) throw new Error(`Required canonical replacement ${researchId} was not compiled.`);
+}
+
+const duplicateResearchIds = ["PC-08", "CA-06", "PD-09", "PD-06", "PD-07", "SO-01", "TL-01", "TL-09"];
+for (const researchId of duplicateResearchIds) {
+  if (compiledResearchIds.has(researchId)) throw new Error(`Semantic duplicate ${researchId} must remain an alias, not a sellable method.`);
+}
 
 await writeFile(
   resolve(root, "src/data/research-methods.json"),
@@ -67,7 +78,9 @@ function parseMethods(markdown) {
     const sourceMatch = sourceMatches[0];
     const urlMatch = sourceText.match(/https:\/\/[^\s)]+/);
     const evidence = cleanText(fields.get("evidence grade") ?? fields.get("evidence") ?? "experiment").toLowerCase();
-    const grade = evidence.includes("official") ? "official" : evidence.includes("derived") ? "derived" : "experiment";
+    const sourceUrls = sourceMatches.map((match) => match[2]);
+    if (sourceUrls.length === 0 && urlMatch?.[0]) sourceUrls.push(urlMatch[0]);
+    const grade = evidenceGrade(evidence, sourceUrls);
 
     const method = {
       id: `research-${researchId.toLowerCase()}`,
@@ -85,7 +98,7 @@ function parseMethods(markdown) {
       providers: cleanText(fields.get("providers") ?? "Provider-agnostic"),
       aliases: [],
       lastVerified: "2026-08-15",
-      experimentType: "guided",
+      experimentType: experimentTypeFor(researchId),
       experimentSupport: "guided-only",
       source: {
         label: cleanText(sourceMatch?.[1] ?? "Primary source"),
@@ -101,6 +114,37 @@ function parseMethods(markdown) {
     }
     return method;
   });
+}
+
+function evidenceGrade(evidence, sourceUrls) {
+  if (evidence.includes("official")) return "official";
+  if (evidence.includes("derived")) return "derived";
+  if (evidence.includes("experiment")) return "experiment";
+
+  const reportSixGrade = evidence.match(/^([abc])(?:\s|—|-)/)?.[1];
+  if (reportSixGrade === "c") return "derived";
+  if (reportSixGrade === "b") return "official";
+  if (reportSixGrade === "a") {
+    return sourceUrls.length > 0 && sourceUrls.every(isOriginalResearchSource) ? "experiment" : "official";
+  }
+  return "experiment";
+}
+
+function isOriginalResearchSource(url) {
+  return ["arxiv.org", "aclanthology.org", "proceedings.mlr.press"].some((host) => new URL(url).hostname.endsWith(host));
+}
+
+function experimentTypeFor(researchId) {
+  if (/^PC-|^CA-/.test(researchId)) return "cache_sequence";
+  if (/^CTX-|^CMP-|^RET-|^MM-/.test(researchId)) return "context_diff";
+  if (/^PD-/.test(researchId)) return "prompt_diff";
+  if (/^OC-/.test(researchId)) return "request_config";
+  if (/^SO-|^TL-/.test(researchId)) return "schema_diff";
+  if (["MRE-002", "MRE-003", "MRE-004", "MRE-006"].includes(researchId)) return "model_route";
+  if (["MRE-020", "MRE-045", "MRE-046", "MRE-051", "PS-DS-02"].includes(researchId)) return "processing_diff";
+  if (["MRE-026", "PS-DS-04"].includes(researchId)) return "context_diff";
+  if (["PS-XA-04", "PS-MI-03"].includes(researchId)) return "request_config";
+  return "guided_only";
 }
 
 function required(fields, key, id) {

@@ -15,7 +15,7 @@
     "providers": "Provider-agnostic; directly applicable to OpenAI, Anthropic, Gemini implicit caching, and Bedrock.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AWS-CACHE — Amazon Bedrock prompt caching",
@@ -44,7 +44,7 @@
     "providers": "Anthropic Claude API and supported Claude partner interfaces.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AN-CACHE — Anthropic prompt caching",
@@ -73,7 +73,7 @@
     "providers": "Anthropic Claude, OpenAI GPT-5.6+, Amazon Bedrock supported models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AN-CACHE — Anthropic prompt caching",
@@ -102,7 +102,7 @@
     "providers": "Anthropic Claude; Amazon Bedrock Claude.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AN-CACHE — Anthropic prompt caching",
@@ -131,7 +131,7 @@
     "providers": "Anthropic, Gemini explicit cache, OpenAI GPT-5.6+, supported Bedrock models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
@@ -160,7 +160,7 @@
     "providers": "OpenAI GPT-5.6+; OpenAI models on Bedrock's Responses endpoint where supported.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-MODEL — OpenAI model guidance",
@@ -189,7 +189,7 @@
     "providers": "OpenAI, Anthropic, Gemini explicit cache, Amazon Bedrock supported models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
@@ -218,7 +218,7 @@
     "providers": "Google Gemini generateContent API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
@@ -247,7 +247,7 @@
     "providers": "OpenAI, Anthropic, Gemini, Amazon Bedrock.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AWS-CACHE — Amazon Bedrock prompt caching",
@@ -276,7 +276,7 @@
     "providers": "Anthropic Claude, Amazon Bedrock; conceptually relevant to other exact-prefix caches.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AN-CACHE — Anthropic prompt caching",
@@ -305,7 +305,7 @@
     "providers": "Provider-agnostic; OpenAI documentation explicitly describes combined window accounting.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-STATE — OpenAI conversation state",
@@ -334,7 +334,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "MEMGPT — MemGPT original paper",
@@ -363,7 +363,7 @@
     "providers": "Provider-agnostic; billing caveat directly documented by OpenAI.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-STATE — OpenAI conversation state",
@@ -392,7 +392,7 @@
     "providers": "Provider-agnostic; can be self-hosted before any LLM API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "SELECTIVE-CONTEXT — original paper",
@@ -421,7 +421,7 @@
     "providers": "Provider-agnostic; compressor can front any compatible text-model API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "LLMLINGUA — original paper",
@@ -450,7 +450,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "LONGLLMLINGUA — original paper",
@@ -479,7 +479,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "LOST-MIDDLE — original paper",
@@ -508,7 +508,7 @@
     "providers": "OpenAI Responses API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-COMPACT — OpenAI compaction",
@@ -537,7 +537,7 @@
     "providers": "OpenAI Responses API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-COMPACT — OpenAI compaction",
@@ -566,7 +566,7 @@
     "providers": "Anthropic supports custom compaction instructions; pattern is portable to client-side and other provider compaction.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AN-COMPACT — Anthropic compaction",
@@ -595,7 +595,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RECURSIVE-SUMMARY — original recursive summarization paper",
@@ -624,7 +624,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RECURSIVE-SUMMARY — original recursive summarization paper",
@@ -653,7 +653,7 @@
     "providers": "Provider-agnostic; self-hostable architecture.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "MEMGPT — original paper",
@@ -682,7 +682,7 @@
     "providers": "Anthropic Claude directly; pattern is provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "AN-MEMORY — Anthropic memory tool",
@@ -711,7 +711,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GENERATIVE-AGENTS — original paper",
@@ -740,7 +740,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GENERATIVE-AGENTS — original paper",
@@ -769,7 +769,7 @@
     "providers": "Provider-agnostic; managed options include OpenAI Retrieval and Gemini File Search.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RAG — original Retrieval-Augmented Generation paper",
@@ -798,7 +798,7 @@
     "providers": "OpenAI Retrieval directly; portable to scored retrievers.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-RETRIEVAL — OpenAI Retrieval",
@@ -827,7 +827,7 @@
     "providers": "OpenAI vector stores, Gemini File Search, provider-agnostic retrieval systems.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GG-FILE — Gemini File Search",
@@ -856,7 +856,7 @@
     "providers": "OpenAI vector stores, Gemini File Search, provider-agnostic retrieval systems.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-RETRIEVAL — OpenAI Retrieval",
@@ -885,7 +885,7 @@
     "providers": "OpenAI Retrieval directly; portable to other retrievers.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-RETRIEVAL — OpenAI Retrieval",
@@ -914,7 +914,7 @@
     "providers": "OpenAI Retrieval directly; analogous hybrid search elsewhere.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OA-RETRIEVAL — OpenAI Retrieval",
@@ -943,7 +943,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RECOMP — original paper",
@@ -972,7 +972,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RECOMP — original paper",
@@ -1001,7 +1001,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "SELF-RAG — original paper",
@@ -1030,7 +1030,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RAPTOR — original paper",
@@ -1059,7 +1059,7 @@
     "providers": "Anthropic on listed supported Claude models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "request_config",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Task budgets",
@@ -1088,7 +1088,7 @@
     "providers": "OpenAI, Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Counting tokens with tools",
@@ -1121,7 +1121,7 @@
     "providers": "Gemini API explicitly; provider-specific validation elsewhere.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Structured outputs, array properties",
@@ -1150,7 +1150,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Structured outputs",
@@ -1179,7 +1179,7 @@
     "providers": "OpenAI, Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Structured outputs",
@@ -1212,7 +1212,7 @@
     "providers": "OpenAI, Anthropic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Tool search",
@@ -1245,7 +1245,7 @@
     "providers": "OpenAI, Anthropic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Prompt caching",
@@ -1278,7 +1278,7 @@
     "providers": "OpenAI.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Function calling, allowed tools",
@@ -1307,7 +1307,7 @@
     "providers": "OpenAI, Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Model guidance",
@@ -1340,7 +1340,7 @@
     "providers": "Any function-calling provider.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Counting tokens with tools",
@@ -1369,7 +1369,7 @@
     "providers": "Provider-agnostic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Programmatic Tool Calling",
@@ -1402,7 +1402,7 @@
     "providers": "Anthropic explicitly; manual pruning elsewhere.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Context editing",
@@ -1431,7 +1431,7 @@
     "providers": "Gemini API; OpenAI and Anthropic on supported tool APIs.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Function calling, parallel function calling",
@@ -1460,7 +1460,7 @@
     "providers": "Anthropic explicitly; provider-agnostic principle.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — How tool use works, when not to use tools",
@@ -1489,7 +1489,7 @@
     "providers": "Anthropic web fetch explicitly; analogous controls should be verified elsewhere.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Web fetch tool",
@@ -1518,7 +1518,7 @@
     "providers": "Anthropic.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "schema_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Web fetch tool, response inclusion",
@@ -1547,7 +1547,7 @@
     "providers": "OpenAI.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Images and vision, choose image detail",
@@ -1576,7 +1576,7 @@
     "providers": "Anthropic, Gemini API, OpenAI with provider-specific mechanics.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Vision, resolution and token cost",
@@ -1609,7 +1609,7 @@
     "providers": "Anthropic, Gemini API, OpenAI.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Vision",
@@ -1642,7 +1642,7 @@
     "providers": "Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Image understanding, media resolution",
@@ -1671,7 +1671,7 @@
     "providers": "Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Video understanding",
@@ -1700,7 +1700,7 @@
     "providers": "Gemini API and other duration-billed/tokenized video models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Video understanding",
@@ -1729,7 +1729,7 @@
     "providers": "Provider-agnostic; Gemini documents separate audio/video token accounting.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Understand and count tokens",
@@ -1758,7 +1758,7 @@
     "providers": "Anthropic explicitly.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Prompt caching, concurrent requests",
@@ -1787,7 +1787,7 @@
     "providers": "Anthropic explicitly.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "cache_sequence",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — Effort",
@@ -1820,7 +1820,7 @@
     "providers": "Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — API errors",
@@ -1853,7 +1853,7 @@
     "providers": "Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — API errors",
@@ -1886,7 +1886,7 @@
     "providers": "Gemini API; provider-agnostic implementation.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Troubleshooting, set maximum retries",
@@ -1915,7 +1915,7 @@
     "providers": "Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — API errors",
@@ -1948,7 +1948,7 @@
     "providers": "Anthropic explicitly; analogous streaming APIs elsewhere.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Anthropic — API errors, long requests and streaming",
@@ -1977,7 +1977,7 @@
     "providers": "OpenAI, Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "OpenAI — Function calling, strict requirements",
@@ -2014,7 +2014,7 @@
     "providers": "OpenAI, Anthropic, Gemini API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google — Function calling",
@@ -2047,7 +2047,7 @@
     "providers": "Provider-neutral and can route across providers if policy permits.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "model_route",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RouteLLM — Learning to Route LLMs with Preference Data",
@@ -2076,7 +2076,7 @@
     "providers": "Provider-neutral; stages may use one or multiple providers.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "model_route",
     "experimentSupport": "guided-only",
     "source": {
       "label": "FrugalGPT — How to Use Large Language Models While Reducing Cost and Improving Performance",
@@ -2105,7 +2105,7 @@
     "providers": "Provider-neutral.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "model_route",
     "experimentSupport": "guided-only",
     "source": {
       "label": "RouteLMT — Route by Expected Marginal Gain",
@@ -2125,7 +2125,7 @@
     "title": "Managed Bedrock prompt routing",
     "category": "Managed model routing",
     "access": "pro",
-    "grade": "experiment",
+    "grade": "official",
     "summary": "Bedrock Intelligent Prompt Routing can shift eligible prompts to a lower-cost model without maintaining a custom router.",
     "action": "Create a router with exactly two supported models from the same family, run a representative offline comparison, and set application-level fallbacks for unsupported modalities or failures.",
     "intervention": "Create a router with exactly two supported models from the same family, run a representative offline comparison, and set application-level fallbacks for unsupported modalities or failures.",
@@ -2134,7 +2134,7 @@
     "providers": "Amazon Bedrock only.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "model_route",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Amazon Bedrock — Intelligent prompt routing",
@@ -2154,7 +2154,7 @@
     "title": "Spot GPU capacity for fault-tolerant offline work",
     "category": "Self-hosted batch infrastructure",
     "access": "pro",
-    "grade": "experiment",
+    "grade": "official",
     "summary": "Interruptible accelerators materially reduce compute cost when jobs can checkpoint and resume.",
     "action": "Containerize the job, shard work into idempotent units, checkpoint to durable storage, monitor interruption signals, and fall back only when the deadline demands it.",
     "intervention": "Containerize the job, shard work into idempotent units, checkpoint to durable storage, monitor interruption signals, and fall back only when the deadline demands it.",
@@ -2163,7 +2163,7 @@
     "providers": "Google Cloud and AWS; analogous spot products require separate validation.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "processing_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google Cloud — Spot VMs",
@@ -2196,7 +2196,7 @@
     "providers": "Provider-neutral.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "GPTCache — An Open-Source Semantic Cache for LLM Applications",
@@ -2216,7 +2216,7 @@
     "title": "Fine-tune a smaller model for a fixed task",
     "category": "Fine-tuning economics",
     "access": "pro",
-    "grade": "experiment",
+    "grade": "official",
     "summary": "A smaller specialized model can replace a larger general model on stable, narrow tasks such as extraction or classification.",
     "action": "Establish a prompt-only baseline, collect at least a representative high-quality training set, tune the smallest plausible model, and calculate break-even requests from training cost divided by per-request savings.",
     "intervention": "Establish a prompt-only baseline, collect at least a representative high-quality training set, tune the smallest plausible model, and calculate break-even requests from training cost divided by per-request savings.",
@@ -2225,7 +2225,7 @@
     "providers": "Google Vertex AI or self-hosted; concept is provider-neutral.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Google Cloud — Tune Gemini models",
@@ -2254,7 +2254,7 @@
     "providers": "Self-hosted/open-weight models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "processing_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "vLLM — Easy, Fast, and Cheap LLM Serving with PagedAttention",
@@ -2268,13 +2268,75 @@
     ]
   },
   {
+    "id": "research-mre-046",
+    "canonicalId": "research-mre-046",
+    "researchId": "MRE-046",
+    "title": "Speculative decoding",
+    "category": "Self-hosted inference",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "A small draft model proposes multiple tokens; the target verifies them in parallel, reducing sequential expensive-model steps.",
+    "action": "Pair a compatible draft and target, tune proposal length on production prompts, and disable speculation for slices with low acceptance.",
+    "intervention": "Pair a compatible draft and target, tune proposal length on production prompts, and disable speculation for slices with low acceptance.",
+    "measure": "Track accepted draft tokens, target passes, output tokens/sec, latency, total GPU-seconds, energy, and quality equivalence.",
+    "caveat": "Low draft acceptance or extra memory can erase gains; it reduces serving compute/latency, not provider-billed tokens when an API hides the implementation.",
+    "providers": "Self-hosted; some providers may implement it internally without exposing savings.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "processing_diff",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Fast Inference from Transformers via Speculative Decoding",
+      "url": "https://proceedings.mlr.press/v202/leviathan23a.html"
+    },
+    "sources": [
+      {
+        "label": "Fast Inference from Transformers via Speculative Decoding",
+        "url": "https://proceedings.mlr.press/v202/leviathan23a.html"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-051",
+    "canonicalId": "research-mre-051",
+    "researchId": "MRE-051",
+    "title": "Smooth admission rate, queue, and shed low priority",
+    "category": "Rate control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Bursty admission causes throttles and retry storms even when average volume fits quota. A queue smooths demand and preserves capacity for valuable work.",
+    "action": "Estimate input plus reserved output tokens, enforce per-provider/model token buckets, prioritize interactive work, queue deferrable jobs, and shed expired low-value items.",
+    "intervention": "Estimate input plus reserved output tokens, enforce per-provider/model token buckets, prioritize interactive work, queue deferrable jobs, and shed expired low-value items.",
+    "measure": "Track admitted/queued/shed tokens, queue age, 429/503 rate, retry cost, utilization, and SLA attainment.",
+    "caveat": "Token reservation can be conservative—Bedrock notes quota burndown may depend on max_tokens—so calibrate estimates and release unused reservations promptly.",
+    "providers": "Provider-neutral; Bedrock documents token quota behavior.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "processing_diff",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Amazon Bedrock — Scaling throughput best practices",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/scaling-throughput-best-practices.html"
+    },
+    "sources": [
+      {
+        "label": "Amazon Bedrock — Scaling throughput best practices",
+        "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/scaling-throughput-best-practices.html"
+      },
+      {
+        "label": "Token quota burndown",
+        "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html"
+      }
+    ]
+  },
+  {
     "id": "research-mre-052",
     "canonicalId": "research-mre-052",
     "researchId": "MRE-052",
     "title": "Idempotency ledger and in-flight deduplication",
     "category": "Application reliability",
     "access": "pro",
-    "grade": "experiment",
+    "grade": "derived",
     "summary": "Client timeouts, worker restarts, and replayed webhooks can submit the same expensive request more than once.",
     "action": "Derive an idempotency key from tenant, operation, input version, and generation settings; atomically record in-flight/completed state; return the prior result or status on duplicates.",
     "intervention": "Derive an idempotency key from tenant, operation, input version, and generation settings; atomically record in-flight/completed state; return the prior result or status on duplicates.",
@@ -2283,7 +2345,7 @@
     "providers": "Provider-neutral; xAI Batch exposes a useful request identifier.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "xAI — Batch API",
@@ -2312,7 +2374,7 @@
     "providers": "xAI Grok supported text models.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "request_config",
     "experimentSupport": "guided-only",
     "source": {
       "label": "xAI Priority processing",
@@ -2345,7 +2407,7 @@
     "providers": "DeepSeek API.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "processing_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "DeepSeek pricing",
@@ -2374,7 +2436,7 @@
     "providers": "DeepSeek reasoning mode.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "context_diff",
     "experimentSupport": "guided-only",
     "source": {
       "label": "DeepSeek thinking mode",
@@ -2384,39 +2446,6 @@
       {
         "label": "DeepSeek thinking mode",
         "url": "https://api-docs.deepseek.com/guides/thinking_mode/"
-      }
-    ]
-  },
-  {
-    "id": "research-ps-ki-04",
-    "canonicalId": "research-ps-ki-04",
-    "researchId": "PS-KI-04",
-    "title": "Buy K2.7 Highspeed only when latency earns its 2× rate",
-    "category": "Model variant / latency",
-    "access": "pro",
-    "grade": "official",
-    "summary": "The high-speed premium changes serving speed, not the advertised model intelligence.",
-    "action": "A/B both variants on the same coding workload, route interactive requests selectively, and fall back to Standard for long outputs or background jobs.",
-    "intervention": "A/B both variants on the same coding workload, route interactive requests selectively, and fall back to Standard for long outputs or background jobs.",
-    "measure": "Time to first token, output tokens/second, user abandonment/SLO value, token cost, and quality parity.",
-    "caveat": "Peak speed is workload/output-length dependent. K2.7 Highspeed is not currently Batch-eligible, so the effective gap can be larger for delayed work.",
-    "providers": "Kimi K2.7 Code and K2.7 Code Highspeed.",
-    "aliases": [],
-    "lastVerified": "2026-08-15",
-    "experimentType": "guided",
-    "experimentSupport": "guided-only",
-    "source": {
-      "label": "Kimi K2.7 Code pricing",
-      "url": "https://platform.kimi.ai/docs/pricing/chat-k27-code.md"
-    },
-    "sources": [
-      {
-        "label": "Kimi K2.7 Code pricing",
-        "url": "https://platform.kimi.ai/docs/pricing/chat-k27-code.md"
-      },
-      {
-        "label": "Kimi Batch pricing",
-        "url": "https://platform.kimi.ai/docs/pricing/batch.md"
       }
     ]
   },
@@ -2436,7 +2465,7 @@
     "providers": "Alibaba Cloud Model Studio / Qwen.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Model Studio context cache",
@@ -2473,7 +2502,7 @@
     "providers": "Mistral regional inference.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "request_config",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Mistral regional inference",
@@ -2502,7 +2531,7 @@
     "providers": "Cohere.",
     "aliases": [],
     "lastVerified": "2026-08-15",
-    "experimentType": "guided",
+    "experimentType": "guided_only",
     "experimentSupport": "guided-only",
     "source": {
       "label": "Cohere pricing guide",
@@ -2512,39 +2541,6 @@
       {
         "label": "Cohere pricing guide",
         "url": "https://docs.cohere.com/docs/how-does-cohere-pricing-work"
-      }
-    ]
-  },
-  {
-    "id": "research-ps-co-04",
-    "canonicalId": "research-ps-co-04",
-    "researchId": "PS-CO-04",
-    "title": "Quarantine conflicting model IDs and prices instead of auto-correcting them",
-    "category": "Catalogue integrity",
-    "access": "pro",
-    "grade": "official",
-    "summary": "Even official documentation can contain internally conflicting identifiers, so scraping by page text alone is unsafe.",
-    "action": "Cross-check title, exact model ID, release page, and model catalogue; quarantine conflicts; require a reviewed override before quoting cost.",
-    "intervention": "Cross-check title, exact model ID, release page, and model catalogue; quarantine conflicts; require a reviewed override before quoting cost.",
-    "measure": "Conflicting records, manual-review latency, estimates blocked, and post-review corrections.",
-    "caveat": "This is an observed documentation inconsistency, not evidence that one of the models shares the other's price. The pages may be corrected after the research date.",
-    "providers": "Cohere Command A / Command A+.",
-    "aliases": [],
-    "lastVerified": "2026-08-15",
-    "experimentType": "guided",
-    "experimentSupport": "guided-only",
-    "source": {
-      "label": "Cohere Command A",
-      "url": "https://docs.cohere.com/docs/command-a"
-    },
-    "sources": [
-      {
-        "label": "Cohere Command A",
-        "url": "https://docs.cohere.com/docs/command-a"
-      },
-      {
-        "label": "Cohere model catalogue",
-        "url": "https://docs.cohere.com/v1/docs/models"
       }
     ]
   }
