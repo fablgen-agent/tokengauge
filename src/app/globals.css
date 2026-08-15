@@ -50,6 +50,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .site-header nav a:not(.nav-cta) { opacity: .74; transition: opacity .2s ease; }
 .site-header nav a:hover { opacity: 1; }
 .nav-cta { border: 1px solid rgba(255,255,255,.36); padding: 10px 17px; border-radius: 8px; }
+.nav-cta-active { border-color: var(--lime); color: var(--lime); }
+.nav-cta-pending { display: inline-flex; align-items: center; opacity: .68; }
 
 .hero {
   min-height: 590px;
