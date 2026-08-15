@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
+  calculateBreakEvenAcceptanceRate,
+  calculateCostPerAcceptedAnswer,
   calculateCostUsd,
   calculateSavings,
   formatRate,
@@ -41,6 +43,8 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
   const [inputReduction, setInputReduction] = useState(25);
   const [outputReduction, setOutputReduction] = useState(20);
   const [cachedShare, setCachedShare] = useState(30);
+  const [baselinePassRate, setBaselinePassRate] = useState(90);
+  const [candidatePassRate, setCandidatePassRate] = useState(85);
 
   const result = useMemo(() => {
     const selectedPrice = selectableModels.find((candidate) => candidate.id === priceId) ?? defaultModel;
@@ -59,6 +63,15 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
     });
     return { baseline, optimized, baselinePrice, optimizedPrice, error: undefined, ...calculateSavings(baseline, optimized) };
   }, [calls, cachedShare, defaultModel, inputReduction, inputTokens, outputReduction, outputTokens, priceId, selectableModels]);
+
+  const baselineAcceptedCost = result.error ? null : calculateCostPerAcceptedAnswer(result.baseline, calls, baselinePassRate);
+  const candidateAcceptedCost = result.error ? null : calculateCostPerAcceptedAnswer(result.optimized, calls, candidatePassRate);
+  const acceptedSavings = baselineAcceptedCost !== null && candidateAcceptedCost !== null
+    ? calculateSavings(baselineAcceptedCost, candidateAcceptedCost)
+    : null;
+  const breakEvenPassRate = result.error
+    ? null
+    : calculateBreakEvenAcceptanceRate(result.baseline, result.optimized, baselinePassRate);
 
   return (
     <div className="calculator-shell">
@@ -79,6 +92,8 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
         <RangeField label="Input reduction" value={inputReduction} onChange={setInputReduction} />
         <RangeField label="Output reduction" value={outputReduction} onChange={setOutputReduction} />
         <RangeField label="Warm cache-read share" value={cachedShare} onChange={setCachedShare} />
+        <RangeField label="Baseline quality pass rate" value={baselinePassRate} min={1} max={100} step={1} onChange={setBaselinePassRate} />
+        <RangeField label="Candidate quality pass rate" value={candidatePassRate} min={1} max={100} step={1} onChange={setCandidatePassRate} />
       </div>
       <div className="calculator-result" aria-live="polite">
         <span className="eyebrow">Estimated monthly API spend · {result.baselinePrice.providerLabel}</span>
@@ -96,7 +111,21 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
         <div className={`savings-pill ${result.amountUsd < 0 ? "negative" : ""}`}>
           {result.amountUsd >= 0 ? "Potential saving" : "Potential increase"}: {formatUsd(Math.abs(result.amountUsd))}
           {result.baseline > 0 ? ` (${Math.abs(result.percentage).toFixed(1)}%)` : ""}
-        </div></>}
+        </div>
+        {baselineAcceptedCost !== null && candidateAcceptedCost !== null && acceptedSavings && breakEvenPassRate !== null ? (
+          <div className="accepted-economics">
+            <span className="eyebrow">QUALITY-ADJUSTED COST</span>
+            <div className="accepted-cost-grid">
+              <div><small>Before / accepted answer</small><strong>{formatAcceptedUsd(baselineAcceptedCost)}</strong><span>{baselinePassRate}% pass assumption</span></div>
+              <div><small>After / accepted answer</small><strong>{formatAcceptedUsd(candidateAcceptedCost)}</strong><span>{candidatePassRate}% pass assumption</span></div>
+            </div>
+            <p className={acceptedSavings.amountUsd < 0 ? "quality-loses" : "quality-wins"}>
+              {breakEvenPassRate > 100
+                ? `No candidate pass rate up to 100% breaks even against the ${baselinePassRate}% baseline assumption.`
+                : `Candidate break-even: ${breakEvenPassRate.toFixed(1)}% pass rate. Your scenario assumes ${candidatePassRate}%.`}
+            </p>
+          </div>
+        ) : null}</>}
         <p>Warm cache-read scenario, not general ROI. It excludes cache writes/storage, tools, regional uplifts, retries, and quality failures. A dash means no published cache-read rate.</p>
         <a className="rate-source" href={result.baselinePrice.sourceUrl} target="_blank" rel="noreferrer">{result.baselinePrice.sourceLabel} ↗</a>
         <div className="calculator-next-step">
@@ -104,9 +133,11 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
           <strong>
             {result.error
               ? "Bring the scenario back inside the published model limits."
-              : result.amountUsd > 0
-                ? `Validate the ${formatUsd(result.amountUsd)} monthly hypothesis.`
-                : "Test a different intervention before changing production."}
+              : acceptedSavings && acceptedSavings.amountUsd > 0
+                ? `Validate the ${acceptedSavings.percentage.toFixed(1)}% accepted-answer advantage.`
+                : acceptedSavings && acceptedSavings.amountUsd < 0
+                  ? "The token-saving arm loses after quality adjustment."
+                  : "Test a different intervention before changing production."}
           </strong>
           <p>The estimate is not a saving until the same workload still passes its quality bar. Compare a supported recipe in the lab, or use the evidence library to design a provider-specific test.</p>
           <div>
@@ -129,11 +160,16 @@ function NumberField({ label, value, min, onChange }: { label: string; value: nu
   );
 }
 
-function RangeField({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) {
+function RangeField({ label, value, min = 0, max = 90, step = 5, onChange }: { label: string; value: number; min?: number; max?: number; step?: number; onChange: (value: number) => void }) {
   return (
     <label className="range-label">
       <span>{label}<b>{value}%</b></span>
-      <input type="range" min="0" max="90" step="5" value={value} onChange={(event) => onChange(Number(event.target.value))} />
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} />
     </label>
   );
+}
+
+function formatAcceptedUsd(value: number): string {
+  if (value > 0 && value < 1) return `$${value.toFixed(4)}`;
+  return formatUsd(value);
 }

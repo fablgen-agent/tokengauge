@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateCostUsd, calculateSavings, getSelectableModelPrices, modelPrices, priceProviders, resolvePriceForInput } from "./costs";
+import {
+  calculateBreakEvenAcceptanceRate,
+  calculateCostPerAcceptedAnswer,
+  calculateCostUsd,
+  calculateSavings,
+  getSelectableModelPrices,
+  modelPrices,
+  priceProviders,
+  resolvePriceForInput,
+} from "./costs";
 
 describe("cost calculations", () => {
   const terra = modelPrices.find((model) => model.id === "openai:gpt-5.6-terra:standard:short")!;
@@ -17,6 +26,19 @@ describe("cost calculations", () => {
   it("reports positive and negative savings without hiding either", () => {
     expect(calculateSavings(100, 75)).toEqual({ amountUsd: 25, percentage: 25 });
     expect(calculateSavings(100, 125)).toEqual({ amountUsd: -25, percentage: -25 });
+  });
+
+  it("prices accepted answers and exposes the candidate break-even quality floor", () => {
+    expect(calculateCostPerAcceptedAnswer(300, 10_000, 90)).toBeCloseTo(0.0333333333, 10);
+    expect(calculateCostPerAcceptedAnswer(202.125, 10_000, 85)).toBeCloseTo(0.0237794118, 10);
+    expect(calculateBreakEvenAcceptanceRate(300, 202.125, 90)).toBeCloseTo(60.6375, 8);
+  });
+
+  it("does not invent accepted-answer economics without attempts or passing answers", () => {
+    expect(calculateCostPerAcceptedAnswer(10, 0, 90)).toBeNull();
+    expect(calculateCostPerAcceptedAnswer(10, 100, 0)).toBeNull();
+    expect(calculateBreakEvenAcceptanceRate(0, 5, 90)).toBeNull();
+    expect(calculateCostPerAcceptedAnswer(10, 100, 120)).toBe(0.1);
   });
 
   it("covers the nine first-class providers with official sources", () => {

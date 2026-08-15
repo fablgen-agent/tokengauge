@@ -124,6 +124,28 @@ export function calculateSavings(
   };
 }
 
+export function calculateCostPerAcceptedAnswer(
+  totalCostUsd: number,
+  attempts: number,
+  acceptanceRatePercentage: number,
+): number | null {
+  const boundedAttempts = Math.max(attempts, 0);
+  const boundedAcceptanceRate = Math.min(Math.max(acceptanceRatePercentage, 0), 100);
+  const acceptedAnswers = boundedAttempts * (boundedAcceptanceRate / 100);
+  if (acceptedAnswers === 0) return null;
+  return Math.max(totalCostUsd, 0) / acceptedAnswers;
+}
+
+export function calculateBreakEvenAcceptanceRate(
+  baselineCostUsd: number,
+  candidateCostUsd: number,
+  baselineAcceptanceRatePercentage: number,
+): number | null {
+  if (baselineCostUsd <= 0) return null;
+  const boundedBaselineRate = Math.min(Math.max(baselineAcceptanceRatePercentage, 0), 100);
+  return (Math.max(candidateCostUsd, 0) / baselineCostUsd) * boundedBaselineRate;
+}
+
 export function formatUsd(value: number): string {
   if (value > 0 && value < 0.01) {
     return `$${value.toFixed(4)}`;
