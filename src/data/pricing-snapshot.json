@@ -789,7 +789,13 @@
       "contextWindowTokens": 256000,
       "region": "Global",
       "sourceUrl": "https://docs.cohere.com/docs/command-a",
-      "sourceLabel": "Cohere Command A pricing"
+      "sourceLabel": "Cohere Command A pricing",
+      "provenanceUrls": [
+        "https://docs.cohere.com/docs/command-a",
+        "https://docs.cohere.com/v1/docs/models"
+      ],
+      "reviewStatus": "manual-review",
+      "reviewNote": "The dedicated Command A page printed a conflicting Command A+ model ID on 2026-08-15; the Command A ID is cross-checked against Cohere's model catalogue."
     },
     {
       "id": "cohere:command-r7b-12-2024:standard",

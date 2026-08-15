@@ -33,6 +33,9 @@ export type ModelPrice = {
   region: string;
   sourceUrl: string;
   sourceLabel: string;
+  provenanceUrls?: readonly string[];
+  reviewStatus?: "verified" | "manual-review";
+  reviewNote?: string;
   effectiveFrom?: string;
   effectiveUntil?: string;
 };

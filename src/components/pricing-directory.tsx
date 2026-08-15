@@ -69,7 +69,7 @@ export function PricingDirectory() {
         <p className="directory-count" aria-live="polite">Showing {visibleModels.length} of {modelPrices.length} rate cards</p>
       </div>
 
-      <div className="rate-table-wrap" tabIndex={0} aria-label="Scrollable API pricing table">
+      <div className="rate-table-wrap" role="region" tabIndex={0} aria-label="Scrollable API pricing table">
         <table className="rate-table">
           <caption>Official provider API rate cards, USD per one million tokens</caption>
           <thead>
@@ -100,6 +100,7 @@ export function PricingDirectory() {
         {visibleModels.length === 0 ? <p className="empty-state">No rate cards match that search.</p> : null}
       </div>
       <div className="mobile-rate-list" aria-label="API pricing cards">
+        <p className="mobile-rate-unit">Rates in USD per 1M tokens</p>
         {visibleModels.map((model) => (
           <article className="mobile-rate-card" key={model.id}>
             <div><span>{model.providerLabel}</span><h3>{model.label}</h3><code>{model.modelId}</code></div>
