@@ -8,8 +8,10 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { AccountPanel } from "@/components/account-panel";
 import { ChatGPTPanel } from "@/components/chatgpt-panel";
+import { planDefinition, type PlanId } from "@/lib/plans";
 
 type Enrollment = { totpURI: string; backupCodes: string[] };
+type ChatGPTIdentity = { name?: string; email?: string; plan?: string; accessPlan: PlanId };
 
 function messageOf(error: { message?: string; code?: string } | null | undefined, fallback: string): string {
   if (!error) return fallback;
@@ -18,7 +20,7 @@ function messageOf(error: { message?: string; code?: string } | null | undefined
   return error.message || fallback;
 }
 
-export function AccountCenter({ accountSystemReady }: { accountSystemReady: boolean }) {
+export function AccountCenter({ accountSystemReady, chatgptIdentity }: { accountSystemReady: boolean; chatgptIdentity?: ChatGPTIdentity }) {
   const session = authClient.useSession();
   const [mode, setMode] = useState<"sign-in" | "create" | "forgot">("sign-in");
   const [notice, setNotice] = useState<string>();
@@ -109,9 +111,26 @@ export function AccountCenter({ accountSystemReady }: { accountSystemReady: bool
   if (session.isPending) return <div className="account-card"><p>Loading account…</p></div>;
 
   if (!session.data?.user) {
+    if (chatgptIdentity) {
+      const access = planDefinition(chatgptIdentity.accessPlan);
+      return (
+        <div className="account-layout">
+          <section className="account-card account-profile">
+            <span className="eyebrow eyebrow-lime">CHATGPT SIGN-IN</span>
+            <h2>{chatgptIdentity.name || "ChatGPT user"}</h2>
+            {chatgptIdentity.email ? <p>{chatgptIdentity.email}</p> : null}
+            <div className="account-badges"><span>✓ ChatGPT identity</span><span>{access.name} access</span>{chatgptIdentity.plan ? <span>{chatgptIdentity.plan} plan</span> : null}</div>
+            <div className="security-actions"><Link className="button button-lime" href="/dashboard">Dashboard</Link><Link className="button button-dark" href="/settings">Settings</Link></div>
+            <ChatGPTPanel compact purpose="sign-in" />
+          </section>
+          <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">ONE LESS ACCOUNT</span><h2>ChatGPT is your TokenGauge login.</h2><p>Your ChatGPT identity now resolves TokenGauge purchases, provider connections, and experiment history. TokenGauge does not receive your ChatGPT password.</p><AccountPanel compact /></aside>
+        </div>
+      );
+    }
     return (
       <div className="account-layout">
         <section className="account-card auth-card">
+          <div className="chatgpt-signin-option"><span className="eyebrow">FASTEST OPTION</span><h2>Use your existing ChatGPT account.</h2><ChatGPTPanel purpose="sign-in" /><div className="auth-divider"><span>or use email</span></div></div>
           <div className="account-tabs" role="tablist" aria-label="Account action">
             <button type="button" className={mode === "sign-in" ? "active" : ""} onClick={() => setMode("sign-in")}>Sign in</button>
             <button type="button" className={mode === "create" ? "active" : ""} onClick={() => setMode("create")}>Create account</button>
@@ -128,7 +147,7 @@ export function AccountCenter({ accountSystemReady }: { accountSystemReady: bool
           {notice ? <p className="form-notice" role="status">{notice}</p> : null}
           {error ? <p className="form-error" role="alert">{error}</p> : null}
         </section>
-        <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">ACCOUNT SECURITY</span><h2>One identity for access and billing.</h2><ul><li>Verified email before sign-in</li><li>12-character minimum password with scrypt hashing</li><li>Authenticator-app 2FA and one-use recovery codes</li><li>Rate-limited sign-in and recovery endpoints</li></ul></aside>
+        <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">TWO VALID PATHS</span><h2>Reuse ChatGPT or keep identities separate.</h2><ul><li>ChatGPT sign-in requires no TokenGauge password</li><li>Email accounts require verification</li><li>12-character password minimum and optional TOTP 2FA</li><li>Provider keys and Stripe billing remain separate</li></ul></aside>
       </div>
     );
   }

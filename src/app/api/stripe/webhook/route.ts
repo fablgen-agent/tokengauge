@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 
-import { markStripeEvent, revokeEntitlementByPaymentIntent } from "@/lib/db";
+import { markStripeEvent, revokeEntitlementByPaymentIntent, setEntitlementPaidAmountByPaymentIntent } from "@/lib/db";
 import { getStripeConfig } from "@/lib/env";
 import { fulfilCheckoutSession, getStripe } from "@/lib/stripe";
 
@@ -40,7 +40,10 @@ export async function POST(request: Request): Promise<Response> {
     } else if (event.type === "charge.refunded") {
       const charge = event.data.object as Stripe.Charge;
       const paymentIntentId = idOf(charge.payment_intent);
-      if (charge.refunded && paymentIntentId) revokeEntitlementByPaymentIntent(paymentIntentId);
+      if (paymentIntentId) {
+        setEntitlementPaidAmountByPaymentIntent(paymentIntentId, charge.amount - charge.amount_refunded, charge.currency);
+        if (charge.refunded) revokeEntitlementByPaymentIntent(paymentIntentId);
+      }
     }
 
     markStripeEvent(event.id, event.type);

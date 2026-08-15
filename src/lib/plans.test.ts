@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { highestPlan, isPaidPlanId, planAtLeast, planDefinition } from "./plans";
+import { highestPlan, isPaidPlanId, launchPricesGbp, planAtLeast, planDefinition } from "./plans";
 import { providerDefinitions } from "./providers";
 
 describe("plan catalogue", () => {
@@ -21,5 +21,12 @@ describe("plan catalogue", () => {
   it("includes every provider adapter with Pro", () => {
     expect(providerDefinitions).toHaveLength(9);
     expect(providerDefinitions.every((provider) => provider.minimumPlan === "pro")).toBe(true);
+  });
+
+  it("keeps the launch offer explicit and cheaper than standard access", () => {
+    expect(launchPricesGbp).toEqual({ pro: 5, pro_plus: 15, ultimate: 20 });
+    expect(launchPricesGbp.pro).toBeLessThan(planDefinition("pro").priceGbp);
+    expect(launchPricesGbp.pro_plus).toBeLessThan(planDefinition("pro_plus").priceGbp);
+    expect(launchPricesGbp.ultimate).toBeLessThan(planDefinition("ultimate").priceGbp);
   });
 });

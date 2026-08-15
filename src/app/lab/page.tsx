@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { ChatGPTPanel } from "@/components/chatgpt-panel";
 import { LabWorkbench } from "@/components/lab-workbench";
 import { SiteHeader } from "@/components/site-header";
-import { getChatGPTContext, getProductAccountContext } from "@/lib/access";
+import { getChatGPTContext, getOwnerAccountContext } from "@/lib/access";
 import { tokenTips } from "@/lib/catalog";
 import { listProviderCredentials } from "@/lib/provider-vault";
 import { providerDefinitions } from "@/lib/providers";
@@ -16,13 +16,13 @@ export const dynamic = "force-dynamic";
 
 export default async function LabPage() {
   const request = new Request("http://tokengauge.internal/lab", { headers: await headers() });
-  const [chatgpt, product] = await Promise.all([getChatGPTContext(request), getProductAccountContext(request)]);
+  const [chatgpt, owner] = await Promise.all([getChatGPTContext(request), getOwnerAccountContext(request)]);
   const supportedTips = tokenTips.filter((tip) => tip.experimentSupport === "supported");
-  const connectedIds = new Set(product ? listProviderCredentials(product.accountId).map((item) => item.providerId) : []);
+  const connectedIds = new Set(owner ? listProviderCredentials(owner.accountId).map((item) => item.providerId) : []);
   const sources = [
     ...(chatgpt ? [{ id: "chatgpt", label: `ChatGPT${chatgpt.plan ? ` · ${chatgpt.plan}` : ""}` }] : []),
     ...providerDefinitions
-      .filter((provider) => product && connectedIds.has(provider.id) && planAtLeast(product.accessPlan, provider.minimumPlan))
+      .filter((provider) => owner && connectedIds.has(provider.id) && planAtLeast(owner.accessPlan, provider.minimumPlan))
       .map((provider) => ({ id: provider.id, label: provider.label })),
   ];
 

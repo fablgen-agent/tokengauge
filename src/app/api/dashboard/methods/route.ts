@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { requireProductAccount } from "@/lib/access";
+import { requireOwnerAccount } from "@/lib/access";
 import { tokenTips } from "@/lib/catalog";
 import { setMethodProgress } from "@/lib/db";
 
@@ -14,7 +14,7 @@ const inputSchema = z.object({
 
 export async function PATCH(request: Request): Promise<Response> {
   try {
-    const account = await requireProductAccount(request);
+    const account = await requireOwnerAccount(request);
     const input = inputSchema.parse(await request.json());
     if (!tokenTips.some((tip) => tip.id === input.methodId)) {
       return Response.json({ error: "Unknown method." }, { status: 404 });

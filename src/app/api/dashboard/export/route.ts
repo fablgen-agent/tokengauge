@@ -1,4 +1,4 @@
-import { requireProductAccount } from "@/lib/access";
+import { requireOwnerAccount } from "@/lib/access";
 import { experimentSummaries } from "@/lib/db";
 import { planAtLeast } from "@/lib/plans";
 
@@ -12,7 +12,7 @@ function csvCell(value: string | number): string {
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    const account = await requireProductAccount(request);
+    const account = await requireOwnerAccount(request);
     if (!planAtLeast(account.accessPlan, "pro_plus")) {
       return Response.json({ error: "CSV export requires Pro+." }, { status: 403 });
     }

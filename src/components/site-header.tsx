@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type AccessState = "checking" | "free" | "pro";
+type AccessState = "checking" | "free" | "launch" | "pro";
 
 export function SiteHeader() {
   const [access, setAccess] = useState<AccessState>("checking");
@@ -16,8 +16,8 @@ export function SiteHeader() {
       credentials: "same-origin",
       signal: controller.signal,
     })
-      .then((response) => response.ok ? response.json() as Promise<{ pro?: boolean }> : undefined)
-      .then((account) => setAccess(account?.pro ? "pro" : "free"))
+      .then((response) => response.ok ? response.json() as Promise<{ pro?: boolean; launchOffer?: { remaining?: number } }> : undefined)
+      .then((account) => setAccess(account?.pro ? "pro" : (account?.launchOffer?.remaining ?? 0) > 0 ? "launch" : "free"))
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setAccess("free");
@@ -39,6 +39,8 @@ export function SiteHeader() {
         <Link href="/settings">Settings</Link>
         {access === "pro" ? (
           <Link className="nav-cta nav-cta-active" href="/account" aria-label="TokenGauge Pro access is active">Pro active</Link>
+        ) : access === "launch" ? (
+          <Link className="nav-cta" href="/#pricing" aria-label="Get launch Pro access for £5 one time">Get Pro £5</Link>
         ) : access === "free" ? (
           <Link className="nav-cta" href="/#pricing" aria-label="Get Pro access for £9 one time">Get Pro £9</Link>
         ) : (

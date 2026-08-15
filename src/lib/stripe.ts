@@ -22,6 +22,33 @@ export function getStripe(): Stripe {
   return singleton;
 }
 
+export async function getOrCreateUpgradeCoupon(amountPence: number): Promise<string | undefined> {
+  const amount = Math.max(0, Math.trunc(amountPence));
+  if (!amount) return undefined;
+  const stripe = getStripe();
+  const id = `tokengauge_credit_gbp_${amount}_v1`;
+  try {
+    const existing = await stripe.coupons.retrieve(id);
+    if (!("deleted" in existing) && existing.valid && existing.amount_off === amount && existing.currency === "gbp") return id;
+    throw new Error("Stored upgrade coupon does not match the required GBP credit.");
+  } catch (error) {
+    if (!(error instanceof Stripe.errors.StripeInvalidRequestError) || error.code !== "resource_missing") throw error;
+    try {
+      await stripe.coupons.create({
+        id,
+        amount_off: amount,
+        currency: "gbp",
+        duration: "once",
+        name: `TokenGauge £${(amount / 100).toFixed(2)} upgrade credit`,
+        metadata: { product: "tokengauge", purpose: "upgrade_credit", amount_pence: String(amount) },
+      });
+    } catch (createError) {
+      if (!(createError instanceof Stripe.errors.StripeInvalidRequestError) || createError.code !== "resource_already_exists") throw createError;
+    }
+    return id;
+  }
+}
+
 function idOf(value: string | { id: string } | null): string | undefined {
   if (!value) return undefined;
   return typeof value === "string" ? value : value.id;
@@ -48,7 +75,9 @@ export async function fulfilCheckoutSession(
   if (!isPaidPlanId(entitlement)) {
     return { fulfilled: false, reason: "Unexpected entitlement." };
   }
-  const expectedPriceId = config.priceIds[entitlement];
+  const expectedPriceId = session.metadata?.offer === "launch_100"
+    ? config.launchPriceIds[entitlement]
+    : config.priceIds[entitlement];
   if (!expectedPriceId) return { fulfilled: false, reason: "Checkout price is not configured." };
   const billingUserId = session.client_reference_id;
   if (!billingUserId) return { fulfilled: false, reason: "Missing account reference." };
@@ -68,6 +97,8 @@ export async function fulfilCheckoutSession(
     checkoutSessionId: session.id,
     paymentIntentId: idOf(session.payment_intent),
     key: entitlement,
+    amountPaid: session.amount_total ?? 0,
+    currency: session.currency ?? undefined,
   });
   const customerId = idOf(session.customer);
   if (customerId) setStripeCustomer(accountId, customerId);

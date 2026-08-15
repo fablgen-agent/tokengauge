@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { requireProductAccount } from "@/lib/access";
+import { requireOwnerAccount } from "@/lib/access";
 import { deleteProviderCredential, listProviderCredentials, saveProviderCredential } from "@/lib/provider-vault";
 import { isProviderId, providerConfiguration, providerDefinition, providerDefinitions } from "@/lib/providers";
 import { planAtLeast, planDefinition } from "@/lib/plans";
@@ -18,7 +18,7 @@ const deletionSchema = z.object({ providerId: z.string().refine(isProviderId) })
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    const account = await requireProductAccount(request);
+    const account = await requireOwnerAccount(request);
     const connected = new Map(listProviderCredentials(account.accountId).map((item) => [item.providerId, item]));
     return Response.json({
       plan: account.accessPlan,
@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
 
 export async function PUT(request: Request): Promise<Response> {
   try {
-    const account = await requireProductAccount(request);
+    const account = await requireOwnerAccount(request);
     const input = mutationSchema.parse(await request.json());
     const provider = providerDefinition(input.providerId);
     if (!planAtLeast(account.accessPlan, provider.minimumPlan)) {
@@ -61,7 +61,7 @@ export async function PUT(request: Request): Promise<Response> {
 
 export async function DELETE(request: Request): Promise<Response> {
   try {
-    const account = await requireProductAccount(request);
+    const account = await requireOwnerAccount(request);
     const input = deletionSchema.parse(await request.json());
     return Response.json({ deleted: deleteProviderCredential(account.accountId, input.providerId) });
   } catch (error) {

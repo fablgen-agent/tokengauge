@@ -47,6 +47,12 @@ export const plans: readonly PlanDefinition[] = [
 
 export const paidPlans = plans.filter((plan): plan is PlanDefinition & { id: PaidPlanId } => plan.id !== "free");
 
+export const launchPricesGbp: Readonly<Record<PaidPlanId, number>> = {
+  pro: 5,
+  pro_plus: 15,
+  ultimate: 20,
+};
+
 export function isPlanId(value: unknown): value is PlanId {
   return typeof value === "string" && plans.some((plan) => plan.id === value);
 }

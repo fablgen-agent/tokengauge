@@ -102,4 +102,20 @@ describe("durable state", () => {
     db.setMethodProgress("dashboard-user", "cap-output", "none");
     expect(db.methodProgress("dashboard-user")).toEqual({});
   });
+
+  it("assigns exactly 100 launch places and carries one across an account link", () => {
+    db.upsertUser({ accountId: "launch-chatgpt", billingUserId: "tg-launch-chatgpt" });
+    db.upsertUser({ accountId: "launch-product", billingUserId: "tg-launch-product" });
+    expect(db.ensureLaunchOffer("launch-chatgpt")).toMatchObject({ eligible: true, ordinal: 1, remaining: 99 });
+    expect(db.linkChatGPTAccount({ chatgptAccountId: "launch-chatgpt", productAccountId: "launch-product" }).linked).toBe(true);
+    expect(db.launchOfferStatus("launch-product")).toMatchObject({ eligible: true, ordinal: 1, joined: 1 });
+
+    for (let ordinal = 2; ordinal <= 100; ordinal += 1) {
+      const accountId = `launch-user-${ordinal}`;
+      db.upsertUser({ accountId, billingUserId: `tg-${accountId}` });
+      expect(db.ensureLaunchOffer(accountId)).toMatchObject({ eligible: true, ordinal });
+    }
+    db.upsertUser({ accountId: "launch-overflow", billingUserId: "tg-launch-overflow" });
+    expect(db.ensureLaunchOffer("launch-overflow")).toMatchObject({ eligible: false, joined: 100, remaining: 0 });
+  });
 });

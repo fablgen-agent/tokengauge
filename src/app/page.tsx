@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 import { AccountPanel } from "@/components/account-panel";
 import { CostCalculator } from "@/components/calculator";
@@ -8,9 +10,34 @@ import { SiteHeader } from "@/components/site-header";
 import { TipCard } from "@/components/tip-card";
 import { evidenceLabels, proTips, publicTips, tokenTips } from "@/lib/catalog";
 import { modelPrices, priceProviders, priceSnapshotDate } from "@/lib/costs";
-import { paidPlans } from "@/lib/plans";
+import { launchOfferStatus } from "@/lib/db";
+import { getOwnerAccountContext } from "@/lib/access";
+import { launchPricesGbp, paidPlans } from "@/lib/plans";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const request = new Request("http://tokengauge.internal/", { headers: await headers() });
+  const owner = await getOwnerAccountContext(request);
+  const offer = launchOfferStatus(owner?.accountId);
+  const description = offer.eligible
+    ? "Your Launch 100 account can get Pro £5, Pro+ £15, or Ultimate £20."
+    : offer.remaining > 0
+      ? `Launch 100: Pro £5, Pro+ £15, or Ultimate £20 for the first 100 authenticated accounts. ${offer.remaining} places currently remain.`
+    : "Compare official model rates, test token-saving methods, and measure paired experiments without storing prompts or outputs.";
+  return {
+    title: "TokenGauge — Evidence-backed AI cost optimization",
+    description,
+    openGraph: { title: "TokenGauge Launch 100", description },
+    twitter: { title: "TokenGauge Launch 100", description },
+  };
+}
+
+export default async function Home() {
+  const request = new Request("http://tokengauge.internal/", { headers: await headers() });
+  const owner = await getOwnerAccountContext(request);
+  const launchOffer = launchOfferStatus(owner?.accountId);
+  const launchActive = launchOffer.eligible || launchOffer.remaining > 0;
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -18,13 +45,14 @@ export default function Home() {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description: "Official AI model rate cards, evidence-backed token-saving methods, and controlled multi-provider A/B experiments.",
-    offers: paidPlans.map((plan) => ({ "@type": "Offer", name: `TokenGauge ${plan.name}`, price: plan.priceGbp, priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://tokengauge.enby.fish/#pricing" })),
+    offers: paidPlans.map((plan) => ({ "@type": "Offer", name: `TokenGauge ${plan.name}`, price: launchActive ? launchPricesGbp[plan.id] : plan.priceGbp, priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://tokengauge.enby.fish/#pricing" })),
   };
   return (
-    <div className="page-shell">
+    <div className={`page-shell ${launchActive ? "has-launch" : ""}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <SiteHeader />
       <main>
+        {launchActive ? <aside className="launch-banner" aria-label="Launch offer"><strong>LAUNCH 100</strong><span>First 100 authenticated accounts: Pro £5 · Pro+ £15 · Ultimate £20</span><span>{launchOffer.eligible ? `Signup ${launchOffer.ordinal} price secured` : `${launchOffer.remaining} places remain`}</span><Link href={launchOffer.eligible ? "/#pricing" : "/account"}>{launchOffer.eligible ? "Use your launch price" : "Secure your account price"} <span aria-hidden="true">→</span></Link></aside> : null}
         <section className="hero section-pad">
           <div className="hero-copy">
             <span className="eyebrow eyebrow-lime">LLM COST INTELLIGENCE</span>
@@ -99,7 +127,7 @@ export default function Home() {
               <li>Usage totals retained; prompts and outputs discarded</li><li>14-day refund policy; statutory rights unaffected</li>
             </ul>
           </div>
-          <div className="pricing-tier-grid">{paidPlans.map((plan) => <article className={`price-card price-card-${plan.id}`} key={plan.id}><div><span>{plan.name} access</span><strong><sup>£</sup>{plan.priceGbp}</strong><small>one time · no subscription</small></div><p>{plan.summary}</p><ul>{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><AccountPanel targetPlan={plan.id} /><p>No API credits included. Provider requests use your own connection and billing. Savings are not guaranteed.</p></article>)}</div>
+          <div className="pricing-tier-grid">{paidPlans.map((plan) => { const shownPrice = launchActive ? launchPricesGbp[plan.id] : plan.priceGbp; return <article className={`price-card price-card-${plan.id}`} key={plan.id}><div><span>{plan.name} access</span><strong><sup>£</sup>{shownPrice}</strong><small>{launchActive ? <><s>£{plan.priceGbp}</s> · launch signup price</> : <>one time · no subscription</>}</small></div><p>{plan.summary}</p><ul>{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><AccountPanel targetPlan={plan.id} /><p>No API credits included. Provider requests use your own connection and billing. Savings are not guaranteed.</p></article>; })}</div>
         </section>
       </main>
       <footer className="site-footer section-pad">

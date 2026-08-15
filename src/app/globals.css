@@ -181,6 +181,19 @@ input[type="range"] { accent-color: var(--ink); }
 .form-notice { color: #245b44; background: #e2f4ea; border: 1px solid #b6ddc7; padding: 12px; font-size: 12px; line-height: 1.5; margin: 0; }
 .status-chip { display: inline-flex; align-items: center; min-height: 32px; align-self: flex-start; border: 1px solid var(--line); background: #edf1ea; padding: 0 10px; color: #3e4b47; font-size: 11px; font-weight: 700; }
 .chatgpt-panel.compact { margin-top: 16px; }
+.chatgpt-signin-option { margin-bottom: 28px; padding-bottom: 4px; }
+.chatgpt-signin-option > h2 { margin-bottom: 0; }
+.chatgpt-signin-option .account-panel { margin: 16px 0 0; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 0; color: var(--muted); font: 10px/1 var(--font-geist-mono), monospace; letter-spacing: .08em; text-transform: uppercase; }
+.auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+
+.launch-banner { min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 22px; padding: 10px 28px; border-bottom: 1px solid #31403c; background: var(--lime); color: #101716; font-size: 12px; }
+.launch-banner strong { font: 800 10px/1 var(--font-geist-mono), monospace; letter-spacing: .12em; }
+.launch-banner > span:nth-of-type(2) { border-left: 1px solid rgba(16,23,22,.25); padding-left: 22px; font-weight: 750; }
+.launch-banner a { min-height: 44px; display: inline-flex; align-items: center; color: #101716; font-weight: 800; text-underline-offset: 4px; }
+.price-card s { color: #8b9793; text-decoration-thickness: 1px; }
+.has-launch .site-header { position: relative; background: var(--ink); }
+.has-launch .hero { padding-top: 90px; }
 
 .account-page { background: #eef1eb; }
 .account-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 480px); align-items: center; gap: 60px; padding-top: 55px; padding-bottom: 55px; }
@@ -431,6 +444,9 @@ input[type="range"] { accent-color: var(--ink); }
   .site-header nav { width: 100%; order: 2; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; font-size: 10px; }
   .site-header nav a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
   .site-header .nav-cta { min-height: 44px; padding: 0 6px; }
+  .launch-banner { align-items: flex-start; flex-direction: column; gap: 5px; padding: 16px 20px; }
+  .launch-banner > span:nth-of-type(2) { border-left: 0; padding-left: 0; }
+  .has-launch .hero { padding-top: 72px; }
   .hero { padding-top: 218px; padding-bottom: 62px; }
   .hero h1 { font-size: 49px; }
   .hero-actions { align-items: stretch; flex-direction: column; gap: 13px; }

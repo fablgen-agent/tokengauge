@@ -3,7 +3,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 
 import { getChatGPTHandler } from "@/lib/chatgpt";
-import { planForAccount, upsertUser } from "@/lib/db";
+import { ensureLaunchOffer, linkedProductAccount, planForAccount, upsertUser, userRecord } from "@/lib/db";
 import { getLoginSecret } from "@/lib/env";
 import { planAtLeast, type PlanId } from "@/lib/plans";
 import { billingIdForProductUser, getProductAuth, productAccountId } from "@/lib/product-auth";
@@ -16,7 +16,7 @@ export type AuthContext = {
   plan?: string;
   accessPlan: PlanId;
   pro: boolean;
-  kind: "product" | "chatgpt";
+  kind: "product" | "chatgpt" | "chatgpt_linked";
   emailVerified?: boolean;
   twoFactorEnabled?: boolean;
 };
@@ -73,8 +73,43 @@ export async function getProductAccountContext(request: Request): Promise<AuthCo
   };
 }
 
+export async function getOwnerAccountContext(request: Request): Promise<AuthContext | undefined> {
+  const product = await getProductAccountContext(request);
+  if (product) {
+    ensureLaunchOffer(product.accountId);
+    return product;
+  }
+
+  const chatgpt = await getChatGPTContext(request);
+  if (!chatgpt) return undefined;
+  const linkedAccountId = linkedProductAccount(chatgpt.accountId);
+  if (!linkedAccountId) {
+    ensureLaunchOffer(chatgpt.accountId);
+    return chatgpt;
+  }
+
+  const linkedUser = userRecord(linkedAccountId);
+  if (!linkedUser) {
+    ensureLaunchOffer(chatgpt.accountId);
+    return chatgpt;
+  }
+  const accessPlan = planForAccount(linkedAccountId);
+  ensureLaunchOffer(linkedAccountId);
+  return {
+    accountId: linkedAccountId,
+    billingUserId: linkedUser.billing_user_id,
+    name: linkedUser.name ?? chatgpt.name,
+    email: linkedUser.email ?? chatgpt.email,
+    plan: chatgpt.plan,
+    accessPlan,
+    pro: planAtLeast(accessPlan, "pro"),
+    kind: "chatgpt_linked",
+    emailVerified: true,
+  };
+}
+
 export async function getAuthContext(request: Request): Promise<AuthContext | undefined> {
-  return (await getProductAccountContext(request)) ?? getChatGPTContext(request);
+  return getOwnerAccountContext(request);
 }
 
 export async function requireAuth(request: Request): Promise<AuthContext> {
@@ -86,6 +121,12 @@ export async function requireAuth(request: Request): Promise<AuthContext> {
 export async function requireProductAccount(request: Request): Promise<AuthContext> {
   const context = await getProductAccountContext(request);
   if (!context) throw new Response("Sign in to your verified TokenGauge account first.", { status: 401 });
+  return context;
+}
+
+export async function requireOwnerAccount(request: Request): Promise<AuthContext> {
+  const context = await getOwnerAccountContext(request);
+  if (!context) throw new Response("Sign in with ChatGPT or a verified TokenGauge account first.", { status: 401 });
   return context;
 }
 

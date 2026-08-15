@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { AccountPanel } from "@/components/account-panel";
 import { MethodDashboard } from "@/components/method-dashboard";
 import { SiteHeader } from "@/components/site-header";
-import { getProductAccountContext } from "@/lib/access";
+import { getOwnerAccountContext } from "@/lib/access";
 import { tokenTips } from "@/lib/catalog";
 import { experimentSummaries, methodProgress } from "@/lib/db";
 import { planAtLeast, planDefinition } from "@/lib/plans";
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const request = new Request("http://tokengauge.internal/dashboard", { headers: await headers() });
-  const account = await getProductAccountContext(request);
+  const account = await getOwnerAccountContext(request);
   if (!account) return <div className="subpage"><SiteHeader /><main><section className="subpage-hero section-pad"><span className="eyebrow eyebrow-lime">DASHBOARD</span><h1>Your measured workbench.</h1><p>Sign in to keep experiment totals and an optional method queue under your TokenGauge identity.</p></section><section className="gate-card"><AccountPanel /></section></main></div>;
 
   const experimentLimit = account.accessPlan === "ultimate" ? 1_000 : planAtLeast(account.accessPlan, "pro_plus") ? 250 : 100;

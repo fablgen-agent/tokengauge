@@ -47,6 +47,8 @@ export function getDatabase(): DatabaseSync {
       entitlement_key TEXT NOT NULL,
       checkout_session_id TEXT NOT NULL UNIQUE,
       payment_intent_id TEXT,
+      amount_paid INTEGER NOT NULL DEFAULT 0,
+      currency TEXT,
       active INTEGER NOT NULL DEFAULT 1,
       granted_at INTEGER NOT NULL,
       revoked_at INTEGER,
@@ -98,10 +100,23 @@ export function getDatabase(): DatabaseSync {
       PRIMARY KEY (account_id, method_id),
       FOREIGN KEY (account_id) REFERENCES users(account_id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS launch_offer_members (
+      account_id TEXT PRIMARY KEY,
+      ordinal INTEGER NOT NULL UNIQUE CHECK (ordinal BETWEEN 1 AND 100),
+      joined_at INTEGER NOT NULL,
+      FOREIGN KEY (account_id) REFERENCES users(account_id) ON DELETE CASCADE
+    );
   `);
   const experimentColumns = singleton.prepare("PRAGMA table_info(experiments)").all() as { name: string }[];
   if (!experimentColumns.some((column) => column.name === "provider_id")) {
     singleton.exec("ALTER TABLE experiments ADD COLUMN provider_id TEXT NOT NULL DEFAULT 'chatgpt'");
+  }
+  const entitlementColumns = singleton.prepare("PRAGMA table_info(entitlements)").all() as { name: string }[];
+  if (!entitlementColumns.some((column) => column.name === "amount_paid")) {
+    singleton.exec("ALTER TABLE entitlements ADD COLUMN amount_paid INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!entitlementColumns.some((column) => column.name === "currency")) {
+    singleton.exec("ALTER TABLE entitlements ADD COLUMN currency TEXT");
   }
   return singleton;
 }
@@ -158,6 +173,74 @@ export function upsertUser(input: {
     .run(input.accountId, input.billingUserId, input.name ?? null, input.email ?? null, now, now);
 }
 
+export type UserRecord = {
+  account_id: string;
+  billing_user_id: string;
+  name: string | null;
+  email: string | null;
+};
+
+export function userRecord(accountId: string): UserRecord | undefined {
+  return getDatabase()
+    .prepare("SELECT account_id, billing_user_id, name, email FROM users WHERE account_id = ?")
+    .get(accountId) as UserRecord | undefined;
+}
+
+export const LAUNCH_OFFER_LIMIT = 100;
+
+export type LaunchOfferStatus = {
+  limit: number;
+  joined: number;
+  remaining: number;
+  eligible: boolean;
+  ordinal?: number;
+};
+
+export function ensureLaunchOffer(accountId: string): LaunchOfferStatus {
+  const db = getDatabase();
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    let member = db
+      .prepare("SELECT ordinal FROM launch_offer_members WHERE account_id = ?")
+      .get(accountId) as { ordinal: number } | undefined;
+    const rows = db.prepare("SELECT ordinal FROM launch_offer_members ORDER BY ordinal").all() as { ordinal: number }[];
+    if (!member && rows.length < LAUNCH_OFFER_LIMIT) {
+      const occupied = new Set(rows.map((row) => row.ordinal));
+      let ordinal = 1;
+      while (occupied.has(ordinal) && ordinal <= LAUNCH_OFFER_LIMIT) ordinal += 1;
+      if (ordinal <= LAUNCH_OFFER_LIMIT) {
+        db.prepare("INSERT INTO launch_offer_members (account_id, ordinal, joined_at) VALUES (?, ?, ?)")
+          .run(accountId, ordinal, Date.now());
+        member = { ordinal };
+      }
+    }
+    const joined = rows.length + (member && !rows.some((row) => row.ordinal === member?.ordinal) ? 1 : 0);
+    db.exec("COMMIT");
+    return {
+      limit: LAUNCH_OFFER_LIMIT,
+      joined,
+      remaining: Math.max(0, LAUNCH_OFFER_LIMIT - joined),
+      eligible: Boolean(member),
+      ordinal: member?.ordinal,
+    };
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
+export function launchOfferStatus(accountId?: string): LaunchOfferStatus {
+  if (accountId) return ensureLaunchOffer(accountId);
+  const db = getDatabase();
+  const joined = (db.prepare("SELECT COUNT(*) AS count FROM launch_offer_members").get() as { count: number }).count;
+  return {
+    limit: LAUNCH_OFFER_LIMIT,
+    joined,
+    remaining: Math.max(0, LAUNCH_OFFER_LIMIT - joined),
+    eligible: false,
+  };
+}
+
 export function hasEntitlement(accountId: string, key = "pro"): boolean {
   const row = getDatabase()
     .prepare("SELECT active FROM entitlements WHERE account_id = ? AND entitlement_key = ?")
@@ -177,15 +260,20 @@ export function grantEntitlement(input: {
   checkoutSessionId: string;
   paymentIntentId?: string;
   key?: PaidPlanId;
+  amountPaid?: number;
+  currency?: string;
 }): void {
   getDatabase()
     .prepare(`
       INSERT INTO entitlements (
-        account_id, entitlement_key, checkout_session_id, payment_intent_id, active, granted_at
-      ) VALUES (?, ?, ?, ?, 1, ?)
+        account_id, entitlement_key, checkout_session_id, payment_intent_id,
+        amount_paid, currency, active, granted_at
+      ) VALUES (?, ?, ?, ?, ?, ?, 1, ?)
       ON CONFLICT(account_id, entitlement_key) DO UPDATE SET
         checkout_session_id = excluded.checkout_session_id,
         payment_intent_id = excluded.payment_intent_id,
+        amount_paid = excluded.amount_paid,
+        currency = excluded.currency,
         active = 1,
         granted_at = excluded.granted_at,
         revoked_at = NULL
@@ -195,8 +283,25 @@ export function grantEntitlement(input: {
       input.key ?? "pro",
       input.checkoutSessionId,
       input.paymentIntentId ?? null,
+      Math.max(0, Math.trunc(input.amountPaid ?? 0)),
+      input.currency?.toLowerCase() ?? null,
       Date.now(),
     );
+}
+
+export function entitlementCredit(accountId: string): { plan: PlanId; amountPaid: number; currency?: string } {
+  const plan = planForAccount(accountId);
+  if (plan === "free") return { plan, amountPaid: 0 };
+  const row = getDatabase()
+    .prepare("SELECT amount_paid, currency FROM entitlements WHERE account_id = ? AND entitlement_key = ? AND active = 1")
+    .get(accountId, plan) as { amount_paid: number; currency: string | null } | undefined;
+  return { plan, amountPaid: Math.max(0, row?.amount_paid ?? 0), currency: row?.currency ?? undefined };
+}
+
+export function setEntitlementPaidAmountByPaymentIntent(paymentIntentId: string, amountPaid: number, currency: string): void {
+  getDatabase()
+    .prepare("UPDATE entitlements SET amount_paid = ?, currency = ? WHERE payment_intent_id = ?")
+    .run(Math.max(0, Math.trunc(amountPaid)), currency.toLowerCase(), paymentIntentId);
 }
 
 export function markStripeEvent(eventId: string, eventType: string): boolean {
@@ -426,6 +531,18 @@ export function linkChatGPTAccount(input: {
         moved = true;
       }
     }
+    const chatgptOffer = db
+      .prepare("SELECT ordinal FROM launch_offer_members WHERE account_id = ?")
+      .get(input.chatgptAccountId) as { ordinal: number } | undefined;
+    const productOffer = db
+      .prepare("SELECT ordinal FROM launch_offer_members WHERE account_id = ?")
+      .get(input.productAccountId) as { ordinal: number } | undefined;
+    if (chatgptOffer && !productOffer) {
+      db.prepare("UPDATE launch_offer_members SET account_id = ? WHERE account_id = ?")
+        .run(input.productAccountId, input.chatgptAccountId);
+    } else if (chatgptOffer && productOffer) {
+      db.prepare("DELETE FROM launch_offer_members WHERE account_id = ?").run(input.chatgptAccountId);
+    }
     db.prepare("UPDATE experiments SET account_id = ? WHERE account_id = ?")
       .run(input.productAccountId, input.chatgptAccountId);
     db.exec("COMMIT");
@@ -441,4 +558,11 @@ export function linkedChatGPTAccount(productAccountId: string): string | undefin
     .prepare("SELECT chatgpt_account_id FROM chatgpt_links WHERE product_account_id = ?")
     .get(productAccountId) as { chatgpt_account_id: string } | undefined;
   return row?.chatgpt_account_id;
+}
+
+export function linkedProductAccount(chatgptAccountId: string): string | undefined {
+  const row = getDatabase()
+    .prepare("SELECT product_account_id FROM chatgpt_links WHERE chatgpt_account_id = ?")
+    .get(chatgptAccountId) as { product_account_id: string } | undefined;
+  return row?.product_account_id;
 }

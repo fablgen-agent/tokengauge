@@ -46,6 +46,7 @@ export function getStripeConfig(): {
   apiKey: string;
   priceId?: string;
   priceIds: Partial<Record<PaidPlanId, string>>;
+  launchPriceIds: Partial<Record<PaidPlanId, string>>;
   upgradeCouponIds: { pro?: string; pro_plus?: string };
   webhookSecret?: string;
 } {
@@ -56,6 +57,11 @@ export function getStripeConfig(): {
     pro: priceId,
     pro_plus: read(mode === "live" ? "STRIPE_LIVE_PRO_PLUS_PRICE_ID" : "STRIPE_TEST_PRO_PLUS_PRICE_ID"),
     ultimate: read(mode === "live" ? "STRIPE_LIVE_ULTIMATE_PRICE_ID" : "STRIPE_TEST_ULTIMATE_PRICE_ID"),
+  };
+  const launchPriceIds: Partial<Record<PaidPlanId, string>> = {
+    pro: read(mode === "live" ? "STRIPE_LIVE_LAUNCH_PRO_PRICE_ID" : "STRIPE_TEST_LAUNCH_PRO_PRICE_ID"),
+    pro_plus: read(mode === "live" ? "STRIPE_LIVE_LAUNCH_PRO_PLUS_PRICE_ID" : "STRIPE_TEST_LAUNCH_PRO_PLUS_PRICE_ID"),
+    ultimate: read(mode === "live" ? "STRIPE_LIVE_LAUNCH_ULTIMATE_PRICE_ID" : "STRIPE_TEST_LAUNCH_ULTIMATE_PRICE_ID"),
   };
   const webhookSecret = read(
     mode === "live" ? "STRIPE_LIVE_WEBHOOK_SECRET" : "STRIPE_TEST_WEBHOOK_SECRET",
@@ -74,6 +80,7 @@ export function getStripeConfig(): {
     apiKey,
     priceId,
     priceIds,
+    launchPriceIds,
     upgradeCouponIds: {
       pro: read("STRIPE_PRO_CREDIT_COUPON_ID"),
       pro_plus: read("STRIPE_PRO_PLUS_CREDIT_COUPON_ID"),
@@ -94,5 +101,6 @@ export function getPublicRuntimeStatus() {
       pro_plus: Boolean(read(`${prefix}_PRO_PLUS_PRICE_ID`)),
       ultimate: Boolean(read(`${prefix}_ULTIMATE_PRICE_ID`)),
     },
+    launchCheckoutReady: ["PRO", "PRO_PLUS", "ULTIMATE"].every((plan) => Boolean(read(`${prefix}_LAUNCH_${plan}_PRICE_ID`))),
   } as const;
 }

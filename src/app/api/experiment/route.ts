@@ -3,7 +3,7 @@ import { streamText, type LanguageModelUsage } from "ai";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-import { requireChatGPT, requireProductAccount, type AuthContext } from "@/lib/access";
+import { requireChatGPT, requireOwnerAccount, type AuthContext } from "@/lib/access";
 import { tokenTips } from "@/lib/catalog";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 import { saveExperiment } from "@/lib/db";
@@ -99,7 +99,7 @@ export async function POST(request: Request): Promise<Response> {
       }
     } else {
       const providerId = input.providerId as ProviderId;
-      account = await requireProductAccount(request);
+      account = await requireOwnerAccount(request);
       const definition = providerDefinition(providerId);
       if (!planAtLeast(account.accessPlan, definition.minimumPlan)) {
         return Response.json({ error: `${definition.label} requires ${planDefinition(definition.minimumPlan).name}.` }, { status: 403 });

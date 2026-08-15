@@ -1,4 +1,4 @@
-import { requireChatGPT, requireProductAccount } from "@/lib/access";
+import { requireChatGPT, requireOwnerAccount } from "@/lib/access";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 import { getProviderCredential } from "@/lib/provider-vault";
 import { providerStrategyIds } from "@/lib/provider-runner";
@@ -17,7 +17,7 @@ export async function GET(request: Request): Promise<Response> {
       return Response.json({ providerId, models, strategyIds: ["lower-reasoning-effort", "low-verbosity", "cap-output"] }, { headers: { "Cache-Control": "no-store" } });
     }
     if (!isProviderId(providerId)) return Response.json({ error: "Unknown provider." }, { status: 400 });
-    const account = await requireProductAccount(request);
+    const account = await requireOwnerAccount(request);
     const definition = providerDefinition(providerId);
     if (!planAtLeast(account.accessPlan, definition.minimumPlan)) {
       return Response.json({ error: `${definition.label} requires ${planDefinition(definition.minimumPlan).name}.` }, { status: 403 });

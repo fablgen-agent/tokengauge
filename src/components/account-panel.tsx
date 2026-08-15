@@ -7,6 +7,7 @@ import { planAtLeast, planDefinition, type PaidPlanId, type PlanId } from "@/lib
 
 type Account = {
   authenticated: boolean;
+  accountKind?: "product" | "chatgpt" | "chatgpt_linked";
   user?: { name?: string; email?: string; emailVerified?: boolean; twoFactorEnabled?: boolean };
   pro: boolean;
   accessPlan: PlanId;
@@ -15,6 +16,9 @@ type Account = {
   stripeMode: "test" | "live";
   checkoutReady: boolean;
   checkoutPlans: Record<PaidPlanId, boolean>;
+  launchCheckoutReady: boolean;
+  launchOffer: { limit: number; joined: number; remaining: number; eligible: boolean; ordinal?: number; pricesGbp: Record<PaidPlanId, number> };
+  upgradeCreditGbp: number;
 };
 
 export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?: boolean; targetPlan?: PaidPlanId }) {
@@ -32,6 +36,10 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
 
   const target = planDefinition(targetPlan);
   const upgradePrice = account ? Math.max(0, target.priceGbp - planDefinition(account.accessPlan).priceGbp) : target.priceGbp;
+  const usesLaunchOffer = Boolean(account?.launchOffer?.eligible);
+  const targetPrice = usesLaunchOffer ? account!.launchOffer.pricesGbp[targetPlan] : target.priceGbp;
+  const checkoutPrice = account ? Math.max(0, targetPrice - account.upgradeCreditGbp) : upgradePrice;
+  const checkoutConfigured = usesLaunchOffer ? account?.launchCheckoutReady : account?.checkoutPlans?.[targetPlan];
 
   async function checkout() {
     setBusy(true);
@@ -80,10 +88,10 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
           </div>
         ) : (
           <div className="checkout-stack">
-            <button className="button button-lime" type="button" disabled={busy || !account.checkoutPlans?.[targetPlan]} onClick={checkout}>
-              {busy ? "Opening secure checkout…" : account.checkoutPlans?.[targetPlan] ? `${account.accessPlan === "free" ? "Get" : "Upgrade to"} ${target.name} — £${upgradePrice} once` : "Checkout setup in progress"}
+            <button className="button button-lime" type="button" disabled={busy || !checkoutConfigured} onClick={checkout}>
+              {busy ? "Opening secure checkout…" : checkoutConfigured ? `${account.accessPlan === "free" ? "Get" : "Upgrade to"} ${target.name} — £${checkoutPrice} once` : "Checkout setup in progress"}
             </button>
-            <small>{account.stripeMode === "test" ? "Test mode — no real charges" : account.accessPlan === "free" ? "One-time payment via Stripe" : "Your existing paid tier is credited automatically"}</small>
+            <small>{account.stripeMode === "test" ? "Test mode — no real charges" : usesLaunchOffer ? `Launch offer secured as signup ${account.launchOffer.ordinal} of ${account.launchOffer.limit}` : account.accessPlan === "free" ? "One-time payment via Stripe" : "Your existing paid tier is credited automatically"}</small>
           </div>
         )
       ) : targetPlan === "pro" && account?.pro && account.chatgpt.legacyPro ? (
@@ -94,7 +102,7 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
       ) : (
         <div className="checkout-stack">
           <Link className="button button-lime" href="/account">{account?.accountSystemReady ? "Create or sign in" : "TokenGauge account"}</Link>
-          <small>{account?.accountSystemReady ? "Verified email required before checkout" : "Verified-email signup is being connected"}</small>
+          <small>{account?.accountSystemReady ? "Continue with ChatGPT or verified email before checkout" : "ChatGPT sign-in is available"}</small>
         </div>
       )}
       {error ? <p className="form-error" role="alert">{error}</p> : null}
