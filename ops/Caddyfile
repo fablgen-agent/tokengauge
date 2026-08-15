@@ -1,0 +1,8 @@
+tokengauge.2a01-4f8-10a-cac--1-63.nip.io {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3100
+	header {
+		-Server
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+}

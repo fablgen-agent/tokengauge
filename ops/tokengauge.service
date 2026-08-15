@@ -1,0 +1,29 @@
+[Unit]
+Description=TokenGauge web application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=admin
+Group=admin
+WorkingDirectory=/home/admin/tokengauge/.next/standalone
+EnvironmentFile=/home/admin/.env
+EnvironmentFile=/home/admin/.config/tokengauge/runtime.env
+EnvironmentFile=/home/admin/.config/tokengauge/secret.env
+EnvironmentFile=/home/admin/.config/tokengauge/stripe-webhook.env
+ExecStart=/opt/node-v24.19.0/bin/node /home/admin/tokengauge/.next/standalone/server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadWritePaths=/home/admin/.local/share/tokengauge
+
+[Install]
+WantedBy=multi-user.target
