@@ -94,6 +94,54 @@ export type TokenUsage = {
   outputTokens: number;
 };
 
+export type CacheTtl = "5m" | "1h";
+
+export type CacheEpisodeUsage = {
+  totalInputTokens: number;
+  reusablePrefixTokens: number;
+  writes: number;
+  readsPerWrite: number;
+  ttl: CacheTtl;
+};
+
+export function calculateCacheEpisodeCosts(price: ModelPrice, usage: CacheEpisodeUsage): {
+  baselineUsd: number;
+  cachedUsd: number;
+  breakEvenReads: number;
+  totalRequests: number;
+} {
+  const totalInput = Math.max(usage.totalInputTokens, 0);
+  if (!isInputWithinPriceTier(price, totalInput)) {
+    throw new RangeError(`${price.id} does not cover ${totalInput} input tokens.`);
+  }
+  const prefix = Math.min(Math.max(usage.reusablePrefixTokens, 0), totalInput);
+  const suffix = totalInput - prefix;
+  const writes = Math.max(Math.trunc(usage.writes), 0);
+  const reads = Math.max(Math.trunc(usage.readsPerWrite), 0);
+  const readRate = price.cachedInputPerMillionUsd;
+  const writeRate = usage.ttl === "1h"
+    ? price.cacheWriteOneHourPerMillionUsd
+    : price.cacheWritePerMillionUsd;
+  if (readRate === null || writeRate === undefined) {
+    throw new RangeError(`${price.id} does not publish the selected cache read/write rates.`);
+  }
+
+  const totalRequests = writes * (1 + reads);
+  const baselineUsd = totalRequests * totalInput * price.inputPerMillionUsd / 1_000_000;
+  const cachedEpisodeCost =
+    prefix * writeRate +
+    suffix * price.inputPerMillionUsd +
+    reads * (prefix * readRate + suffix * price.inputPerMillionUsd);
+  const cachedUsd = writes * cachedEpisodeCost / 1_000_000;
+  const denominator = price.inputPerMillionUsd - readRate;
+  const threshold = denominator > 0 ? (writeRate - price.inputPerMillionUsd) / denominator : Number.POSITIVE_INFINITY;
+  const breakEvenReads = prefix > 0 && Number.isFinite(threshold)
+    ? Math.max(0, Math.floor(threshold) + 1)
+    : Number.POSITIVE_INFINITY;
+
+  return { baselineUsd, cachedUsd, breakEvenReads, totalRequests };
+}
+
 export function calculateCostUsd(price: ModelPrice, usage: TokenUsage): number {
   if (!isInputWithinPriceTier(price, usage.inputTokens)) {
     throw new RangeError(`${price.id} does not cover ${usage.inputTokens} input tokens.`);
