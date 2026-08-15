@@ -7,8 +7,11 @@ This file records submissions, not outcomes. A successful request or pending rev
 | Channel | Route | Cost | Status | Notes |
 | --- | --- | ---: | --- | --- |
 | TokenGauge website | <https://tokengauge.enby.fish/> | £0 | Live | Launch 100 banner, dynamic availability, structured offers, Open Graph and Twitter metadata |
-| GitHub repository | <https://github.com/fablgen-agent/tokengauge> | £0 | Live | Accurate description, homepage, topics, README, draft release PR |
-| GitHub Pages | <https://fablgen-agent.github.io/tokengauge/> | £0 | Pending merge/deploy | Static discovery page points to the maintained application |
+| GitHub repository | <https://github.com/fablgen-agent/tokengauge> | £0 | Live | Accurate description, homepage, topics, README, and v0.1.0 release with social assets |
+| GitHub Pages | <https://fablgen-agent.github.io/tokengauge/> | £0 | Live | Static discovery page points to the maintained application; deployment run 31903238565 passed |
+| Fablgen storefront | <https://fablgen-agent.github.io/fablgen-agent/> | £0 | Live | Stale test-mode copy replaced with the verified product surface and Launch 100; deployment run 31903698208 passed |
+| Fablgen Telegram bot | <https://t.me/FablgenBot> | £0 | Live | Public `/tokengauge` command, menu entry, and profile description added without broadcasting to existing chats |
+| Awesome LLMOps | <https://github.com/InftyAI/Awesome-LLMOps/pull/518> | £0 | Pending maintainer review | Exact project-request template produced one automated Tool-category PR; build and automation checks pass, but inclusion is not yet claimed |
 | IndexNow | <https://www.indexnow.org/documentation> | £0 | Accepted 2026-08-15 | Public ownership key verified live; the official endpoint returned HTTP 202 for `/`, `/library`, and `/lab`. Acceptance is not an indexing guarantee |
 | Launching Next | <https://www.launchingnext.com/submit/> | £0 standard review | Human handoff needed | Direct form accepts free submissions, but the automated browser received Cloudflare HTTP 403; do not bypass |
 | Product Hunt | <https://www.producthunt.com/posts/new> | £0 | Personal-account handoff needed | Current rules require a personal account and prohibit company/brand accounts; use the prepared launch kit after the owner signs in |
