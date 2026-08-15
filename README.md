@@ -3,7 +3,7 @@
 TokenGauge is an evidence-backed AI cost-optimization workbench. It combines a free API-cost calculator, an auditable strategy catalogue, and a private A/B lab that compares prompt variants using a customer’s own ChatGPT plan.
 
 - Public mirror: <https://fablgen-agent.github.io/tokengauge/>
-- Full application: <https://tokengauge.2a01-4f8-10a-cac--1-63.nip.io/>
+- Full application: <https://tokengauge.enby.fish/>
 
 The project is independent software and is not affiliated with or endorsed by OpenAI.
 
@@ -58,13 +58,13 @@ The check runs ESLint, strict TypeScript, Vitest, and a production Next.js build
 
 ## Deployment
 
-The reference deployment runs the Next.js standalone server behind Caddy. Templates are in [`ops/`](ops/). Keep environment files outside the repository and make secret-bearing files readable only by the service account.
+The reference deployment runs the Next.js standalone server behind a named Cloudflare Tunnel. An alternative Caddy configuration is included for hosts with public ports. Templates are in [`ops/`](ops/). Keep environment and tunnel credential files outside the repository and make secret-bearing files readable only by the service account. Set `APP_URL` to the public origin so cookie-authenticated POST requests retain strict origin checking when a reverse proxy uses a local upstream host.
 
 GitHub Pages serves only [`docs/`](docs/), which deliberately contains no authentication or payment code.
 
 ## Security and privacy
 
-Please avoid placing secrets, private prompts, or customer data in issues. Report sensitive problems privately to the repository owner through GitHub. See the application’s [privacy notice](https://tokengauge.2a01-4f8-10a-cac--1-63.nip.io/privacy) for the deployed data flow.
+Please avoid placing secrets, private prompts, or customer data in issues. Report sensitive problems privately to the repository owner through GitHub. See the application’s [privacy notice](https://tokengauge.enby.fish/privacy) for the deployed data flow.
 
 ## License
 
