@@ -1,9 +1,9 @@
 import { createChatGPTProxyProvider } from "@opencoredev/loginwithchatgpt-ai";
-import { generateText, type LanguageModelUsage } from "ai";
+import { streamText, type LanguageModelUsage } from "ai";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-import { requireAuth } from "@/lib/access";
+import { requireChatGPT } from "@/lib/access";
 import { tokenTips } from "@/lib/catalog";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 import { saveExperiment } from "@/lib/db";
@@ -53,7 +53,7 @@ export async function POST(request: Request): Promise<Response> {
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (contentLength > 20_000) return Response.json({ error: "Experiment is too large." }, { status: 413 });
 
-    const account = await requireAuth(request);
+    const account = await requireChatGPT(request);
     const rawBody = await request.text();
     if (Buffer.byteLength(rawBody, "utf8") > 20_000) {
       return Response.json({ error: "Experiment is too large." }, { status: 413 });
@@ -79,14 +79,15 @@ export async function POST(request: Request): Promise<Response> {
 
     const results = new Map<"baseline" | "candidate", { text: string; usage: ReturnType<typeof usageDto>; settings: ReturnType<typeof settingsFor> }>();
     for (const variant of variants) {
-      const result = await generateText({
+      const result = streamText({
         model: provider(input.model),
         system: variant.instructions,
         prompt: input.task,
         maxOutputTokens: variant.settings.maxOutputTokens,
         providerOptions: { openai: { reasoningEffort: variant.settings.reasoningEffort, textVerbosity: variant.settings.textVerbosity } },
       });
-      results.set(variant.key, { text: result.text, usage: usageDto(result.usage), settings: variant.settings });
+      const [text, usage] = await Promise.all([result.text, result.usage]);
+      results.set(variant.key, { text, usage: usageDto(usage), settings: variant.settings });
     }
 
     const baseline = results.get("baseline");

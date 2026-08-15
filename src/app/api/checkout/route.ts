@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/access";
+import { requireProductAccount } from "@/lib/access";
 import { getAppUrl, getStripeConfig } from "@/lib/env";
 import { getStripe } from "@/lib/stripe";
 
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const account = await requireAuth(request);
+    const account = await requireProductAccount(request);
     if (account.pro) {
       return Response.json({ url: `${getAppUrl(request)}/library` });
     }

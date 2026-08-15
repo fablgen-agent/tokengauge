@@ -65,6 +65,13 @@ export function getDatabase(): DatabaseSync {
       created_at INTEGER NOT NULL,
       FOREIGN KEY (account_id) REFERENCES users(account_id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS chatgpt_links (
+      chatgpt_account_id TEXT PRIMARY KEY,
+      product_account_id TEXT NOT NULL UNIQUE,
+      linked_at INTEGER NOT NULL,
+      FOREIGN KEY (chatgpt_account_id) REFERENCES users(account_id) ON DELETE CASCADE,
+      FOREIGN KEY (product_account_id) REFERENCES users(account_id) ON DELETE CASCADE
+    );
   `);
   return singleton;
 }
@@ -74,14 +81,14 @@ export class SqliteKeyValueStore<T> implements KeyValueStore<T> {
 
   get(key: string): T | undefined {
     const db = getDatabase();
+    db.prepare(`
+      DELETE FROM kv_store
+      WHERE namespace = ? AND key = ? AND expires_at IS NOT NULL AND expires_at <= ?
+    `).run(this.namespace, key, Date.now());
     const row = db
       .prepare("SELECT value, expires_at FROM kv_store WHERE namespace = ? AND key = ?")
       .get(this.namespace, key) as { value: string; expires_at: number | null } | undefined;
     if (!row) return undefined;
-    if (row.expires_at !== null && row.expires_at <= Date.now()) {
-      this.delete(key);
-      return undefined;
-    }
     return JSON.parse(row.value) as T;
   }
 
@@ -214,4 +221,56 @@ export function saveExperiment(input: {
       input.optimized.total,
       Date.now(),
     );
+}
+
+export function linkChatGPTAccount(input: {
+  chatgptAccountId: string;
+  productAccountId: string;
+}): { linked: boolean; entitlementMoved: boolean; reason?: string } {
+  const db = getDatabase();
+  const existingChatGPT = db
+    .prepare("SELECT product_account_id FROM chatgpt_links WHERE chatgpt_account_id = ?")
+    .get(input.chatgptAccountId) as { product_account_id: string } | undefined;
+  if (existingChatGPT && existingChatGPT.product_account_id !== input.productAccountId) {
+    return { linked: false, entitlementMoved: false, reason: "That ChatGPT account is already linked elsewhere." };
+  }
+  const existingProduct = db
+    .prepare("SELECT chatgpt_account_id FROM chatgpt_links WHERE product_account_id = ?")
+    .get(input.productAccountId) as { chatgpt_account_id: string } | undefined;
+  if (existingProduct && existingProduct.chatgpt_account_id !== input.chatgptAccountId) {
+    return { linked: false, entitlementMoved: false, reason: "This TokenGauge account already has a ChatGPT connection." };
+  }
+
+  let moved = false;
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare(`
+      INSERT OR IGNORE INTO chatgpt_links (chatgpt_account_id, product_account_id, linked_at)
+      VALUES (?, ?, ?)
+    `).run(input.chatgptAccountId, input.productAccountId, Date.now());
+
+    const legacyEntitlement = db
+      .prepare("SELECT 1 AS present FROM entitlements WHERE account_id = ? AND entitlement_key = 'pro' AND active = 1")
+      .get(input.chatgptAccountId) as { present: number } | undefined;
+    const productEntitlement = db
+      .prepare("SELECT 1 AS present FROM entitlements WHERE account_id = ? AND entitlement_key = 'pro' AND active = 1")
+      .get(input.productAccountId) as { present: number } | undefined;
+    if (legacyEntitlement && !productEntitlement) {
+      db.prepare("UPDATE entitlements SET account_id = ? WHERE account_id = ? AND entitlement_key = 'pro'")
+        .run(input.productAccountId, input.chatgptAccountId);
+      moved = true;
+    }
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+  return { linked: true, entitlementMoved: moved };
+}
+
+export function linkedChatGPTAccount(productAccountId: string): string | undefined {
+  const row = getDatabase()
+    .prepare("SELECT chatgpt_account_id FROM chatgpt_links WHERE product_account_id = ?")
+    .get(productAccountId) as { chatgpt_account_id: string } | undefined;
+  return row?.chatgpt_account_id;
 }

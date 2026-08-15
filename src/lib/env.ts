@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createHmac } from "node:crypto";
+
 export type StripeMode = "test" | "live";
 
 function read(name: string): string | undefined {
@@ -20,6 +22,17 @@ export function getLoginSecret(): string {
     throw new Error("A stable Login with ChatGPT secret of at least 32 characters is required.");
   }
   return secret;
+}
+
+export function getProductAuthSecret(): string {
+  const configured = read("BETTER_AUTH_SECRET");
+  if (configured) {
+    if (configured.length < 32) throw new Error("BETTER_AUTH_SECRET must contain at least 32 characters.");
+    return configured;
+  }
+  return createHmac("sha256", getLoginSecret())
+    .update("tokengauge-product-auth-v1")
+    .digest("base64url");
 }
 
 export function getStripeMode(): StripeMode {

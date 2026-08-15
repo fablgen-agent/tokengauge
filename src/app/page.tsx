@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { AccountPanel } from "@/components/account-panel";
 import { CostCalculator } from "@/components/calculator";
@@ -69,6 +70,7 @@ export default function Home() {
 
         <section className="section-pad section-block method-section">
           <div className="section-heading"><span className="eyebrow">EXPERIMENT STANDARD</span><h2>A cheaper answer only wins<br />when it still works.</h2></div>
+          <figure className="method-visual"><Image src="/images/token-flow-workbench.webp" alt="Abstract token tiles moving through a calibrated gauge and emerging as a smaller organized set" width={1536} height={1024} sizes="(max-width: 620px) 100vw, 1240px" /></figure>
           <ol className="method-grid">
             <li><span>01</span><h3>Declare quality</h3><p>Set the acceptance rubric and allowed regression before looking at the outputs.</p></li>
             <li><span>02</span><h3>Pair the trials</h3><p>Run the same inputs through baseline and candidate, recording exact model and cache state.</p></li>
@@ -88,7 +90,7 @@ export default function Home() {
           </div>
           <div className="price-card">
             <div><span>Pro access</span><strong><sup>£</sup>9</strong><small>one time · no subscription</small></div>
-            <ol className="checkout-flow"><li>Connect ChatGPT—no charge</li><li>Review the £9 Stripe checkout</li><li>Receive Pro access</li></ol>
+            <ol className="checkout-flow"><li>Create or sign in to a verified TokenGauge account</li><li>Review the £9 Stripe checkout</li><li>Receive Pro access</li></ol>
             <AccountPanel />
             <p>No API credits included. Lab requests use your connected ChatGPT plan and count against its limits. Savings are not guaranteed.</p>
           </div>
@@ -96,7 +98,7 @@ export default function Home() {
       </main>
       <footer className="site-footer section-pad">
         <div><span className="brand"><span className="brand-mark">T</span>TokenGauge</span><p>Measure the cost. Preserve the answer.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link></nav>
+        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link><Link href="/account">Account</Link></nav>
         <p>Independent software. Not affiliated with or endorsed by any listed model provider.</p>
       </footer>
     </div>

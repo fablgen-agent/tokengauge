@@ -9,6 +9,7 @@ export function SiteHeader() {
         <Link href="/#calculator">Calculator</Link>
         <Link href="/library">Methods</Link>
         <Link href="/lab">Lab</Link>
+        <Link href="/account">Account</Link>
         <Link className="nav-cta" href="/#pricing" aria-label="Upgrade for £9 one time">Upgrade £9</Link>
       </nav>
     </header>

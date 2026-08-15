@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/access";
+import { requireProductAccount } from "@/lib/access";
 import { fulfilCheckoutSession } from "@/lib/stripe";
 import { z } from "zod";
 
@@ -9,7 +9,7 @@ const inputSchema = z.object({ sessionId: z.string().regex(/^cs_(test_|live_)?[A
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const account = await requireAuth(request);
+    const account = await requireProductAccount(request);
     const input = inputSchema.parse(await request.json());
     const result = await fulfilCheckoutSession(input.sessionId, account.billingUserId);
     return Response.json(result, { status: result.fulfilled ? 200 : 409 });

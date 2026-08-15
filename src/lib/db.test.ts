@@ -34,4 +34,19 @@ describe("durable state", () => {
     expect(db.markStripeEvent("evt_one", "checkout.session.completed")).toBe(true);
     expect(db.markStripeEvent("evt_one", "checkout.session.completed")).toBe(false);
   });
+
+  it("moves a legacy ChatGPT entitlement only after an explicit account link", () => {
+    db.upsertUser({ accountId: "chatgpt-legacy", billingUserId: "tg-chatgpt-legacy" });
+    db.upsertUser({ accountId: "product-user", billingUserId: "tg-product-user" });
+    db.grantEntitlement({ accountId: "chatgpt-legacy", checkoutSessionId: "cs_test_legacy" });
+
+    const result = db.linkChatGPTAccount({
+      chatgptAccountId: "chatgpt-legacy",
+      productAccountId: "product-user",
+    });
+    expect(result).toEqual({ linked: true, entitlementMoved: true });
+    expect(db.hasEntitlement("chatgpt-legacy")).toBe(false);
+    expect(db.hasEntitlement("product-user")).toBe(true);
+    expect(db.linkedChatGPTAccount("product-user")).toBe("chatgpt-legacy");
+  });
 });
