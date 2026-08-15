@@ -5,10 +5,11 @@ export function SiteHeader() {
     <header className="site-header">
       <Link className="brand" href="/" aria-label="TokenGauge home"><span className="brand-mark" aria-hidden="true">T</span>TokenGauge</Link>
       <nav aria-label="Main navigation">
+        <Link href="/#rates">Rates</Link>
         <Link href="/#calculator">Calculator</Link>
-        <Link href="/library">Library</Link>
-        <Link href="/lab">A/B Lab</Link>
-        <Link className="nav-cta" href="/#pricing">Get access</Link>
+        <Link href="/library">Methods</Link>
+        <Link href="/lab">Lab</Link>
+        <Link className="nav-cta" href="/#pricing">Upgrade £9</Link>
       </nav>
     </header>
   );

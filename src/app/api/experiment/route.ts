@@ -3,7 +3,8 @@ import { generateText, type LanguageModelUsage } from "ai";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-import { requirePro } from "@/lib/access";
+import { requireAuth } from "@/lib/access";
+import { tokenTips } from "@/lib/catalog";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 import { saveExperiment } from "@/lib/db";
 
@@ -14,7 +15,7 @@ const inputSchema = z.object({
   model: z.string().min(1).max(100),
   task: z.string().min(10).max(6_000),
   baselineInstructions: z.string().min(3).max(6_000),
-  candidateInstructions: z.string().min(3).max(6_000),
+  candidateInstructions: z.string().min(3).max(6_000).optional(),
   strategyId: z.string().min(1).max(100).default("custom"),
 });
 
@@ -29,17 +30,39 @@ function usageDto(usage: LanguageModelUsage) {
   };
 }
 
+function settingsFor(strategyId: string, variant: "baseline" | "candidate") {
+  const settings = {
+    maxOutputTokens: 600,
+    reasoningEffort: "low" as "low" | "medium",
+    textVerbosity: "low" as "low" | "medium",
+  };
+  if (strategyId === "low-verbosity") {
+    settings.textVerbosity = variant === "baseline" ? "medium" : "low";
+  }
+  if (strategyId === "lower-reasoning-effort") {
+    settings.reasoningEffort = variant === "baseline" ? "medium" : "low";
+  }
+  if (strategyId === "cap-output" && variant === "candidate") {
+    settings.maxOutputTokens = 300;
+  }
+  return settings;
+}
+
 export async function POST(request: Request): Promise<Response> {
   try {
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (contentLength > 20_000) return Response.json({ error: "Experiment is too large." }, { status: 413 });
 
-    const account = await requirePro(request);
+    const account = await requireAuth(request);
     const rawBody = await request.text();
     if (Buffer.byteLength(rawBody, "utf8") > 20_000) {
       return Response.json({ error: "Experiment is too large." }, { status: 413 });
     }
     const input = inputSchema.parse(JSON.parse(rawBody));
+    const strategy = tokenTips.find((tip) => tip.id === input.strategyId);
+    if (!strategy || strategy.experimentSupport !== "supported" || (!account.pro && strategy.access !== "free")) {
+      return Response.json({ error: "That strategy is not available for this account." }, { status: 403 });
+    }
 
     const handler = getChatGPTHandler();
     const availableModels = await handler.getModels(request);
@@ -49,21 +72,21 @@ export async function POST(request: Request): Promise<Response> {
 
     const provider = createChatGPTProxyProvider({ fetch: handler.proxyFetch(request) });
     const variants = [
-      { key: "baseline" as const, instructions: input.baselineInstructions },
-      { key: "candidate" as const, instructions: input.candidateInstructions },
+      { key: "baseline" as const, instructions: input.baselineInstructions, settings: settingsFor(input.strategyId, "baseline") },
+      { key: "candidate" as const, instructions: input.baselineInstructions, settings: settingsFor(input.strategyId, "candidate") },
     ];
     if (Math.random() < 0.5) variants.reverse();
 
-    const results = new Map<"baseline" | "candidate", { text: string; usage: ReturnType<typeof usageDto> }>();
+    const results = new Map<"baseline" | "candidate", { text: string; usage: ReturnType<typeof usageDto>; settings: ReturnType<typeof settingsFor> }>();
     for (const variant of variants) {
       const result = await generateText({
         model: provider(input.model),
         system: variant.instructions,
         prompt: input.task,
-        maxOutputTokens: 600,
-        providerOptions: { openai: { reasoningEffort: "low", textVerbosity: "low" } },
+        maxOutputTokens: variant.settings.maxOutputTokens,
+        providerOptions: { openai: { reasoningEffort: variant.settings.reasoningEffort, textVerbosity: variant.settings.textVerbosity } },
       });
-      results.set(variant.key, { text: result.text, usage: usageDto(result.usage) });
+      results.set(variant.key, { text: result.text, usage: usageDto(result.usage), settings: variant.settings });
     }
 
     const baseline = results.get("baseline");

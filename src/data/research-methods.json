@@ -1,0 +1,2551 @@
+[
+  {
+    "id": "research-pc-02",
+    "canonicalId": "research-pc-02",
+    "researchId": "PC-02",
+    "title": "Canonicalize the cached prefix byte-for-byte",
+    "category": "Prompt caching / cache-key stability",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Semantically identical prompts can miss when whitespace, JSON key order, tool order, image identity, or formatting differs because providers match an exact prefix.",
+    "action": "Build one deterministic prefix renderer: fixed Unicode normalization, newline style, JSON key ordering, tool ordering, whitespace, and asset IDs; hash the rendered prefix in logs and alert when a template version unexpectedly produces multiple hashes.",
+    "intervention": "Build one deterministic prefix renderer: fixed Unicode normalization, newline style, JSON key ordering, tool ordering, whitespace, and asset IDs; hash the rendered prefix in logs and alert when a template version unexpectedly produces multiple hashes.",
+    "measure": "Track distinct prefix hashes per template version and hit rate per hash. A/B canonical versus existing serialization with the same traffic shape.",
+    "caveat": "Provider tokenization and internal rendering are not fully exposed; a stable application hash is a diagnostic proxy, not proof of a provider-side match.",
+    "providers": "Provider-agnostic; directly applicable to OpenAI, Anthropic, Gemini implicit caching, and Bedrock.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AWS-CACHE — Amazon Bedrock prompt caching",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html"
+    },
+    "sources": [
+      {
+        "label": "AWS-CACHE — Amazon Bedrock prompt caching",
+        "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-04",
+    "canonicalId": "research-pc-04",
+    "researchId": "PC-04",
+    "title": "Use Anthropic automatic moving caching for growing chats",
+    "category": "Prompt caching / conversation history",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Anthropic's top-level cache_control moves the cache point forward as a conversation grows, reading the old prefix and writing only the new tail.",
+    "action": "On supported Claude interfaces, set top-level cache_control: {\"type\":\"ephemeral\"} on every turn and append history without rewriting earlier blocks.",
+    "intervention": "On supported Claude interfaces, set top-level cache_control: {\"type\":\"ephemeral\"} on every turn and append history without rewriting earlier blocks.",
+    "measure": "Per turn, graph cache_read_input_tokens, cache_creation_input_tokens, and uncached input_tokens; successful growth should show a large read and a small new write.",
+    "caveat": "Automatic caching consumes one of four breakpoint slots, can miss when more than 20 blocks separate writes, and is unavailable on legacy Bedrock integration for Opus 4.6 and earlier.",
+    "providers": "Anthropic Claude API and supported Claude partner interfaces.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AN-CACHE — Anthropic prompt caching",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    },
+    "sources": [
+      {
+        "label": "AN-CACHE — Anthropic prompt caching",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-06",
+    "canonicalId": "research-pc-06",
+    "researchId": "PC-06",
+    "title": "Use multiple breakpoints for different change frequencies",
+    "category": "Prompt caching / hierarchical reuse",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Separate checkpoints let a rarely changing tools/system layer survive while a daily context layer or growing conversation tail is rewritten.",
+    "action": "Place breakpoints after, for example, (1) tools/policy, (2) shared reference corpus, and (3) conversation anchor; keep within the provider's checkpoint limit.",
+    "intervention": "Place breakpoints after, for example, (1) tools/policy, (2) shared reference corpus, and (3) conversation anchor; keep within the provider's checkpoint limit.",
+    "measure": "Attribute reads and writes to each layer using prefix token counts and version IDs; remove a breakpoint if it produces writes without later reads.",
+    "caveat": "Anthropic permits up to four slots; supported Bedrock models have model-specific maxima. More markers do not guarantee more savings.",
+    "providers": "Anthropic Claude, OpenAI GPT-5.6+, Amazon Bedrock supported models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AN-CACHE — Anthropic prompt caching",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    },
+    "sources": [
+      {
+        "label": "AN-CACHE — Anthropic prompt caching",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-07",
+    "canonicalId": "research-pc-07",
+    "researchId": "PC-07",
+    "title": "Anchor growing Claude histories inside the 20-block lookback",
+    "category": "Prompt caching / conversation history",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Each Anthropic breakpoint checks backward at most 20 content blocks for a prior written prefix. Long tool-heavy turns can push a reusable entry out of reach.",
+    "action": "Add an earlier explicit anchor breakpoint before the rolling tail, or consolidate tiny blocks so the previous write remains within 20 positions.",
+    "intervention": "Add an earlier explicit anchor breakpoint before the rolling tail, or consolidate tiny blocks so the previous write remains within 20 positions.",
+    "measure": "Log block distance from each current breakpoint to the last cache write and correlate distances of 20+ with cache misses.",
+    "caveat": "This is Anthropic-specific behavior and also appears in Bedrock's simplified Claude cache management; do not assume the same search window elsewhere.",
+    "providers": "Anthropic Claude; Amazon Bedrock Claude.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AN-CACHE — Anthropic prompt caching",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    },
+    "sources": [
+      {
+        "label": "AN-CACHE — Anthropic prompt caching",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-11",
+    "canonicalId": "research-pc-11",
+    "researchId": "PC-11",
+    "title": "Choose TTL from measured request inter-arrival time",
+    "category": "Prompt caching / cache economics",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "A longer TTL can rescue later reads but costs more on Anthropic and incurs duration-based storage charges for Gemini explicit caches; OpenAI GPT-5.6 currently exposes a 30-minute TTL.",
+    "action": "Build an inter-arrival histogram per reusable prefix. Use Claude 5m unless meaningful reuse lands after 5m; upgrade selected prefixes to 1h. Set Gemini TTL just beyond the selected percentile rather than accepting 1h blindly.",
+    "intervention": "Build an inter-arrival histogram per reusable prefix. Use Claude 5m unless meaningful reuse lands after 5m; upgrade selected prefixes to 1h. Set Gemini TTL just beyond the selected percentile rather than accepting 1h blindly.",
+    "measure": "Calculate realized cost per prefix as writes + storage + reads and simulate each supported TTL over the same timestamp trace.",
+    "caveat": "TTL menus and prices differ by provider/model/partner surface and can change; never reuse a Claude TTL rule for Gemini or OpenAI.",
+    "providers": "Anthropic, Gemini explicit cache, OpenAI GPT-5.6+, supported Bedrock models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
+      "url": "https://ai.google.dev/gemini-api/docs/generate-content/caching"
+    },
+    "sources": [
+      {
+        "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
+        "url": "https://ai.google.dev/gemini-api/docs/generate-content/caching"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-12",
+    "canonicalId": "research-pc-12",
+    "researchId": "PC-12",
+    "title": "Disable implicit writes when an explicit GPT-5.6 boundary is enough",
+    "category": "Prompt caching / write control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "GPT-5.6 cache writes cost more than uncached input. Explicit mode avoids the automatic latest-message breakpoint and writes only marked prefixes.",
+    "action": "Set prompt_cache_options.mode: \"explicit\", mark only proven reusable prefixes, and leave highly variable conversation tails unmarked.",
+    "intervention": "Set prompt_cache_options.mode: \"explicit\", mark only proven reusable prefixes, and leave highly variable conversation tails unmarked.",
+    "measure": "Compare cache_write_tokens, cached_tokens, and net input cost against implicit mode on the same session traces.",
+    "caveat": "GPT-5.5 and earlier do not support explicit breakpoints, and removing the automatic breakpoint can reduce reuse for genuinely stable growing histories.",
+    "providers": "OpenAI GPT-5.6+; OpenAI models on Bedrock's Responses endpoint where supported.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-MODEL — OpenAI model guidance",
+      "url": "https://developers.openai.com/api/docs/guides/latest-model"
+    },
+    "sources": [
+      {
+        "label": "OA-MODEL — OpenAI model guidance",
+        "url": "https://developers.openai.com/api/docs/guides/latest-model"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-13",
+    "canonicalId": "research-pc-13",
+    "researchId": "PC-13",
+    "title": "Cache repeated images, PDFs, video, and reference files",
+    "category": "Prompt caching / multimodal context",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Supported providers can include non-text assets in cached prefixes, avoiding repeated full-price processing of the same document or media input.",
+    "action": "Upload or reference one immutable asset, put it in the reusable prefix/cache object, and send only the new text question on later requests.",
+    "intervention": "Upload or reference one immutable asset, put it in the reusable prefix/cache object, and send only the new text question on later requests.",
+    "measure": "Compare cached-input tokens, asset-processing latency, and total cost across N repeated questions versus resending the asset.",
+    "caveat": "Asset identity and ordering must remain stable; supported types and fields differ. Anthropic user-turn images/documents, Gemini cache objects, and Bedrock content blocks are not interchangeable.",
+    "providers": "OpenAI, Anthropic, Gemini explicit cache, Amazon Bedrock supported models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
+      "url": "https://ai.google.dev/gemini-api/docs/generate-content/caching"
+    },
+    "sources": [
+      {
+        "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
+        "url": "https://ai.google.dev/gemini-api/docs/generate-content/caching"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-14",
+    "canonicalId": "research-pc-14",
+    "researchId": "PC-14",
+    "title": "Use a named Gemini explicit cache for guaranteed corpus reuse",
+    "category": "Prompt caching / explicit cache object",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Gemini generateContent can create a named cache once and reference it in later requests, guaranteeing the explicit-cache price treatment rather than relying on implicit-cache hits.",
+    "action": "Create CachedContent containing the stable corpus/system instruction, store its name and expiry, and pass cached_content on every compatible generation.",
+    "intervention": "Create CachedContent containing the stable corpus/system instruction, store its name and expiry, and pass cached_content on every compatible generation.",
+    "measure": "Track cache creation tokens, storage duration, cached tokens per generation, reuse count, and cost versus ordinary repeated input.",
+    "caveat": "The Interactions API supports implicit caching only; explicit cache objects belong to the legacy generateContent interface and cached content itself cannot be retrieved for inspection.",
+    "providers": "Google Gemini generateContent API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
+      "url": "https://ai.google.dev/gemini-api/docs/generate-content/caching"
+    },
+    "sources": [
+      {
+        "label": "GG-CACHE-EXPLICIT — Gemini generateContent context caching",
+        "url": "https://ai.google.dev/gemini-api/docs/generate-content/caching"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-15",
+    "canonicalId": "research-pc-15",
+    "researchId": "PC-15",
+    "title": "Instrument cache reads, writes, misses, and uncached tails separately",
+    "category": "Prompt caching / observability",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Cache economics require distinct token categories. Provider totals are not normalized and some input fields exclude cache reads/writes.",
+    "action": "Persist provider-native usage fields plus normalized uncached_input, cache_write, cache_read, model, TTL, prefix version, and price snapshot for every request.",
+    "intervention": "Persist provider-native usage fields plus normalized uncached_input, cache_write, cache_read, model, TTL, prefix version, and price snapshot for every request.",
+    "measure": "Dashboard hit ratio, read/write ratio, avoided standard-input dollars, actual billed dollars, p95 latency, and quality by prefix version.",
+    "caveat": "On Bedrock, total input is inputTokens + cacheReadInputTokens + cacheWriteInputTokens; do not apply OpenAI usage semantics to that response.",
+    "providers": "OpenAI, Anthropic, Gemini, Amazon Bedrock.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AWS-CACHE — Amazon Bedrock prompt caching",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html"
+    },
+    "sources": [
+      {
+        "label": "AWS-CACHE — Amazon Bedrock prompt caching",
+        "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html"
+      }
+    ]
+  },
+  {
+    "id": "research-pc-16",
+    "canonicalId": "research-pc-16",
+    "researchId": "PC-16",
+    "title": "Version cache hierarchy from tools to system to messages",
+    "category": "Prompt caching / invalidation control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Anthropic and Bedrock document a hierarchy where changing an earlier layer invalidates that layer and later cached layers. Uncoordinated tool reordering can therefore erase downstream reuse.",
+    "action": "Assign explicit versions to tool bundle, system policy, corpus, and message template; deploy changes deliberately and avoid per-request mutation of earlier layers.",
+    "intervention": "Assign explicit versions to tool bundle, system policy, corpus, and message template; deploy changes deliberately and avoid per-request mutation of earlier layers.",
+    "measure": "Overlay cache-miss spikes with component-version changes and compute rewritten tokens caused by each deployment.",
+    "caveat": "Version labels do not create cache hits by themselves; the rendered prefix must still match exactly.",
+    "providers": "Anthropic Claude, Amazon Bedrock; conceptually relevant to other exact-prefix caches.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AN-CACHE — Anthropic prompt caching",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    },
+    "sources": [
+      {
+        "label": "AN-CACHE — Anthropic prompt caching",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-02",
+    "canonicalId": "research-ctx-02",
+    "researchId": "CTX-02",
+    "title": "Reserve output and reasoning headroom in the context budget",
+    "category": "Context management / admission control",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "A context window includes input, output, and on some models reasoning tokens. Filling it with input risks truncation and wasted retries.",
+    "action": "Define max_input = context_window - max_output - reasoning_reserve - safety_margin; prune, retrieve, or compact before admitting a request above it.",
+    "intervention": "Define max_input = context_window - max_output - reasoning_reserve - safety_margin; prune, retrieve, or compact before admitting a request above it.",
+    "measure": "Track truncation/context-limit errors, retry tokens, and task completion before and after enforcing the budget.",
+    "caveat": "Hidden reasoning consumption can vary and provider limits differ; tune the reserve from observed usage rather than a universal percentage.",
+    "providers": "Provider-agnostic; OpenAI documentation explicitly describes combined window accounting.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-STATE — OpenAI conversation state",
+      "url": "https://developers.openai.com/api/docs/guides/conversation-state"
+    },
+    "sources": [
+      {
+        "label": "OA-STATE — OpenAI conversation state",
+        "url": "https://developers.openai.com/api/docs/guides/conversation-state"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-08",
+    "canonicalId": "research-ctx-08",
+    "researchId": "CTX-08",
+    "title": "Keep a sliding recent window plus pinned invariants",
+    "category": "Conversation history / client-side pruning",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Retain a small recency window verbatim while pinning durable goals, constraints, decisions, unresolved questions, and identifiers outside it.",
+    "action": "On each turn, construct context as system + pinned state + last N turns; archive older raw turns outside model context and adjust N by token budget, not message count.",
+    "intervention": "On each turn, construct context as system + pinned state + last N turns; archive older raw turns outside model context and adjust N by token budget, not message count.",
+    "measure": "Sweep token budgets and score fact retention, instruction adherence, cost, and latency on long-session replay tests.",
+    "caveat": "Recency alone can drop an old fact that suddenly matters; combine with retrieval over the archive for nonlocal references.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "MEMGPT — MemGPT original paper",
+      "url": "https://arxiv.org/abs/2310.08560"
+    },
+    "sources": [
+      {
+        "label": "MEMGPT — MemGPT original paper",
+        "url": "https://arxiv.org/abs/2310.08560"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-09",
+    "canonicalId": "research-ctx-09",
+    "researchId": "CTX-09",
+    "title": "Reset context at real task boundaries",
+    "category": "Conversation history / lifecycle",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Continuing an unrelated task drags old tokens into every later request. A new conversation with only transferred durable state is cheaper and reduces interference.",
+    "action": "Detect explicit “new task/project/user” boundaries, start a new thread, and carry only a typed handoff of relevant facts and permissions.",
+    "intervention": "Detect explicit “new task/project/user” boundaries, start a new thread, and carry only a typed handoff of relevant facts and permissions.",
+    "measure": "Compare average input tokens and cross-task contamination errors for reset versus continuous sessions on multi-task transcripts.",
+    "caveat": "OpenAI previous_response_id is state convenience, not a billing shortcut: all previous input tokens in the chain are billed unless context is compacted/pruned.",
+    "providers": "Provider-agnostic; billing caveat directly documented by OpenAI.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-STATE — OpenAI conversation state",
+      "url": "https://developers.openai.com/api/docs/guides/conversation-state"
+    },
+    "sources": [
+      {
+        "label": "OA-STATE — OpenAI conversation state",
+        "url": "https://developers.openai.com/api/docs/guides/conversation-state"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-10",
+    "canonicalId": "research-ctx-10",
+    "researchId": "CTX-10",
+    "title": "Filter low-information tokens with Selective Context",
+    "category": "Context compression / token filtering",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Selective Context uses self-information to remove less informative content from documents or conversation transcripts.",
+    "action": "Score tokens or lexical units with a small language model, remove the lowest-information units to a fixed budget, and protect entities, numbers, negation, code, and quoted requirements.",
+    "intervention": "Score tokens or lexical units with a small language model, remove the lowest-information units to a fixed budget, and protect entities, numbers, negation, code, and quoted requirements.",
+    "measure": "Sweep compression ratios and evaluate exact fact retention, downstream answer score, hallucinations, latency, and total cost including compressor compute.",
+    "caveat": "Token deletion can damage grammar or silently remove a decisive qualifier; do not deploy from compression ratio alone.",
+    "providers": "Provider-agnostic; can be self-hosted before any LLM API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "SELECTIVE-CONTEXT — original paper",
+      "url": "https://arxiv.org/abs/2304.12102"
+    },
+    "sources": [
+      {
+        "label": "SELECTIVE-CONTEXT — original paper",
+        "url": "https://arxiv.org/abs/2304.12102"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-11",
+    "canonicalId": "research-ctx-11",
+    "researchId": "CTX-11",
+    "title": "Apply budget-controlled LLMLingua prompt compression",
+    "category": "Context compression / learned compressor",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "LLMLingua combines coarse-to-fine selection, a budget controller, and token-level iterative compression to shrink prompts while retaining task semantics.",
+    "action": "Compress only the long context/examples, preserve the instruction and query verbatim, and select a conservative target token budget from an eval sweep.",
+    "intervention": "Compress only the long context/examples, preserve the instruction and query verbatim, and select a conservative target token budget from an eval sweep.",
+    "measure": "Include compressor compute in end-to-end cost; report compression ratio, task score, latency, and failure slices for code, tables, numbers, and multilingual content.",
+    "caveat": "The paper's reported up-to-20× result is dataset/model-specific and not a production guarantee.",
+    "providers": "Provider-agnostic; compressor can front any compatible text-model API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "LLMLINGUA — original paper",
+      "url": "https://arxiv.org/abs/2310.05736"
+    },
+    "sources": [
+      {
+        "label": "LLMLINGUA — original paper",
+        "url": "https://arxiv.org/abs/2310.05736"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-12",
+    "canonicalId": "research-ctx-12",
+    "researchId": "CTX-12",
+    "title": "Use query-aware LongLLMLingua for long evidence sets",
+    "category": "Context compression / relevance and position",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "LongLLMLingua makes compression query-aware and addresses both irrelevant tokens and position bias in long contexts.",
+    "action": "Score context conditioned on the current query, compress lower-relevance passages more aggressively, and preserve/reposition high-relevance evidence.",
+    "intervention": "Score context conditioned on the current query, compress lower-relevance passages more aggressively, and preserve/reposition high-relevance evidence.",
+    "measure": "Compare against uncompressed, simple top-k, and LLMLingua baselines on answer accuracy, citation faithfulness, input tokens, total latency, and cost.",
+    "caveat": "Query-aware preprocessing must be rerun when the question changes and can erase evidence needed for multi-hop questions.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "LONGLLMLINGUA — original paper",
+      "url": "https://arxiv.org/abs/2310.06839"
+    },
+    "sources": [
+      {
+        "label": "LONGLLMLINGUA — original paper",
+        "url": "https://arxiv.org/abs/2310.06839"
+      }
+    ]
+  },
+  {
+    "id": "research-ctx-13",
+    "canonicalId": "research-ctx-13",
+    "researchId": "CTX-13",
+    "title": "Put the strongest evidence near context edges",
+    "category": "Context management / evidence ordering",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "“Lost in the Middle” found many models use relevant information better at the beginning or end than in the middle of long context.",
+    "action": "After reranking, place the highest-confidence evidence first (and, if appropriate, a second key item last), with lower-ranked context in the middle.",
+    "intervention": "After reranking, place the highest-confidence evidence first (and, if appropriate, a second key item last), with lower-ranked context in the middle.",
+    "measure": "Randomize evidence order on a fixed QA set and measure answer/citation accuracy by relevant-chunk position as well as token count.",
+    "caveat": "This does not reduce tokens by itself; it can permit a smaller evidence budget only if evaluation confirms quality holds. Newer models may show different position behavior.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "LOST-MIDDLE — original paper",
+      "url": "https://arxiv.org/abs/2307.03172"
+    },
+    "sources": [
+      {
+        "label": "LOST-MIDDLE — original paper",
+        "url": "https://arxiv.org/abs/2307.03172"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-02",
+    "canonicalId": "research-cmp-02",
+    "researchId": "CMP-02",
+    "title": "Use OpenAI's standalone compact endpoint at semantic checkpoints",
+    "category": "Compaction / explicit control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "/responses/compact accepts a full window and returns the canonical smaller window for the next response.",
+    "action": "Compact after milestones such as plan approval or phase completion, then pass the returned output as-is plus the next user message.",
+    "intervention": "Compact after milestones such as plan approval or phase completion, then pass the returned output as-is plus the next user message.",
+    "measure": "Compare milestone-triggered and threshold-triggered policies on number of compactions, compact-call cost, next-turn tokens, and state-retention tests.",
+    "caveat": "The input sent to the compact endpoint must still fit the context window, and its output may contain retained items beyond the opaque compaction item.",
+    "providers": "OpenAI Responses API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-COMPACT — OpenAI compaction",
+      "url": "https://developers.openai.com/api/docs/guides/compaction"
+    },
+    "sources": [
+      {
+        "label": "OA-COMPACT — OpenAI compaction",
+        "url": "https://developers.openai.com/api/docs/guides/compaction"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-03",
+    "canonicalId": "research-cmp-03",
+    "researchId": "CMP-03",
+    "title": "Drop items before the latest OpenAI compaction item",
+    "category": "Conversation history / post-compaction pruning",
+    "access": "pro",
+    "grade": "official",
+    "summary": "The latest server-side compaction item carries the prior state, so earlier raw items can be removed from subsequent stateless requests.",
+    "action": "After appending response outputs, find the newest compaction item and discard all preceding items before the next request.",
+    "intervention": "After appending response outputs, find the newest compaction item and discard all preceding items before the next request.",
+    "measure": "Confirm identical continuity-eval results while measuring request payload bytes, input tokens, and long-tail latency before and after pruning.",
+    "caveat": "Do not manually prune when using previous_response_id, and do not prune the canonical output returned by standalone /responses/compact.",
+    "providers": "OpenAI Responses API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-COMPACT — OpenAI compaction",
+      "url": "https://developers.openai.com/api/docs/guides/compaction"
+    },
+    "sources": [
+      {
+        "label": "OA-COMPACT — OpenAI compaction",
+        "url": "https://developers.openai.com/api/docs/guides/compaction"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-05",
+    "canonicalId": "research-cmp-05",
+    "researchId": "CMP-05",
+    "title": "Make compaction summaries preserve typed task state",
+    "category": "Compaction / custom summarization",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "A generic prose summary can omit the exact data an agent needs. A typed summary prioritizes goal, constraints, decisions, evidence, artifacts, tool state, failures, and next actions.",
+    "action": "Supply custom compaction instructions that emit fixed sections and stable identifiers; validate required fields before replacing raw history.",
+    "intervention": "Supply custom compaction instructions that emit fixed sections and stable identifiers; validate required fields before replacing raw history.",
+    "measure": "Create “needle” continuity tests for every required state field and track omission rate, summary tokens, next-step success, and compaction cost.",
+    "caveat": "Anthropic custom instructions completely replace its default compaction prompt; a weak custom prompt can perform worse than the default.",
+    "providers": "Anthropic supports custom compaction instructions; pattern is portable to client-side and other provider compaction.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AN-COMPACT — Anthropic compaction",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/compaction"
+    },
+    "sources": [
+      {
+        "label": "AN-COMPACT — Anthropic compaction",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/compaction"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-06",
+    "canonicalId": "research-cmp-06",
+    "researchId": "CMP-06",
+    "title": "Maintain a rolling structured summary plus a recent raw tail",
+    "category": "Summarization / client-side history",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Replace old turns with one continually updated structured summary while retaining recent turns verbatim for local coherence.",
+    "action": "When history crosses a budget, summarize only the oldest segment into the prior summary, validate entities/numbers/decisions, and retain the last K tokens unchanged.",
+    "intervention": "When history crosses a budget, summarize only the oldest segment into the prior summary, validate entities/numbers/decisions, and retain the last K tokens unchanged.",
+    "measure": "Compare cumulative tokens and summary-update cost with full replay; evaluate long-range fact recall, chronology, and contradiction rate over 50+ turns.",
+    "caveat": "Repeated abstractive updates can accumulate distortion. Archive raw turns and periodically rebuild/verify the summary from source.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RECURSIVE-SUMMARY — original recursive summarization paper",
+      "url": "https://arxiv.org/abs/2109.10862"
+    },
+    "sources": [
+      {
+        "label": "RECURSIVE-SUMMARY — original recursive summarization paper",
+        "url": "https://arxiv.org/abs/2109.10862"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-07",
+    "canonicalId": "research-cmp-07",
+    "researchId": "CMP-07",
+    "title": "Build hierarchical summaries instead of repeatedly flattening everything",
+    "category": "Summarization / hierarchy",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Summarize small segments, then recursively summarize groups of summaries, retaining the tree so later queries can select the right level.",
+    "action": "Store leaf spans, intermediate summaries, and provenance links; rebuild only branches affected by new content.",
+    "intervention": "Store leaf spans, intermediate summaries, and provenance links; rebuild only branches affected by new content.",
+    "measure": "Compare tokens recomputed per update, long-range QA, summary faithfulness, and retrieval cost against a single rolling flat summary.",
+    "caveat": "Higher levels lose detail; keep source links and descend to leaves for exact quotes, numbers, or decisions.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RECURSIVE-SUMMARY — original recursive summarization paper",
+      "url": "https://arxiv.org/abs/2109.10862"
+    },
+    "sources": [
+      {
+        "label": "RECURSIVE-SUMMARY — original recursive summarization paper",
+        "url": "https://arxiv.org/abs/2109.10862"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-08",
+    "canonicalId": "research-cmp-08",
+    "researchId": "CMP-08",
+    "title": "Separate fast active memory from large archival memory",
+    "category": "Memory / tiered context",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "MemGPT's virtual-context design moves information between a small in-context tier and larger external storage instead of replaying all history.",
+    "action": "Define an always-in-context working state, an append-only archival store, and explicit promote/evict/search operations with token quotas.",
+    "intervention": "Define an always-in-context working state, an append-only archival store, and explicit promote/evict/search operations with token quotas.",
+    "measure": "Test multi-session recall, active-context tokens, retrieval calls, latency, and false-memory rate against full-history and summary-only baselines.",
+    "caveat": "Memory orchestration adds failure modes and tool calls; incorrect eviction or retrieval can be worse than a larger plain context.",
+    "providers": "Provider-agnostic; self-hostable architecture.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "MEMGPT — original paper",
+      "url": "https://arxiv.org/abs/2310.08560"
+    },
+    "sources": [
+      {
+        "label": "MEMGPT — original paper",
+        "url": "https://arxiv.org/abs/2310.08560"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-09",
+    "canonicalId": "research-cmp-09",
+    "researchId": "CMP-09",
+    "title": "Retrieve persistent memory just in time",
+    "category": "Memory / on-demand retrieval",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Anthropic's memory tool stores facts in application-controlled files and reads only relevant files on demand, keeping the active context focused.",
+    "action": "Store concise per-user/project memory under a protected namespace, expose directory/list/search first, and read individual files only when the current task needs them.",
+    "intervention": "Store concise per-user/project memory under a protected namespace, expose directory/list/search first, and read individual files only when the current task needs them.",
+    "measure": "Track memory tokens read per task, useful-read rate, cross-session recall accuracy, and stale/incorrect memory incidents.",
+    "caveat": "The application, not Anthropic, owns persistence, access control, deletion, tenant isolation, and path traversal defense.",
+    "providers": "Anthropic Claude directly; pattern is provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "AN-MEMORY — Anthropic memory tool",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
+    },
+    "sources": [
+      {
+        "label": "AN-MEMORY — Anthropic memory tool",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-10",
+    "canonicalId": "research-cmp-10",
+    "researchId": "CMP-10",
+    "title": "Rank memories by relevance, recency, and importance",
+    "category": "Memory / selection",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Generative Agents retrieves a small set of memories using relevance, recency, and importance rather than dumping the complete event log into context.",
+    "action": "Score candidate memories on all three dimensions, normalize the scores, retrieve to a strict token budget, and log why each memory was selected.",
+    "intervention": "Score candidate memories on all three dimensions, normalize the scores, retrieve to a strict token budget, and log why each memory was selected.",
+    "measure": "Ablate each score and measure downstream task success, recall of durable facts, irrelevant tokens injected, and retrieval latency.",
+    "caveat": "Importance scoring can encode model bias; recent trivial events can crowd out old critical constraints without calibrated weights and pinned facts.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GENERATIVE-AGENTS — original paper",
+      "url": "https://arxiv.org/abs/2304.03442"
+    },
+    "sources": [
+      {
+        "label": "GENERATIVE-AGENTS — original paper",
+        "url": "https://arxiv.org/abs/2304.03442"
+      }
+    ]
+  },
+  {
+    "id": "research-cmp-11",
+    "canonicalId": "research-cmp-11",
+    "researchId": "CMP-11",
+    "title": "Consolidate many observations into higher-level reflections",
+    "category": "Memory / consolidation",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Periodic reflection converts clusters of low-level memories into fewer durable abstractions that can be retrieved instead of many raw events.",
+    "action": "When accumulated importance crosses a threshold, synthesize a reflection with provenance links, store it separately, and prefer it for broad questions while retaining raw evidence.",
+    "intervention": "When accumulated importance crosses a threshold, synthesize a reflection with provenance links, store it separately, and prefer it for broad questions while retaining raw evidence.",
+    "measure": "Measure tokens retrieved, planning/task score, contradiction rate, and whether answers can trace a reflection back to supporting observations.",
+    "caveat": "Reflections can overgeneralize or fossilize an early mistake; expire or revise them when contrary evidence arrives.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GENERATIVE-AGENTS — original paper",
+      "url": "https://arxiv.org/abs/2304.03442"
+    },
+    "sources": [
+      {
+        "label": "GENERATIVE-AGENTS — original paper",
+        "url": "https://arxiv.org/abs/2304.03442"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-01",
+    "canonicalId": "research-ret-01",
+    "researchId": "RET-01",
+    "title": "Retrieve evidence instead of injecting the whole corpus",
+    "category": "Retrieval / RAG",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Retrieval-augmented generation keeps external knowledge in a non-parametric index and places only selected passages into the generation context.",
+    "action": "Index the corpus, retrieve a bounded candidate set for each query, and send only cited passages plus the query to the generator.",
+    "intervention": "Index the corpus, retrieve a bounded candidate set for each query, and send only cited passages plus the query to the generator.",
+    "measure": "Compare input tokens, answer accuracy, citation coverage, latency, retrieval cost, and freshness against full-corpus injection.",
+    "caveat": "Retrieval adds an independent recall failure: absent evidence cannot be recovered by the generator. Maintain no-answer and escalation behavior.",
+    "providers": "Provider-agnostic; managed options include OpenAI Retrieval and Gemini File Search.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RAG — original Retrieval-Augmented Generation paper",
+      "url": "https://arxiv.org/abs/2005.11401"
+    },
+    "sources": [
+      {
+        "label": "RAG — original Retrieval-Augmented Generation paper",
+        "url": "https://arxiv.org/abs/2005.11401"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-03",
+    "canonicalId": "research-ret-03",
+    "researchId": "RET-03",
+    "title": "Reject low-score chunks with a relevance threshold",
+    "category": "Retrieval / filtering",
+    "access": "pro",
+    "grade": "official",
+    "summary": "A score threshold can return fewer or zero chunks rather than padding the prompt with weak matches.",
+    "action": "Calibrate score_threshold on labeled queries, use a no-context/no-answer path below it, and tune separately by corpus and ranker.",
+    "intervention": "Calibrate score_threshold on labeled queries, use a no-context/no-answer path below it, and tune separately by corpus and ranker.",
+    "measure": "Measure precision, recall, empty-result rate, injected tokens, hallucination rate, and answer accuracy across thresholds.",
+    "caveat": "Similarity scores are not universally calibrated; a higher threshold can exclude useful evidence and must not be copied across embedding models.",
+    "providers": "OpenAI Retrieval directly; portable to scored retrievers.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-RETRIEVAL — OpenAI Retrieval",
+      "url": "https://developers.openai.com/api/docs/guides/retrieval"
+    },
+    "sources": [
+      {
+        "label": "OA-RETRIEVAL — OpenAI Retrieval",
+        "url": "https://developers.openai.com/api/docs/guides/retrieval"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-05",
+    "canonicalId": "research-ret-05",
+    "researchId": "RET-05",
+    "title": "Tune chunk size to the evidence unit",
+    "category": "Retrieval / indexing",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Smaller chunks reduce irrelevant tokens per hit; larger chunks preserve surrounding context. Provider defaults are not universally optimal.",
+    "action": "Index test variants at several chunk sizes aligned to headings/paragraphs when possible, then select the smallest size that preserves required evidence.",
+    "intervention": "Index test variants at several chunk sizes aligned to headings/paragraphs when possible, then select the smallest size that preserves required evidence.",
+    "measure": "Evaluate retrieval recall, answer score, chunks/query, retrieved tokens, and indexing/storage cost for each size.",
+    "caveat": "Very small chunks lose cross-sentence context and can increase top-k; very large chunks recreate whole-document bloat.",
+    "providers": "OpenAI vector stores, Gemini File Search, provider-agnostic retrieval systems.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GG-FILE — Gemini File Search",
+      "url": "https://ai.google.dev/gemini-api/docs/file-search"
+    },
+    "sources": [
+      {
+        "label": "GG-FILE — Gemini File Search",
+        "url": "https://ai.google.dev/gemini-api/docs/file-search"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-06",
+    "canonicalId": "research-ret-06",
+    "researchId": "RET-06",
+    "title": "Minimize chunk overlap consistent with boundary recall",
+    "category": "Retrieval / indexing duplication",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Overlap repeats tokens across neighboring hits. Reducing it lowers index size and duplicated context when adjacent chunks are retrieved together.",
+    "action": "Sweep overlap from zero upward; deduplicate identical spans after retrieval and preserve source offsets for citations.",
+    "intervention": "Sweep overlap from zero upward; deduplicate identical spans after retrieval and preserve source offsets for citations.",
+    "measure": "Track boundary-question recall, duplicate-token ratio in final context, index size, and answer accuracy.",
+    "caveat": "Zero overlap can split a decisive statement; chunk size and overlap must be tuned jointly.",
+    "providers": "OpenAI vector stores, Gemini File Search, provider-agnostic retrieval systems.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-RETRIEVAL — OpenAI Retrieval",
+      "url": "https://developers.openai.com/api/docs/guides/retrieval"
+    },
+    "sources": [
+      {
+        "label": "OA-RETRIEVAL — OpenAI Retrieval",
+        "url": "https://developers.openai.com/api/docs/guides/retrieval"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-07",
+    "canonicalId": "research-ret-07",
+    "researchId": "RET-07",
+    "title": "Rewrite conversational queries before retrieval",
+    "category": "Retrieval / query formulation",
+    "access": "pro",
+    "grade": "official",
+    "summary": "A concise search-oriented rewrite can improve retrieval so fewer results are needed for the same recall.",
+    "action": "Enable OpenAI rewrite_query=true or generate a standalone search query that resolves entities from pinned conversation state; log the rewrite.",
+    "intervention": "Enable OpenAI rewrite_query=true or generate a standalone search query that resolves entities from pinned conversation state; log the rewrite.",
+    "measure": "Compare recall@small-k, retrieved tokens, answer score, and rewrite errors against raw-query retrieval.",
+    "caveat": "Rewriting can change intent; retain the original query for generation and audit, and bypass rewrite for exact identifiers/quoted text when appropriate.",
+    "providers": "OpenAI Retrieval directly; portable to other retrievers.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-RETRIEVAL — OpenAI Retrieval",
+      "url": "https://developers.openai.com/api/docs/guides/retrieval"
+    },
+    "sources": [
+      {
+        "label": "OA-RETRIEVAL — OpenAI Retrieval",
+        "url": "https://developers.openai.com/api/docs/guides/retrieval"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-08",
+    "canonicalId": "research-ret-08",
+    "researchId": "RET-08",
+    "title": "Tune hybrid lexical/semantic ranking before increasing top-k",
+    "category": "Retrieval / ranking",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Adjusting semantic-versus-keyword weights and reranking can move useful evidence into a smaller result budget.",
+    "action": "Evaluate semantic-only, lexical-heavy, and balanced reciprocal-rank-fusion settings; select by query class before changing k.",
+    "intervention": "Evaluate semantic-only, lexical-heavy, and balanced reciprocal-rank-fusion settings; select by query class before changing k.",
+    "measure": "Measure recall@k, MRR/nDCG, downstream answer score, and retrieved tokens at the same small k.",
+    "caveat": "The best weights depend on corpus and query mix; exact API controls shown here are OpenAI-specific.",
+    "providers": "OpenAI Retrieval directly; analogous hybrid search elsewhere.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OA-RETRIEVAL — OpenAI Retrieval",
+      "url": "https://developers.openai.com/api/docs/guides/retrieval"
+    },
+    "sources": [
+      {
+        "label": "OA-RETRIEVAL — OpenAI Retrieval",
+        "url": "https://developers.openai.com/api/docs/guides/retrieval"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-09",
+    "canonicalId": "research-ret-09",
+    "researchId": "RET-09",
+    "title": "Extract only useful sentences from retrieved documents",
+    "category": "Retrieval / extractive compression",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "RECOMP's extractive compressor selects task-useful sentences before adding retrieved material to the generator prompt.",
+    "action": "Run sentence-level relevance selection over retrieved candidates, retain source spans verbatim, and enforce a post-retrieval token budget.",
+    "intervention": "Run sentence-level relevance selection over retrieved candidates, retain source spans verbatim, and enforce a post-retrieval token budget.",
+    "measure": "Compare tokens, answer score, evidence recall, and citation faithfulness against raw chunks and naive first-sentence truncation.",
+    "caveat": "Sentence extraction can miss evidence that only makes sense across sentences or documents.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RECOMP — original paper",
+      "url": "https://arxiv.org/abs/2310.04408"
+    },
+    "sources": [
+      {
+        "label": "RECOMP — original paper",
+        "url": "https://arxiv.org/abs/2310.04408"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-10",
+    "canonicalId": "research-ret-10",
+    "researchId": "RET-10",
+    "title": "Synthesize a short multi-document retrieval summary",
+    "category": "Retrieval / abstractive compression",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "RECOMP's abstractive compressor merges relevant information across documents into a compact summary before final generation.",
+    "action": "Summarize the candidate set conditioned on the user query, require source-span IDs for every claim, and send the summary plus minimal supporting excerpts.",
+    "intervention": "Summarize the candidate set conditioned on the user query, require source-span IDs for every claim, and send the summary plus minimal supporting excerpts.",
+    "measure": "Include compressor cost; evaluate token reduction, factual faithfulness, source coverage, final answer quality, and latency.",
+    "caveat": "Abstractive compression can hallucinate or erase disagreements. Preserve provenance and use extractive compression for high-stakes exactness.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RECOMP — original paper",
+      "url": "https://arxiv.org/abs/2310.04408"
+    },
+    "sources": [
+      {
+        "label": "RECOMP — original paper",
+        "url": "https://arxiv.org/abs/2310.04408"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-11",
+    "canonicalId": "research-ret-11",
+    "researchId": "RET-11",
+    "title": "Skip retrieval or augmentation when it adds no value",
+    "category": "Retrieval / adaptive gating",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Self-RAG retrieves on demand, and RECOMP can emit an empty augmentation when results are irrelevant. Avoiding unconditional fixed-k retrieval saves both retrieval and context tokens.",
+    "action": "Add a calibrated gate using query type, confidence, and relevance scores; permit zero retrieved chunks and fall back to retrieval when factuality or uncertainty requires it.",
+    "intervention": "Add a calibrated gate using query type, confidence, and relevance scores; permit zero retrieved chunks and fall back to retrieval when factuality or uncertainty requires it.",
+    "measure": "Track retrieval-call rate, zero-context rate, cost, factual accuracy, unsupported claims, and false-skip errors versus always-retrieve.",
+    "caveat": "The dangerous failure is skipping retrieval when current or proprietary facts are required; bias the gate toward retrieval for high-stakes or freshness-sensitive questions.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "SELF-RAG — original paper",
+      "url": "https://arxiv.org/abs/2310.11511"
+    },
+    "sources": [
+      {
+        "label": "SELF-RAG — original paper",
+        "url": "https://arxiv.org/abs/2310.11511"
+      }
+    ]
+  },
+  {
+    "id": "research-ret-12",
+    "canonicalId": "research-ret-12",
+    "researchId": "RET-12",
+    "title": "Retrieve from a tree of recursive summaries",
+    "category": "Retrieval / hierarchical index",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "RAPTOR recursively clusters and summarizes chunks, then retrieves at the level of abstraction appropriate to the query.",
+    "action": "Build a tree whose leaves are source chunks and internal nodes are summaries; retrieve across levels and descend to leaves when exact evidence is needed.",
+    "intervention": "Build a tree whose leaves are source chunks and internal nodes are summaries; retrieve across levels and descend to leaves when exact evidence is needed.",
+    "measure": "Compare input tokens, multi-hop QA, retrieval recall, preprocessing/update cost, and citation faithfulness against flat chunk retrieval.",
+    "caveat": "Tree maintenance is expensive for frequently changing corpora, and summary nodes need provenance to prevent ungrounded abstraction.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RAPTOR — original paper",
+      "url": "https://arxiv.org/abs/2401.18059"
+    },
+    "sources": [
+      {
+        "label": "RAPTOR — original paper",
+        "url": "https://arxiv.org/abs/2401.18059"
+      }
+    ]
+  },
+  {
+    "id": "research-oc-08",
+    "canonicalId": "research-oc-08",
+    "researchId": "OC-08",
+    "title": "Give long Claude agents an end-to-end task budget",
+    "category": "Agent output/tool-loop control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Anthropic task budgets expose a running token countdown so an agent can prioritize and finish instead of expanding work indefinitely.",
+    "action": "Set output_config.task_budget.total from measured per-task distributions and combine it with a hard per-request max_tokens ceiling.",
+    "intervention": "Set output_config.task_budget.total from measured per-task distributions and combine it with a hard per-request max_tokens ceiling.",
+    "measure": "Compare total tokens across the whole agent loop, completion rate, partial-result rate, tool calls, and cost per successful task.",
+    "caveat": "The feature is beta, model-limited, and advisory rather than a hard cap; changing remaining between cached turns can invalidate cache prefixes.",
+    "providers": "Anthropic on listed supported Claude models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Task budgets",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/task-budgets"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Task budgets",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/task-budgets"
+      }
+    ]
+  },
+  {
+    "id": "research-so-03",
+    "canonicalId": "research-so-03",
+    "researchId": "SO-03",
+    "title": "Make the output schema no larger than the consumer contract",
+    "category": "Structured outputs / schema design",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Schema text consumes input tokens, and every generated field consumes output tokens; unused fields cost on both sides.",
+    "action": "Delete properties not read downstream, shorten field descriptions without losing disambiguation, and split unrelated response shapes into task-specific schemas.",
+    "intervention": "Delete properties not read downstream, shorten field descriptions without losing disambiguation, and split unrelated response shapes into task-specific schemas.",
+    "measure": "Count the request with each schema, compare output tokens and semantic error rate, and verify downstream code accesses no removed field.",
+    "caveat": "Descriptions can be essential for correct semantics even when the JSON type is obvious; remove them only through ablation.",
+    "providers": "OpenAI, Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Counting tokens with tools",
+      "url": "https://developers.openai.com/api/docs/guides/token-counting"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Counting tokens with tools",
+        "url": "https://developers.openai.com/api/docs/guides/token-counting"
+      },
+      {
+        "label": "Google — Structured outputs",
+        "url": "https://ai.google.dev/gemini-api/docs/structured-output"
+      }
+    ]
+  },
+  {
+    "id": "research-so-05",
+    "canonicalId": "research-so-05",
+    "researchId": "SO-05",
+    "title": "Bound array cardinality in both schema and prompt",
+    "category": "Structured outputs / output control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "maxItems plus an explicit “top N” instruction caps list-shaped outputs more reliably than “keep it short.”",
+    "action": "Set maxItems: N where the provider supports it and say exactly how to rank/select the N items; enforce the same limit client-side.",
+    "intervention": "Set maxItems: N where the provider supports it and say exactly how to rank/select the N items; enforce the same limit client-side.",
+    "measure": "Track output tokens, item-count violations, top-N precision/recall, and truncation.",
+    "caveat": "JSON Schema keyword support differs. Gemini explicitly documents maxItems; verify OpenAI/Anthropic support before sending the same schema cross-provider.",
+    "providers": "Gemini API explicitly; provider-specific validation elsewhere.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Structured outputs, array properties",
+      "url": "https://ai.google.dev/gemini-api/docs/structured-output"
+    },
+    "sources": [
+      {
+        "label": "Google — Structured outputs, array properties",
+        "url": "https://ai.google.dev/gemini-api/docs/structured-output"
+      }
+    ]
+  },
+  {
+    "id": "research-so-06",
+    "canonicalId": "research-so-06",
+    "researchId": "SO-06",
+    "title": "Return identifiers and hydrate records locally",
+    "category": "Structured outputs / application design",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "If the application already owns the records, the model need not repeat names, descriptions, URLs, or metadata.",
+    "action": "Give each candidate a compact stable ID, ask the model to return only selected IDs plus indispensable generated fields, then join full records in application code.",
+    "intervention": "Give each candidate a compact stable ID, ask the model to return only selected IDs plus indispensable generated fields, then join full records in application code.",
+    "measure": "Compare input/output tokens, ID-selection accuracy, join failures, and end-to-end latency against full-record generation.",
+    "caveat": "IDs must be stable and collision-free; opaque IDs can make reasoning harder, so retain short human-readable labels in input when needed.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Structured outputs",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Structured outputs",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+      }
+    ]
+  },
+  {
+    "id": "research-so-07",
+    "canonicalId": "research-so-07",
+    "researchId": "SO-07",
+    "title": "Repair only semantically invalid fields",
+    "category": "Structured outputs / retry handling",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Native schemas remove syntax failures, but a bad value should not force regeneration of every valid field.",
+    "action": "Validate business rules locally; on failure send the smallest failing field set, validation message, and required context to a repair schema, then merge only validated repairs.",
+    "intervention": "Validate business rules locally; on failure send the smallest failing field set, validation message, and required context to a repair schema, then merge only validated repairs.",
+    "measure": "Compare repair-call input/output tokens, final correctness, and cost against full-request retries on the same failures.",
+    "caveat": "Field-local repair is unsafe when fields are tightly coupled; rerun the whole object when changing one value can invalidate others.",
+    "providers": "OpenAI, Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Structured outputs",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Structured outputs",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+      },
+      {
+        "label": "Google — Structured outputs, semantic validation caveat",
+        "url": "https://ai.google.dev/gemini-api/docs/structured-output"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-02",
+    "canonicalId": "research-tl-02",
+    "researchId": "TL-02",
+    "title": "Load large tool catalogs on demand",
+    "category": "Tool schemas / context management",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Tool search replaces dozens of upfront schemas with one search tool and loads only selected definitions.",
+    "action": "Mark non-core tools deferred and expose the provider’s tool-search mechanism; always load only the few universal tools.",
+    "intervention": "Mark non-core tools deferred and expose the provider’s tool-search mechanism; always load only the few universal tools.",
+    "measure": "Compare baseline input tokens, search calls, added latency, tool-selection accuracy, and total cost at catalog sizes of 10, 20, 50, and 100 tools.",
+    "caveat": "Anthropic suggests the technique for large sets (roughly 20+); OpenAI’s API and supported models differ. One extra search turn can cost more for small catalogs.",
+    "providers": "OpenAI, Anthropic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Tool search",
+      "url": "https://developers.openai.com/api/docs/guides/tools-tool-search"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Tool search",
+        "url": "https://developers.openai.com/api/docs/guides/tools-tool-search"
+      },
+      {
+        "label": "Anthropic — Manage tool context",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/manage-tool-context"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-03",
+    "canonicalId": "research-tl-03",
+    "researchId": "TL-03",
+    "title": "Cache stable tool definitions",
+    "category": "Tool schemas / caching",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Caching does not shrink tool schemas, but it can substantially discount their repeated input cost.",
+    "action": "Keep tool order and definitions byte-stable, place a cache breakpoint on the last stable tool definition where required, and monitor cache reads.",
+    "intervention": "Keep tool order and definitions byte-stable, place a cache breakpoint on the last stable tool definition where required, and monitor cache reads.",
+    "measure": "Track cache-write/read tokens, cache-hit rate, amortized tool-schema cost, and invalidations per deployment.",
+    "caveat": "Anthropic cache writes carry a markup and OpenAI cache rules/prices differ; one-off or frequently changing toolsets can cost more with explicit writes.",
+    "providers": "OpenAI, Anthropic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Prompt caching",
+      "url": "https://developers.openai.com/api/docs/guides/prompt-caching"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Prompt caching",
+        "url": "https://developers.openai.com/api/docs/guides/prompt-caching"
+      },
+      {
+        "label": "Anthropic — Tool use with prompt caching",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-use-with-prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-04",
+    "canonicalId": "research-tl-04",
+    "researchId": "TL-04",
+    "title": "Keep the OpenAI tool array stable and vary allowed_tools",
+    "category": "Tool routing / caching",
+    "access": "pro",
+    "grade": "official",
+    "summary": "An allowed subset changes what the model may call without rewriting the cached tool-definition prefix.",
+    "action": "Send one stable ordered tool list, then set tool_choice.type: \"allowed_tools\" with only the names permitted for the current request.",
+    "intervention": "Send one stable ordered tool list, then set tool_choice.type: \"allowed_tools\" with only the names permitted for the current request.",
+    "measure": "Compare cache-hit tokens, wrong-tool calls, and input cost against dynamically rebuilding the tools array.",
+    "caveat": "This is OpenAI-specific; do not assume the same cache semantics for Gemini or Anthropic modes.",
+    "providers": "OpenAI.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Function calling, allowed tools",
+      "url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Function calling, allowed tools",
+        "url": "https://developers.openai.com/api/docs/guides/function-calling"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-05",
+    "canonicalId": "research-tl-05",
+    "researchId": "TL-05",
+    "title": "Make tool descriptions concise and operationally precise",
+    "category": "Tool schemas",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Short descriptions save recurring context, but precision prevents expensive wrong calls and repair turns.",
+    "action": "For each tool, retain purpose, when to use/not use, argument semantics, return shape, and error behavior; remove marketing prose, duplicated type text, and generic examples.",
+    "intervention": "For each tool, retain purpose, when to use/not use, argument semantics, return shape, and error behavior; remove marketing prose, duplicated type text, and generic examples.",
+    "measure": "Count schema tokens and evaluate tool-choice accuracy, argument validity, call count, and retries after each description reduction.",
+    "caveat": "Anthropic emphasizes detailed descriptions for reliable selection; “shortest” is not the objective. Keep detail that resolves overlap between tools.",
+    "providers": "OpenAI, Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Model guidance",
+      "url": "https://developers.openai.com/api/docs/guides/latest-model"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Model guidance",
+        "url": "https://developers.openai.com/api/docs/guides/latest-model"
+      },
+      {
+        "label": "Google — Function calling",
+        "url": "https://ai.google.dev/gemini-api/docs/function-calling"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-06",
+    "canonicalId": "research-tl-06",
+    "researchId": "TL-06",
+    "title": "Remove unused tool parameters and nesting",
+    "category": "Tool schemas",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Every optional property and nested object increases schema tokens and the space for invalid arguments.",
+    "action": "Split broad tools into task-specific variants only when routing can hide unused variants; delete deprecated fields and replace repeated nested metadata with a compact ID.",
+    "intervention": "Split broad tools into task-specific variants only when routing can hide unused variants; delete deprecated fields and replace repeated nested metadata with a compact ID.",
+    "measure": "Compare schema tokens, invalid-argument rate, tool success, and tool count before and after each schema simplification.",
+    "caveat": "More separate tools can increase catalog size; optimize total visible schema, not individual schema length in isolation.",
+    "providers": "Any function-calling provider.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Counting tokens with tools",
+      "url": "https://developers.openai.com/api/docs/guides/token-counting"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Counting tokens with tools",
+        "url": "https://developers.openai.com/api/docs/guides/token-counting"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-07",
+    "canonicalId": "research-tl-07",
+    "researchId": "TL-07",
+    "title": "Project and aggregate tool results before returning them to the model",
+    "category": "Tool results",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Raw API records, logs, and search responses often contain fields the model will never use, yet they are billed again as input.",
+    "action": "Apply allowlisted field projection, deduplication, filtering, sorting, and aggregation in code; return a bounded JSON result plus counts/truncation metadata.",
+    "intervention": "Apply allowlisted field projection, deduplication, filtering, sorting, and aggregation in code; return a bounded JSON result plus counts/truncation metadata.",
+    "measure": "Compare tool-result input tokens, final-answer completeness, evidence recall, and latency against raw results.",
+    "caveat": "Over-filtering can remove evidence needed for synthesis or citations; preserve native citations/artifacts when the final answer must reproduce them.",
+    "providers": "Provider-agnostic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Programmatic Tool Calling",
+      "url": "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Programmatic Tool Calling",
+        "url": "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+      },
+      {
+        "label": "Anthropic — Manage tool context",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/manage-tool-context"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-08",
+    "canonicalId": "research-tl-08",
+    "researchId": "TL-08",
+    "title": "Clear stale tool results from long conversations",
+    "category": "Tool results / context editing",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Old search results and file dumps become dead weight after the model has used them.",
+    "action": "Enable Anthropic clear_tool_uses_20250919 at a measured trigger, retain the most recent/critical results, and exclude tools whose outputs must remain verbatim.",
+    "intervention": "Enable Anthropic clear_tool_uses_20250919 at a measured trigger, retain the most recent/critical results, and exclude tools whose outputs must remain verbatim.",
+    "measure": "Track cleared_input_tokens, cumulative input cost, cache invalidations, and long-horizon success.",
+    "caveat": "Context editing is Anthropic beta and clearing can break later references; clear_at_least can prevent a small clear from needlessly breaking cache.",
+    "providers": "Anthropic explicitly; manual pruning elsewhere.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Context editing",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/context-editing"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Context editing",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/context-editing"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-10",
+    "canonicalId": "research-tl-10",
+    "researchId": "TL-10",
+    "title": "Request parallel calls for independent operations",
+    "category": "Tool orchestration",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Independent calls in one model turn avoid repeating the growing conversation across several sequential turns.",
+    "action": "State which operations are independent, enable provider parallel function calling, execute them concurrently, and return all results in one continuation.",
+    "intervention": "State which operations are independent, enable provider parallel function calling, execute them concurrently, and return all results in one continuation.",
+    "measure": "Compare model turns, repeated input tokens, wall time, tool-call accuracy, and total cost against sequential orchestration.",
+    "caveat": "Parallel calls do not reduce the size of the tool results themselves and are wrong when later arguments depend on earlier results.",
+    "providers": "Gemini API; OpenAI and Anthropic on supported tool APIs.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Function calling, parallel function calling",
+      "url": "https://ai.google.dev/gemini-api/docs/function-calling"
+    },
+    "sources": [
+      {
+        "label": "Google — Function calling, parallel function calling",
+        "url": "https://ai.google.dev/gemini-api/docs/function-calling"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-11",
+    "canonicalId": "research-tl-11",
+    "researchId": "TL-11",
+    "title": "Skip tools when the model can answer directly",
+    "category": "Tool routing",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Tool use adds schema tokens, tool-call/result tokens, at least one extra roundtrip for client tools, and sometimes per-tool fees.",
+    "action": "Add a deterministic no-tools route for summarization, translation, rewriting, and other tasks fully contained in the prompt.",
+    "intervention": "Add a deterministic no-tools route for summarization, translation, rewriting, and other tasks fully contained in the prompt.",
+    "measure": "Compare direct versus tool-enabled paths on success, latency, schema/result tokens, tool fees, and hallucination risk.",
+    "caveat": "Do not disable tools for current/external facts, private data, calculations requiring guarantees, or side effects.",
+    "providers": "Anthropic explicitly; provider-agnostic principle.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — How tool use works, when not to use tools",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — How tool use works, when not to use tools",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-12",
+    "canonicalId": "research-tl-12",
+    "researchId": "TL-12",
+    "title": "Cap server-tool uses and fetched content",
+    "category": "Hosted tools / output control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Explicit call and content caps prevent search/fetch loops and oversized retrieved context.",
+    "action": "Set per-request max_uses, max_content_tokens, domain allowlists, and a stopping criterion sized to the task.",
+    "intervention": "Set per-request max_uses, max_content_tokens, domain allowlists, and a stopping criterion sized to the task.",
+    "measure": "Track hosted-tool calls, retrieved tokens, max-limit errors, answer completeness, latency, and tool fees.",
+    "caveat": "Names and support are tool/provider specific; an overly small cap can force a second full request.",
+    "providers": "Anthropic web fetch explicitly; analogous controls should be verified elsewhere.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Web fetch tool",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Web fetch tool",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool"
+      }
+    ]
+  },
+  {
+    "id": "research-tl-13",
+    "canonicalId": "research-tl-13",
+    "researchId": "TL-13",
+    "title": "Exclude nested hosted-tool traces when the client does not need them",
+    "category": "Hosted tools / response payload",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Raw server-tool call/result blocks can be omitted from the returned response after code execution has consumed them, avoiding unnecessary output payload/tokens.",
+    "action": "Set Anthropic web fetch response_inclusion: \"excluded\" for workflows that need only the final reduced result, not the nested trace.",
+    "intervention": "Set Anthropic web fetch response_inclusion: \"excluded\" for workflows that need only the final reduced result, not the nested trace.",
+    "measure": "Compare response tokens/bytes, client parse time, auditability, and final-answer correctness.",
+    "caveat": "Requires a recent web-fetch tool version and is unsuitable when citations, provenance, debugging, or audit logs require the raw blocks.",
+    "providers": "Anthropic.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Web fetch tool, response inclusion",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Web fetch tool, response inclusion",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-01",
+    "canonicalId": "research-mm-01",
+    "researchId": "MM-01",
+    "title": "Use OpenAI detail: \"low\" for coarse vision",
+    "category": "Image input",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Low detail sends a 512×512 representation and is intended for fast, low-cost understanding where fine visual detail is unnecessary.",
+    "action": "Default classification, scene presence, dominant-color, and rough-layout tasks to low; elevate to high/original only through a task allowlist or failed first pass.",
+    "intervention": "Default classification, scene presence, dominant-color, and rough-layout tasks to low; elevate to high/original only through a task allowlist or failed first pass.",
+    "measure": "Compare image input tokens, accuracy, escalation rate, latency, and total cost by task type.",
+    "caveat": "Detail modes and tokenization are OpenAI model-specific; original is limited to newer models and can use substantially more tokens.",
+    "providers": "OpenAI.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Images and vision, choose image detail",
+      "url": "https://developers.openai.com/api/docs/guides/images-vision"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Images and vision, choose image detail",
+        "url": "https://developers.openai.com/api/docs/guides/images-vision"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-02",
+    "canonicalId": "research-mm-02",
+    "researchId": "MM-02",
+    "title": "Downsample images to the smallest task-sufficient resolution",
+    "category": "Image input",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Smaller images use fewer visual tokens until the provider’s patch/tile floor, and reduce upload latency.",
+    "action": "Benchmark a resolution ladder; resize before upload to the lowest resolution that preserves required text, objects, or coordinates.",
+    "intervention": "Benchmark a resolution ladder; resize before upload to the lowest resolution that preserves required text, objects, or coordinates.",
+    "measure": "Record visual/input tokens, accuracy, OCR/entity recall, upload bytes, and latency at each resolution.",
+    "caveat": "Anthropic uses 28×28 visual patches and model-specific caps; Gemini uses model/API-specific tiles or media-resolution budgets; OpenAI uses detail modes. One pixel rule does not transfer across providers.",
+    "providers": "Anthropic, Gemini API, OpenAI with provider-specific mechanics.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Vision, resolution and token cost",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/vision"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Vision, resolution and token cost",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/vision"
+      },
+      {
+        "label": "Google — Image understanding",
+        "url": "https://ai.google.dev/gemini-api/docs/image-understanding"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-03",
+    "canonicalId": "research-mm-03",
+    "researchId": "MM-03",
+    "title": "Crop to regions of interest before inference",
+    "category": "Image input",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Removing irrelevant margins, pages, or panels reduces patch/tile count while preserving the evidence the task actually needs.",
+    "action": "Use deterministic layout metadata or a cheap detector to crop the relevant region; retain a full-image fallback when crop confidence is low.",
+    "intervention": "Use deterministic layout metadata or a cheap detector to crop the relevant region; retain a full-image fallback when crop confidence is low.",
+    "measure": "Compare visual tokens, crop-failure rate, accuracy, and fallback frequency against full images.",
+    "caveat": "Cropping can remove contextual relationships and may increase cost if many overlapping crops are sent; coordinate systems must be mapped back to the original.",
+    "providers": "Anthropic, Gemini API, OpenAI.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Vision",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/vision"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Vision",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/vision"
+      },
+      {
+        "label": "Google — Image understanding",
+        "url": "https://ai.google.dev/gemini-api/docs/image-understanding"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-04",
+    "canonicalId": "research-mm-04",
+    "researchId": "MM-04",
+    "title": "Set Gemini media resolution per media part",
+    "category": "Multimodal input control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Gemini 3 can allocate different visual-token budgets to different images/frames, avoiding a high-resolution setting for every item.",
+    "action": "Set low resolution for context/reference media and higher resolution only for dense text, small objects, or spatially precise items.",
+    "intervention": "Set low resolution for context/reference media and higher resolution only for dense text, small objects, or spatially precise items.",
+    "measure": "Compare media/input tokens, accuracy per item type, latency, and cost against one global high setting.",
+    "caveat": "Per-part control is Gemini-version/API dependent; higher resolution may still be required for fine text and small targets.",
+    "providers": "Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Image understanding, media resolution",
+      "url": "https://ai.google.dev/gemini-api/docs/image-understanding"
+    },
+    "sources": [
+      {
+        "label": "Google — Image understanding, media resolution",
+        "url": "https://ai.google.dev/gemini-api/docs/image-understanding"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-05",
+    "canonicalId": "research-mm-05",
+    "researchId": "MM-05",
+    "title": "Use low video media resolution when frame detail is unimportant",
+    "category": "Video input",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Google documents roughly 100 tokens/second at low resolution versus roughly 300 tokens/second at default for the cited video path.",
+    "action": "Set low media resolution for event presence, broad scene changes, or transcript-led summaries; use default/high only for small visual details.",
+    "intervention": "Set low media resolution for event presence, broad scene changes, or transcript-led summaries; use default/high only for small visual details.",
+    "measure": "Compare video tokens, event/scene accuracy, latency, and cost across low and default on stratified clips.",
+    "caveat": "Rates and frame sampling are model/API specific and subject to change; fast actions can be missed at the documented 1 FPS sampling.",
+    "providers": "Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Video understanding",
+      "url": "https://ai.google.dev/gemini-api/docs/video-understanding"
+    },
+    "sources": [
+      {
+        "label": "Google — Video understanding",
+        "url": "https://ai.google.dev/gemini-api/docs/video-understanding"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-06",
+    "canonicalId": "research-mm-06",
+    "researchId": "MM-06",
+    "title": "Trim video time ranges or send representative frames",
+    "category": "Video input",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Video token cost scales with processed duration, so irrelevant seconds are recurring waste.",
+    "action": "Use known timestamps, chapters, or a cheap scene detector to send only relevant clips/keyframes; include timestamp metadata in the prompt.",
+    "intervention": "Use known timestamps, chapters, or a cheap scene detector to send only relevant clips/keyframes; include timestamp metadata in the prompt.",
+    "measure": "Compare processed seconds, video tokens, event recall, preprocessing time, and total cost against the full video.",
+    "caveat": "Keyframes lose motion and audio continuity; the Gemini documentation’s fixed sampling can already miss fast events, so trimming must preserve the target window.",
+    "providers": "Gemini API and other duration-billed/tokenized video models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Video understanding",
+      "url": "https://ai.google.dev/gemini-api/docs/video-understanding"
+    },
+    "sources": [
+      {
+        "label": "Google — Video understanding",
+        "url": "https://ai.google.dev/gemini-api/docs/video-understanding"
+      }
+    ]
+  },
+  {
+    "id": "research-mm-07",
+    "canonicalId": "research-mm-07",
+    "researchId": "MM-07",
+    "title": "Send transcript-only when the task is purely linguistic",
+    "category": "Audio/video input",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "A meeting-summary or topic-classification task may not need visual frames or audio tokens once a reliable transcript is available.",
+    "action": "Route transcript-only tasks to text input; attach audio/video only for speaker, tone, timing, visual, or verification requirements.",
+    "intervention": "Route transcript-only tasks to text input; attach audio/video only for speaker, tone, timing, visual, or verification requirements.",
+    "measure": "Compare multimodal versus transcript-only total tokens, transcript cost, summary/QA quality, speaker attribution, and latency.",
+    "caveat": "Transcripts discard prosody, non-speech audio, visual context, and may contain ASR errors; do not use for evidence that depends on those signals.",
+    "providers": "Provider-agnostic; Gemini documents separate audio/video token accounting.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Understand and count tokens",
+      "url": "https://ai.google.dev/gemini-api/docs/tokens"
+    },
+    "sources": [
+      {
+        "label": "Google — Understand and count tokens",
+        "url": "https://ai.google.dev/gemini-api/docs/tokens"
+      }
+    ]
+  },
+  {
+    "id": "research-ca-03",
+    "canonicalId": "research-ca-03",
+    "researchId": "CA-03",
+    "title": "Fill the cache before parallel fan-out",
+    "category": "Prompt caching / concurrency",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Concurrent requests started before the first cache entry becomes available can all pay full input/write cost.",
+    "action": "Send one warm-up/first real request, wait until its response begins, then release parallel requests sharing the prefix.",
+    "intervention": "Send one warm-up/first real request, wait until its response begins, then release parallel requests sharing the prefix.",
+    "measure": "Compare cache reads and total billed input for cold simultaneous fan-out versus staged fan-out; include added wall-clock delay.",
+    "caveat": "Anthropic explicitly documents this availability timing; OpenAI and Gemini cache-fill timing may differ and should be tested, not assumed.",
+    "providers": "Anthropic explicitly.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Prompt caching, concurrent requests",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Prompt caching, concurrent requests",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-ca-04",
+    "canonicalId": "research-ca-04",
+    "researchId": "CA-04",
+    "title": "Keep effort and thinking configuration stable inside cached sessions",
+    "category": "Prompt caching / reasoning control",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Changing reasoning configuration changes the rendered prompt and invalidates message-level caches, erasing expected discounts.",
+    "action": "Select effort/thinking mode at session start and hold it constant; route a changed-effort phase to a new cache/session boundary.",
+    "intervention": "Select effort/thinking mode at session start and hold it constant; route a changed-effort phase to a new cache/session boundary.",
+    "measure": "Track cache-hit tokens and total cost for stable versus varying settings while holding conversation content constant.",
+    "caveat": "Anthropic explicitly documents invalidation; OpenAI and Gemini have different cache rendering and should be measured separately.",
+    "providers": "Anthropic explicitly.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — Effort",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/effort"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — Effort",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/effort"
+      },
+      {
+        "label": "Anthropic — Tool use with prompt caching",
+        "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-use-with-prompt-caching"
+      }
+    ]
+  },
+  {
+    "id": "research-er-01",
+    "canonicalId": "research-er-01",
+    "researchId": "ER-01",
+    "title": "Retry only transient classes",
+    "category": "Retry handling",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Replaying deterministic client errors spends latency and can repeat billable work without changing the outcome.",
+    "action": "Retry only documented transient conditions such as 408, 429, connection failures, and 5xx/overload; route 400/403/schema errors to validation or code fixes.",
+    "intervention": "Retry only documented transient conditions such as 408, 429, connection failures, and 5xx/overload; route 400/403/schema errors to validation or code fixes.",
+    "measure": "Track retries by status, eventual success rate, tokens/cost spent on failed attempts, and non-transient retries eliminated.",
+    "caveat": "Retryable status sets differ by provider and a streamed request can fail after HTTP 200; use the provider’s current error taxonomy.",
+    "providers": "Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — API errors",
+      "url": "https://platform.claude.com/docs/en/api/errors"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — API errors",
+        "url": "https://platform.claude.com/docs/en/api/errors"
+      },
+      {
+        "label": "Google — Troubleshooting, retry strategy",
+        "url": "https://ai.google.dev/gemini-api/docs/troubleshooting"
+      }
+    ]
+  },
+  {
+    "id": "research-er-02",
+    "canonicalId": "research-er-02",
+    "researchId": "ER-02",
+    "title": "Use exponential backoff with jitter",
+    "category": "Retry handling",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Backoff and jitter reduce synchronized retry storms that cause repeated rate-limit failures.",
+    "action": "Start with a short delay, multiply it after each transient failure, add random jitter, and reset after success.",
+    "intervention": "Start with a short delay, multiply it after each transient failure, add random jitter, and reset after success.",
+    "measure": "Compare attempts per successful call, 429/5xx recurrence, completion latency, and duplicate token spend versus fixed immediate retries.",
+    "caveat": "Backoff saves failed retries, not tokens on a successful request; interactive latency may worsen and provider SDKs may already implement it.",
+    "providers": "Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — API errors",
+      "url": "https://platform.claude.com/docs/en/api/errors"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — API errors",
+        "url": "https://platform.claude.com/docs/en/api/errors"
+      },
+      {
+        "label": "Google — Troubleshooting",
+        "url": "https://ai.google.dev/gemini-api/docs/troubleshooting"
+      }
+    ]
+  },
+  {
+    "id": "research-er-03",
+    "canonicalId": "research-er-03",
+    "researchId": "ER-03",
+    "title": "Cap attempts and the retry token budget",
+    "category": "Retry handling / cost guardrail",
+    "access": "pro",
+    "grade": "official",
+    "summary": "A maximum attempt count prevents an outage or impossible request from multiplying token spend indefinitely.",
+    "action": "Set a small max retry count per operation, a wall-clock deadline, and a cumulative token/cost ceiling; return a typed failure after any limit is reached.",
+    "intervention": "Set a small max retry count per operation, a wall-clock deadline, and a cumulative token/cost ceiling; return a typed failure after any limit is reached.",
+    "measure": "Track attempts, abandoned tasks, eventual success by attempt number, cumulative failed tokens, and user-visible failures.",
+    "caveat": "Google explicitly recommends maximum retries; a global count is too crude when long-running agent steps have different idempotency and value.",
+    "providers": "Gemini API; provider-agnostic implementation.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Troubleshooting, set maximum retries",
+      "url": "https://ai.google.dev/gemini-api/docs/troubleshooting"
+    },
+    "sources": [
+      {
+        "label": "Google — Troubleshooting, set maximum retries",
+        "url": "https://ai.google.dev/gemini-api/docs/troubleshooting"
+      }
+    ]
+  },
+  {
+    "id": "research-er-04",
+    "canonicalId": "research-er-04",
+    "researchId": "ER-04",
+    "title": "Honor Retry-After and do not stack retry layers",
+    "category": "Retry handling",
+    "access": "pro",
+    "grade": "official",
+    "summary": "The official SDK may already retry; wrapping it in another loop can multiply attempts geometrically.",
+    "action": "Inspect SDK defaults, configure one owner for retries, honor retry-after, and expose the final attempt count in telemetry.",
+    "intervention": "Inspect SDK defaults, configure one owner for retries, honor retry-after, and expose the final attempt count in telemetry.",
+    "measure": "Record actual HTTP attempts per logical request, retry delay, eventual success, and duplicate tokens before/after consolidating layers.",
+    "caveat": "Anthropic documents two automatic retries by default; Google documents SDK automatic retry behavior that can vary by language/version. Pin and inspect the current SDK.",
+    "providers": "Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — API errors",
+      "url": "https://platform.claude.com/docs/en/api/errors"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — API errors",
+        "url": "https://platform.claude.com/docs/en/api/errors"
+      },
+      {
+        "label": "Google — Troubleshooting",
+        "url": "https://ai.google.dev/gemini-api/docs/troubleshooting"
+      }
+    ]
+  },
+  {
+    "id": "research-er-05",
+    "canonicalId": "research-er-05",
+    "researchId": "ER-05",
+    "title": "Stream long generations to reduce timeout-driven replays",
+    "category": "Error handling / long responses",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Streaming keeps a long request active and exposes partial progress, reducing the chance that a client timeout triggers a full replay.",
+    "action": "Use the streaming Messages/Responses path for long jobs, set idle and total deadlines separately, and handle mid-stream error events without blindly restarting.",
+    "intervention": "Use the streaming Messages/Responses path for long jobs, set idle and total deadlines separately, and handle mid-stream error events without blindly restarting.",
+    "measure": "Compare timeout rate, completed-output rate, replayed tokens, and latency for streaming versus non-streaming at the same output size.",
+    "caveat": "Streaming does not reduce tokens by itself; Anthropic notes errors can arrive after HTTP 200, so partial data and billing must be reconciled.",
+    "providers": "Anthropic explicitly; analogous streaming APIs elsewhere.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Anthropic — API errors, long requests and streaming",
+      "url": "https://platform.claude.com/docs/en/api/errors"
+    },
+    "sources": [
+      {
+        "label": "Anthropic — API errors, long requests and streaming",
+        "url": "https://platform.claude.com/docs/en/api/errors"
+      }
+    ]
+  },
+  {
+    "id": "research-er-06",
+    "canonicalId": "research-er-06",
+    "researchId": "ER-06",
+    "title": "Validate request schemas locally before paying for a call",
+    "category": "Error prevention",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Unsupported JSON Schema keywords, missing required constraints, and out-of-range generation parameters are deterministic failures that can be caught locally.",
+    "action": "Compile/provider-validate schemas at deploy time; validate request objects and parameter ranges client-side before enqueueing them.",
+    "intervention": "Compile/provider-validate schemas at deploy time; validate request objects and parameter ranges client-side before enqueueing them.",
+    "measure": "Track prevented 4xx calls, schema deployment failures, request-validation latency, and incident rate after model/provider upgrades.",
+    "caveat": "Provider schema subsets evolve; maintain provider-specific validators rather than one “universal” JSON Schema assumption.",
+    "providers": "OpenAI, Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "OpenAI — Function calling, strict requirements",
+      "url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    "sources": [
+      {
+        "label": "OpenAI — Function calling, strict requirements",
+        "url": "https://developers.openai.com/api/docs/guides/function-calling"
+      },
+      {
+        "label": "Google — Structured output limitations",
+        "url": "https://ai.google.dev/gemini-api/docs/structured-output"
+      },
+      {
+        "label": "Google — Troubleshooting parameter checks",
+        "url": "https://ai.google.dev/gemini-api/docs/troubleshooting"
+      }
+    ]
+  },
+  {
+    "id": "research-er-07",
+    "canonicalId": "research-er-07",
+    "researchId": "ER-07",
+    "title": "Preserve successful work and retry only the failed operation",
+    "category": "Retry handling / tool loops",
+    "access": "pro",
+    "grade": "derived",
+    "summary": "Re-running the entire agent after one tool or output failure repeats prior model turns, tool calls, and context.",
+    "action": "Persist response IDs, tool-call IDs, validated tool results, and completed-stage outputs; resume from the failed stage with the smallest required context.",
+    "intervention": "Persist response IDs, tool-call IDs, validated tool results, and completed-stage outputs; resume from the failed stage with the smallest required context.",
+    "measure": "Inject failures at each stage and compare repeated model/tool calls, tokens, side effects, completion rate, and recovery latency against full restart.",
+    "caveat": "Continuation state differs: Gemini thought/tool signatures and OpenAI/Anthropic call linkage must be preserved exactly; side-effecting tools also require idempotency controls.",
+    "providers": "OpenAI, Anthropic, Gemini API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google — Function calling",
+      "url": "https://ai.google.dev/gemini-api/docs/function-calling"
+    },
+    "sources": [
+      {
+        "label": "Google — Function calling",
+        "url": "https://ai.google.dev/gemini-api/docs/function-calling"
+      },
+      {
+        "label": "OpenAI — Programmatic Tool Calling",
+        "url": "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-002",
+    "canonicalId": "research-mre-002",
+    "researchId": "MRE-002",
+    "title": "Learned weak/strong model router",
+    "category": "Model routing",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "A learned router predicts when a cheaper model is sufficient and sends only harder prompts to a stronger model.",
+    "action": "Build paired weak/strong outcomes, train a router on preference or correctness labels, calibrate a routing threshold on held-out production-like data, and keep hard safety/capability constraints outside the learned score.",
+    "intervention": "Build paired weak/strong outcomes, train a router on preference or correctness labels, calibrate a routing threshold on held-out production-like data, and keep hard safety/capability constraints outside the learned score.",
+    "measure": "Plot quality and dollars per request over the full routing-threshold curve; compare with random routing, all-small, and all-large baselines.",
+    "caveat": "Router accuracy can drift when prompts, models, or traffic mix change; retraining on public benchmarks alone is weak evidence for production.",
+    "providers": "Provider-neutral and can route across providers if policy permits.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RouteLLM — Learning to Route LLMs with Preference Data",
+      "url": "https://arxiv.org/abs/2406.18665"
+    },
+    "sources": [
+      {
+        "label": "RouteLLM — Learning to Route LLMs with Preference Data",
+        "url": "https://arxiv.org/abs/2406.18665"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-003",
+    "canonicalId": "research-mre-003",
+    "researchId": "MRE-003",
+    "title": "Confidence-gated cascade",
+    "category": "Model cascade",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Run the cheapest candidate first, accept high-confidence results, and escalate uncertain cases to increasingly capable models.",
+    "action": "Define a verifiable confidence signal—schema validity, retrieval support, calibrated classifier, or task grader—then choose escalation thresholds against a quality constraint.",
+    "intervention": "Define a verifiable confidence signal—schema validity, retrieval support, calibrated classifier, or task grader—then choose escalation thresholds against a quality constraint.",
+    "measure": "Track cascade depth, acceptance accuracy at each stage, false accepts, false escalations, average tokens, and cost per successful task.",
+    "caveat": "Self-reported model confidence is often poorly calibrated. High-stakes outputs need external checks or conservative escalation.",
+    "providers": "Provider-neutral; stages may use one or multiple providers.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "FrugalGPT — How to Use Large Language Models While Reducing Cost and Improving Performance",
+      "url": "https://arxiv.org/abs/2305.05176"
+    },
+    "sources": [
+      {
+        "label": "FrugalGPT — How to Use Large Language Models While Reducing Cost and Improving Performance",
+        "url": "https://arxiv.org/abs/2305.05176"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-004",
+    "canonicalId": "research-mre-004",
+    "researchId": "MRE-004",
+    "title": "Route on expected marginal quality gain",
+    "category": "Model routing",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "A prompt can be intrinsically hard yet equally poorly handled by both models. Spending more is justified only when the expensive model is likely to improve the outcome.",
+    "action": "Train a predictor for quality_large − quality_small; route upward only when expected gain exceeds the price/latency penalty and any risk threshold.",
+    "intervention": "Train a predictor for quality_large − quality_small; route upward only when expected gain exceeds the price/latency penalty and any risk threshold.",
+    "measure": "Measure realized uplift among escalated prompts, regret versus an oracle route, quality at each budget, and spend wasted on no-gain escalations.",
+    "caveat": "Requires paired labels or judge scores for both models; biased judges can teach the router the wrong preference.",
+    "providers": "Provider-neutral.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "RouteLMT — Route by Expected Marginal Gain",
+      "url": "https://arxiv.org/abs/2604.22520"
+    },
+    "sources": [
+      {
+        "label": "RouteLMT — Route by Expected Marginal Gain",
+        "url": "https://arxiv.org/abs/2604.22520"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-006",
+    "canonicalId": "research-mre-006",
+    "researchId": "MRE-006",
+    "title": "Managed Bedrock prompt routing",
+    "category": "Managed model routing",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Bedrock Intelligent Prompt Routing can shift eligible prompts to a lower-cost model without maintaining a custom router.",
+    "action": "Create a router with exactly two supported models from the same family, run a representative offline comparison, and set application-level fallbacks for unsupported modalities or failures.",
+    "intervention": "Create a router with exactly two supported models from the same family, run a representative offline comparison, and set application-level fallbacks for unsupported modalities or failures.",
+    "measure": "Compare routed versus fixed-model quality, dollar cost, p95 latency, route share, and errors for each production slice.",
+    "caveat": "The router is English-optimized, allows exactly two models, and does not learn application-specific performance. It is not a drop-in replacement for custom policy routing.",
+    "providers": "Amazon Bedrock only.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Amazon Bedrock — Intelligent prompt routing",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-routing.html"
+    },
+    "sources": [
+      {
+        "label": "Amazon Bedrock — Intelligent prompt routing",
+        "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-routing.html"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-020",
+    "canonicalId": "research-mre-020",
+    "researchId": "MRE-020",
+    "title": "Spot GPU capacity for fault-tolerant offline work",
+    "category": "Self-hosted batch infrastructure",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Interruptible accelerators materially reduce compute cost when jobs can checkpoint and resume.",
+    "action": "Containerize the job, shard work into idempotent units, checkpoint to durable storage, monitor interruption signals, and fall back only when the deadline demands it.",
+    "intervention": "Containerize the job, shard work into idempotent units, checkpoint to durable storage, monitor interruption signals, and fall back only when the deadline demands it.",
+    "measure": "Compare GPU-hour price, completed examples per dollar, interruption/restart overhead, lost work, and deadline success against on-demand GPUs.",
+    "caveat": "Poor checkpointing can erase the discount. Interactive serving and tightly synchronized distributed jobs are usually poor fits.",
+    "providers": "Google Cloud and AWS; analogous spot products require separate validation.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google Cloud — Spot VMs",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/spot"
+    },
+    "sources": [
+      {
+        "label": "Google Cloud — Spot VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/spot"
+      },
+      {
+        "label": "AWS — EC2 Spot best practices",
+        "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-best-practices.html"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-026",
+    "canonicalId": "research-mre-026",
+    "researchId": "MRE-026",
+    "title": "Semantic answer cache",
+    "category": "Application response caching",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Unlike provider prompt caching, an answer cache skips model generation entirely when a previous answer is safely reusable.",
+    "action": "Embed normalized queries, retrieve within a conservative similarity threshold, scope entries by tenant/policy/version, and bypass the cache for time-sensitive or personalized requests.",
+    "intervention": "Embed normalized queries, retrieve within a conservative similarity threshold, scope entries by tenant/policy/version, and bypass the cache for time-sensitive or personalized requests.",
+    "measure": "Track exact and semantic hit rate, model calls avoided, false-hit rate from review, staleness incidents, latency, and net cost including embedding/vector search.",
+    "caveat": "Semantic similarity does not prove answer equivalence. Privacy, authorization, freshness, and model/prompt versioning are mandatory cache keys or filters.",
+    "providers": "Provider-neutral.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "GPTCache — An Open-Source Semantic Cache for LLM Applications",
+      "url": "https://aclanthology.org/anthology-files/pdf/nlposs/2023.nlposs-1.24.pdf"
+    },
+    "sources": [
+      {
+        "label": "GPTCache — An Open-Source Semantic Cache for LLM Applications",
+        "url": "https://aclanthology.org/anthology-files/pdf/nlposs/2023.nlposs-1.24.pdf"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-041",
+    "canonicalId": "research-mre-041",
+    "researchId": "MRE-041",
+    "title": "Fine-tune a smaller model for a fixed task",
+    "category": "Fine-tuning economics",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "A smaller specialized model can replace a larger general model on stable, narrow tasks such as extraction or classification.",
+    "action": "Establish a prompt-only baseline, collect at least a representative high-quality training set, tune the smallest plausible model, and calculate break-even requests from training cost divided by per-request savings.",
+    "intervention": "Establish a prompt-only baseline, collect at least a representative high-quality training set, tune the smallest plausible model, and calculate break-even requests from training cost divided by per-request savings.",
+    "measure": "Track training/hosting cost, quality by slice, prompt/output tokens, throughput, and cumulative break-even date.",
+    "caveat": "Drift, retraining, safety evaluation, and endpoint hosting costs can erase savings. OpenAI’s current fine-tuning platform is winding down; use a supported provider or self-hosted workflow.",
+    "providers": "Google Vertex AI or self-hosted; concept is provider-neutral.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Google Cloud — Tune Gemini models",
+      "url": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/tune-models"
+    },
+    "sources": [
+      {
+        "label": "Google Cloud — Tune Gemini models",
+        "url": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/tune-models"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-045",
+    "canonicalId": "research-mre-045",
+    "researchId": "MRE-045",
+    "title": "PagedAttention and continuous batching",
+    "category": "Self-hosted inference",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Better KV-cache allocation and continuous batching raise useful tokens per GPU, lowering infrastructure cost per request.",
+    "action": "Benchmark the current server against vLLM or an equivalent engine at realistic prompt/output lengths, concurrency, quantization, and latency SLOs; tune batch and memory limits.",
+    "intervention": "Benchmark the current server against vLLM or an equivalent engine at realistic prompt/output lengths, concurrency, quantization, and latency SLOs; tune batch and memory limits.",
+    "measure": "Report requests/tokens per second, time to first token, inter-token latency, GPU utilization, OOM rate, and dollars per million generated tokens.",
+    "caveat": "Throughput gains are workload/hardware/model-specific; maximizing batching can violate interactive latency targets.",
+    "providers": "Self-hosted/open-weight models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "vLLM — Easy, Fast, and Cheap LLM Serving with PagedAttention",
+      "url": "https://arxiv.org/abs/2309.06180"
+    },
+    "sources": [
+      {
+        "label": "vLLM — Easy, Fast, and Cheap LLM Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180"
+      }
+    ]
+  },
+  {
+    "id": "research-mre-052",
+    "canonicalId": "research-mre-052",
+    "researchId": "MRE-052",
+    "title": "Idempotency ledger and in-flight deduplication",
+    "category": "Application reliability",
+    "access": "pro",
+    "grade": "experiment",
+    "summary": "Client timeouts, worker restarts, and replayed webhooks can submit the same expensive request more than once.",
+    "action": "Derive an idempotency key from tenant, operation, input version, and generation settings; atomically record in-flight/completed state; return the prior result or status on duplicates.",
+    "intervention": "Derive an idempotency key from tenant, operation, input version, and generation settings; atomically record in-flight/completed state; return the prior result or status on duplicates.",
+    "measure": "Track duplicate submissions suppressed, duplicate provider calls observed, stale-lock recoveries, and cost avoided.",
+    "caveat": "A client-provided ID does not universally guarantee provider-side deduplication. Set retention windows carefully and never conflate distinct randomized generations.",
+    "providers": "Provider-neutral; xAI Batch exposes a useful request identifier.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "xAI — Batch API",
+      "url": "https://docs.x.ai/developers/advanced-api-usage/batch-api"
+    },
+    "sources": [
+      {
+        "label": "xAI — Batch API",
+        "url": "https://docs.x.ai/developers/advanced-api-usage/batch-api"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-xa-04",
+    "canonicalId": "research-ps-xa-04",
+    "researchId": "PS-XA-04",
+    "title": "Pay 2× for Priority only on latency-valued paths",
+    "category": "Processing tier / latency",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Priority doubles all text-token categories but fallback must be priced from the returned tier.",
+    "action": "Enable it only for critical user-facing requests, record the returned service tier, and compare latency/value against the same request class on Standard.",
+    "intervention": "Enable it only for critical user-facing requests, record the returned service tier, and compare latency/value against the same request class on Standard.",
+    "measure": "Priority fulfillment/fallback rate, p50/p95 latency improvement, 2× token premium, conversion or SLO value, and cached-token share.",
+    "caveat": "Do not price from the requested tier alone. Priority is applied after the cache rate, and it cannot be combined with Batch.",
+    "providers": "xAI Grok supported text models.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "xAI Priority processing",
+      "url": "https://docs.x.ai/developers/advanced-api-usage/priority-processing"
+    },
+    "sources": [
+      {
+        "label": "xAI Priority processing",
+        "url": "https://docs.x.ai/developers/advanced-api-usage/priority-processing"
+      },
+      {
+        "label": "xAI pricing",
+        "url": "https://docs.x.ai/developers/pricing"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-ds-02",
+    "canonicalId": "research-ps-ds-02",
+    "researchId": "PS-DS-02",
+    "title": "Schedule bulk work around the new UTC off-peak window only after activation",
+    "category": "Time-of-day pricing",
+    "access": "pro",
+    "grade": "official",
+    "summary": "DeepSeek is the reviewed provider with an explicit scheduled time-of-day discount, and it is date-sensitive.",
+    "action": "Store the effective timestamp and UTC windows, convert them for users without changing the billing basis, and schedule only latency-tolerant queues off peak.",
+    "intervention": "Store the effective timestamp and UTC windows, convert them for users without changing the billing basis, and schedule only latency-tolerant queues off peak.",
+    "measure": "Tokens by peak/off-peak window, job-delay minutes, realized rate, SLO misses, and forecast-versus-invoice after activation.",
+    "caveat": "This item is forward-effective as of the research date. Pricing can change again; refresh the page rather than hard-coding a perpetual schedule. Cache-hit and output categories retain their own rates.",
+    "providers": "DeepSeek API.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "DeepSeek pricing",
+      "url": "https://api-docs.deepseek.com/quick_start/pricing/"
+    },
+    "sources": [
+      {
+        "label": "DeepSeek pricing",
+        "url": "https://api-docs.deepseek.com/quick_start/pricing/"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-ds-04",
+    "canonicalId": "research-ps-ds-04",
+    "researchId": "PS-DS-04",
+    "title": "Preserve reasoning content only across tool-call continuations",
+    "category": "Conversation state / tool use",
+    "access": "pro",
+    "grade": "official",
+    "summary": "DeepSeek has opposite history rules for ordinary turns and in-progress tool chains.",
+    "action": "Detect tool_calls; if absent, do not retain old reasoning content; if present, persist and replay it verbatim until that tool sequence completes.",
+    "intervention": "Detect tool_calls; if absent, do not retain old reasoning content; if present, persist and replay it verbatim until that tool sequence completes.",
+    "measure": "Resent reasoning tokens, request errors, tool-chain completion rate, and input-token savings outside tool calls.",
+    "caveat": "A generic “always strip hidden reasoning” optimizer will break tool calls, while “always resend it” wastes input. Ignored sampling parameters should not be presented as effective cost levers.",
+    "providers": "DeepSeek reasoning mode.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "DeepSeek thinking mode",
+      "url": "https://api-docs.deepseek.com/guides/thinking_mode/"
+    },
+    "sources": [
+      {
+        "label": "DeepSeek thinking mode",
+        "url": "https://api-docs.deepseek.com/guides/thinking_mode/"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-ki-04",
+    "canonicalId": "research-ps-ki-04",
+    "researchId": "PS-KI-04",
+    "title": "Buy K2.7 Highspeed only when latency earns its 2× rate",
+    "category": "Model variant / latency",
+    "access": "pro",
+    "grade": "official",
+    "summary": "The high-speed premium changes serving speed, not the advertised model intelligence.",
+    "action": "A/B both variants on the same coding workload, route interactive requests selectively, and fall back to Standard for long outputs or background jobs.",
+    "intervention": "A/B both variants on the same coding workload, route interactive requests selectively, and fall back to Standard for long outputs or background jobs.",
+    "measure": "Time to first token, output tokens/second, user abandonment/SLO value, token cost, and quality parity.",
+    "caveat": "Peak speed is workload/output-length dependent. K2.7 Highspeed is not currently Batch-eligible, so the effective gap can be larger for delayed work.",
+    "providers": "Kimi K2.7 Code and K2.7 Code Highspeed.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Kimi K2.7 Code pricing",
+      "url": "https://platform.kimi.ai/docs/pricing/chat-k27-code.md"
+    },
+    "sources": [
+      {
+        "label": "Kimi K2.7 Code pricing",
+        "url": "https://platform.kimi.ai/docs/pricing/chat-k27-code.md"
+      },
+      {
+        "label": "Kimi Batch pricing",
+        "url": "https://platform.kimi.ai/docs/pricing/batch.md"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-qw-03",
+    "canonicalId": "research-ps-qw-03",
+    "researchId": "PS-QW-03",
+    "title": "Never stack cache and Batch discounts in the forecast",
+    "category": "Batch processing / discount interaction",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Qwen explicitly rejects a discount combination that some other providers permit.",
+    "action": "Resolve endpoint, region, and model; choose real-time cached, Batch File, or Batch Chat; then load the exact table row without multiplying discounts.",
+    "intervention": "Resolve endpoint, region, and model; choose real-time cached, Batch File, or Batch Chat; then load the exact table row without multiplying discounts.",
+    "measure": "Forecast errors from attempted stacking, tokens by processing product, realized discount, and unsupported batch selections.",
+    "caveat": "“Batch” is not one price: Batch File and Batch Chat can differ. A 50% rule from OpenAI, Anthropic, Gemini, or Mistral is not portable.",
+    "providers": "Alibaba Cloud Model Studio / Qwen.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Model Studio context cache",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/context-cache"
+    },
+    "sources": [
+      {
+        "label": "Model Studio context cache",
+        "url": "https://www.alibabacloud.com/help/en/model-studio/context-cache"
+      },
+      {
+        "label": "Qwen3.7-Flash",
+        "url": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-flash"
+      },
+      {
+        "label": "Model Studio pricing",
+        "url": "https://www.alibabacloud.com/help/en/model-studio/model-pricing"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-mi-03",
+    "canonicalId": "research-ps-mi-03",
+    "researchId": "PS-MI-03",
+    "title": "Apply the 10% regional-inference multiplier to every token component",
+    "category": "Data residency / regional processing",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Regional selection is a compliance-cost tradeoff, not merely an input-token surcharge.",
+    "action": "Ask for residency requirements, set the regional flag deliberately, and multiply each applicable token component rather than only the final uncached input line.",
+    "intervention": "Ask for residency requirements, set the regional flag deliberately, and multiply each applicable token component rather than only the final uncached input line.",
+    "measure": "Regional-token share, 10% premium, cache read/write contribution, compliance requirement, and routing mistakes.",
+    "caveat": "Do not recommend Global when policy requires a region. The Mistral multiplier is not the same scope or eligibility rule as OpenAI regional processing.",
+    "providers": "Mistral regional inference.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Mistral regional inference",
+      "url": "https://docs.mistral.ai/inference/regional-inference"
+    },
+    "sources": [
+      {
+        "label": "Mistral regional inference",
+        "url": "https://docs.mistral.ai/inference/regional-inference"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-co-01",
+    "canonicalId": "research-ps-co-01",
+    "researchId": "PS-CO-01",
+    "title": "Use billed units, not raw tokenizer counts, for cost attribution",
+    "category": "Usage accounting",
+    "access": "pro",
+    "grade": "official",
+    "summary": "A provider-agnostic input_tokens × rate calculation can overstate Cohere cost.",
+    "action": "Parse the billed-unit fields, join them to exact model rates, and store raw tokens alongside billed units without substituting one for the other.",
+    "intervention": "Parse the billed-unit fields, join them to exact model rates, and store raw tokens alongside billed units without substituting one for the other.",
+    "measure": "Raw-minus-billed token delta, forecast-to-invoice variance, missing billed-unit events, and cost per task.",
+    "caveat": "This does not imply a prompt-cache discount. Cohere does not label the difference as cache hits, and it should not be mapped to another provider's cached_tokens.",
+    "providers": "Cohere.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Cohere pricing guide",
+      "url": "https://docs.cohere.com/docs/how-does-cohere-pricing-work"
+    },
+    "sources": [
+      {
+        "label": "Cohere pricing guide",
+        "url": "https://docs.cohere.com/docs/how-does-cohere-pricing-work"
+      }
+    ]
+  },
+  {
+    "id": "research-ps-co-04",
+    "canonicalId": "research-ps-co-04",
+    "researchId": "PS-CO-04",
+    "title": "Quarantine conflicting model IDs and prices instead of auto-correcting them",
+    "category": "Catalogue integrity",
+    "access": "pro",
+    "grade": "official",
+    "summary": "Even official documentation can contain internally conflicting identifiers, so scraping by page text alone is unsafe.",
+    "action": "Cross-check title, exact model ID, release page, and model catalogue; quarantine conflicts; require a reviewed override before quoting cost.",
+    "intervention": "Cross-check title, exact model ID, release page, and model catalogue; quarantine conflicts; require a reviewed override before quoting cost.",
+    "measure": "Conflicting records, manual-review latency, estimates blocked, and post-review corrections.",
+    "caveat": "This is an observed documentation inconsistency, not evidence that one of the models shares the other's price. The pages may be corrected after the research date.",
+    "providers": "Cohere Command A / Command A+.",
+    "aliases": [],
+    "lastVerified": "2026-08-15",
+    "experimentType": "guided",
+    "experimentSupport": "guided-only",
+    "source": {
+      "label": "Cohere Command A",
+      "url": "https://docs.cohere.com/docs/command-a"
+    },
+    "sources": [
+      {
+        "label": "Cohere Command A",
+        "url": "https://docs.cohere.com/docs/command-a"
+      },
+      {
+        "label": "Cohere model catalogue",
+        "url": "https://docs.cohere.com/v1/docs/models"
+      }
+    ]
+  }
+]

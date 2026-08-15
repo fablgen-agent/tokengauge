@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 
 type Usage = { input: number; cachedRead: number; cachedWrite: number; output: number; reasoning: number; total: number };
-type Variant = { text: string; usage: Usage };
+type Variant = { text: string; usage: Usage; settings: { maxOutputTokens: number; reasoningEffort: string; textVerbosity: string } };
 type ExperimentResult = { baseline: Variant; candidate: Variant; executionOrder: string[] };
+type StrategyOption = { id: string; title: string; action: string };
 
-export function LabWorkbench() {
+export function LabWorkbench({ strategies }: { strategies: readonly StrategyOption[] }) {
   const [models, setModels] = useState<string[]>([]);
   const [model, setModel] = useState("");
+  const [strategyId, setStrategyId] = useState(strategies[0]?.id ?? "");
   const [task, setTask] = useState("Explain why prompt-prefix stability matters to an engineering manager in three concise bullets.");
-  const [baselineInstructions, setBaselineInstructions] = useState("You are a helpful AI assistant. Give a detailed answer.");
-  const [candidateInstructions, setCandidateInstructions] = useState("Answer in exactly three concise bullets. Each bullet must contain one action and one reason.");
+  const [baselineInstructions, setBaselineInstructions] = useState("You are a helpful AI assistant. Preserve every required fact.");
   const [result, setResult] = useState<ExperimentResult>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -37,7 +38,7 @@ export function LabWorkbench() {
       const response = await fetch("/api/experiment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model, task, baselineInstructions, candidateInstructions, strategyId: "custom-ab" }),
+        body: JSON.stringify({ model, task, baselineInstructions, strategyId }),
       });
       const data = (await response.json()) as ExperimentResult & { error?: string };
       if (!response.ok) throw new Error(data.error || "Experiment failed.");
@@ -51,8 +52,14 @@ export function LabWorkbench() {
 
   return (
     <div className="lab-workbench">
-      <h2>Paired prompt test</h2>
+      <h2>Controlled request-setting test</h2>
+      <p className="retention-note">The task and instructions stay byte-for-byte identical. Only the selected request setting changes between arms.</p>
       <form className="lab-form" onSubmit={run}>
+        <label>Strategy
+          <select value={strategyId} onChange={(event) => setStrategyId(event.target.value)} required>
+            {strategies.map((strategy) => <option value={strategy.id} key={strategy.id}>{strategy.title}</option>)}
+          </select>
+        </label>
         <label>Model
           <select value={model} onChange={(event) => setModel(event.target.value)} required disabled={!models.length}>
             {!models.length ? <option value="">Loading available models…</option> : null}
@@ -62,11 +69,8 @@ export function LabWorkbench() {
         <label>Same task for both variants
           <textarea value={task} onChange={(event) => setTask(event.target.value)} minLength={10} maxLength={6000} required />
         </label>
-        <label>Baseline instructions
+        <label>Shared instructions for both variants
           <textarea value={baselineInstructions} onChange={(event) => setBaselineInstructions(event.target.value)} minLength={3} maxLength={6000} required />
-        </label>
-        <label>Candidate instructions
-          <textarea value={candidateInstructions} onChange={(event) => setCandidateInstructions(event.target.value)} minLength={3} maxLength={6000} required />
         </label>
         <button className="button button-dark" type="submit" disabled={busy || !model}>{busy ? "Running two requests…" : "Run randomized A/B test"}</button>
       </form>
@@ -98,6 +102,9 @@ function VariantResult({ title, variant }: { title: string; variant: Variant }) 
         <div><dt>Output</dt><dd>{variant.usage.output}</dd></div>
         <div><dt>Reasoning</dt><dd>{variant.usage.reasoning}</dd></div>
         <div><dt>Cache read</dt><dd>{variant.usage.cachedRead}</dd></div>
+        <div><dt>Output cap</dt><dd>{variant.settings.maxOutputTokens}</dd></div>
+        <div><dt>Effort</dt><dd>{variant.settings.reasoningEffort}</dd></div>
+        <div><dt>Verbosity</dt><dd>{variant.settings.textVerbosity}</dd></div>
       </dl>
       <pre>{variant.text}</pre>
     </article>
