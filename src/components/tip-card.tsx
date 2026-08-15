@@ -1,6 +1,13 @@
-import { evidenceLabels, type TokenTip } from "@/lib/catalog";
+import type { EvidenceGrade, TokenTip } from "@/lib/catalog";
+
+const evidenceLabels: Record<EvidenceGrade, string> = {
+  official: "Official fact",
+  derived: "Derived math",
+  experiment: "Test protocol",
+};
 
 export function TipCard({ tip, compact = false }: { tip: TokenTip; compact?: boolean }) {
+  const supportLabel = tip.experimentSupport === "supported" ? "Controlled lab recipe" : tip.experimentSupport === "guided-only" ? "Guided protocol" : "Guide only · no lab adapter";
   return (
     <article className={`tip-card ${compact ? "compact" : ""}`}>
       <div className="tip-meta">
@@ -9,6 +16,7 @@ export function TipCard({ tip, compact = false }: { tip: TokenTip; compact?: boo
       </div>
       <h3>{tip.title}</h3>
       <p>{tip.summary}</p>
+      <p className="tip-providers"><strong>Applies to:</strong> {tip.providers}<br /><strong>Testing:</strong> {supportLabel}</p>
       {!compact ? (
         <div className="tip-details">
           <p><strong>Do:</strong> {tip.action}</p>
@@ -16,7 +24,10 @@ export function TipCard({ tip, compact = false }: { tip: TokenTip; compact?: boo
           <p><strong>Watch:</strong> {tip.caveat}</p>
         </div>
       ) : null}
-      <a href={tip.source.url} target="_blank" rel="noreferrer">{tip.source.label} ↗</a>
+      <div className="tip-sources">
+        {(compact ? tip.sources.slice(0, 1) : tip.sources).map((source) => <a href={source.url} target="_blank" rel="noreferrer" key={source.url}>{source.label} ↗</a>)}
+        <span>Checked {tip.lastVerified}</span>
+      </div>
     </article>
   );
 }

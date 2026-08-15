@@ -1,4 +1,4 @@
-import { requirePro } from "@/lib/access";
+import { requireAuth } from "@/lib/access";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 
 export const runtime = "nodejs";
@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    await requirePro(request);
+    await requireAuth(request);
     const models = (await getChatGPTHandler().getModels(request)) ?? [];
     return Response.json({ models }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {

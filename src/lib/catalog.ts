@@ -1,8 +1,15 @@
+import researchMethods from "@/data/research-methods.json";
+
 export type EvidenceGrade = "official" | "derived" | "experiment";
 export type TipAccess = "free" | "pro";
+export type ExperimentType = "request_config" | "prompt_diff" | "guided";
+export type ExperimentSupport = "supported" | "guided-only" | "not-supported";
+
+type TipSource = { label: string; url: string };
 
 export type TokenTip = {
   id: string;
+  canonicalId: string;
   title: string;
   category: string;
   access: TipAccess;
@@ -11,22 +18,30 @@ export type TokenTip = {
   action: string;
   measure: string;
   caveat: string;
-  source: {
-    label: string;
-    url: string;
-  };
+  intervention: string;
+  aliases: readonly string[];
+  providers: string;
+  sources: readonly TipSource[];
+  lastVerified: string;
+  experimentType: ExperimentType;
+  experimentSupport: ExperimentSupport;
+  researchId?: string;
+  source: TipSource;
 };
+
+type TipInput = Omit<TokenTip, "canonicalId" | "intervention" | "aliases" | "providers" | "sources" | "lastVerified" | "experimentType" | "experimentSupport"> &
+  Partial<Pick<TokenTip, "canonicalId" | "intervention" | "aliases" | "providers" | "sources" | "lastVerified" | "experimentType" | "experimentSupport">>;
 
 const official = "official" as const;
 const derived = "derived" as const;
 const experiment = "experiment" as const;
 
-export const tokenTips: readonly TokenTip[] = [
+const coreTips: readonly TipInput[] = [
   {
     id: "stable-prefix-first",
     title: "Put stable prompt content first",
     category: "Caching",
-    access: "free",
+    access: "pro",
     grade: official,
     summary: "Prompt cache hits require an exact matching prefix, so ordering determines whether repeated context is reusable.",
     action: "Place durable instructions, examples, tool schemas, and shared context before user-specific or time-varying data.",
@@ -38,7 +53,7 @@ export const tokenTips: readonly TokenTip[] = [
     id: "cache-minimum-prefix",
     title: "Cross the cacheable-prefix threshold deliberately",
     category: "Caching",
-    access: "free",
+    access: "pro",
     grade: official,
     summary: "GPT-5.6 prompt caching starts at a 1,024-token prefix; a smaller shared prefix cannot produce the same cache benefit.",
     action: "Measure the stable prefix separately and avoid assuming that a repeated but tiny instruction block is cached.",
@@ -50,7 +65,7 @@ export const tokenTips: readonly TokenTip[] = [
     id: "model-route-by-difficulty",
     title: "Route by measured task difficulty",
     category: "Model routing",
-    access: "free",
+    access: "pro",
     grade: official,
     summary: "OpenAI recommends establishing the quality target with a capable model, then finding the cheapest model that maintains it.",
     action: "Create simple, medium, and hard task buckets, then test Luna, Terra, and Sol against the same acceptance rubric.",
@@ -86,7 +101,7 @@ export const tokenTips: readonly TokenTip[] = [
     id: "batch-offline-work",
     title: "Move delay-tolerant work to Batch",
     category: "Processing",
-    access: "free",
+    access: "pro",
     grade: official,
     summary: "The Batch API offers a 50% cost discount for asynchronous workloads that can complete within 24 hours.",
     action: "Batch evaluations, classification, enrichment, and other work that does not need an immediate user response.",
@@ -134,7 +149,7 @@ export const tokenTips: readonly TokenTip[] = [
     id: "deduplicate-instructions",
     title: "Remove duplicated instructions before shortening prose",
     category: "Prompt design",
-    access: "pro",
+    access: "free",
     grade: experiment,
     summary: "Rules often appear in system text, examples, tool descriptions, and the user prompt at the same time.",
     action: "Map each requirement to one authoritative location, then remove only true duplicates in a paired test.",
@@ -146,7 +161,7 @@ export const tokenTips: readonly TokenTip[] = [
     id: "remove-example-one-at-time",
     title: "Ablate examples one at a time",
     category: "Prompt design",
-    access: "pro",
+    access: "free",
     grade: experiment,
     summary: "Few-shot examples are recurring input cost, but some may be carrying most of the quality gain.",
     action: "Remove one example, rerun the same evaluation set, and keep it removed only when quality remains inside the declared margin.",
@@ -155,16 +170,16 @@ export const tokenTips: readonly TokenTip[] = [
     source: { label: "OpenAI model guidance", url: "https://developers.openai.com/api/docs/guides/latest-model" },
   },
   {
-    id: "directional-lean-prompts",
-    title: "Treat lean-prompt savings as directional, not universal",
-    category: "Prompt design",
-    access: "pro",
+    id: "stop-at-known-delimiter",
+    title: "Stop at a known delimiter",
+    category: "Output",
+    access: "free",
     grade: official,
-    summary: "OpenAI reports a coding-agent sample with 41–66% fewer tokens and 33–67% lower cost, while explicitly calling the ranges directional.",
-    action: "Use the result as a hypothesis and reproduce it on your own workload before publishing a savings claim.",
-    measure: "Report your own median, range, quality margin, model snapshot, and evaluation set.",
-    caveat: "An internal example is not a guarantee for another product or task distribution.",
-    source: { label: "OpenAI model guidance", url: "https://developers.openai.com/api/docs/guides/latest-model" },
+    summary: "A stop sequence can prevent trailing explanations or repeated sections after the useful payload is complete.",
+    action: "Choose a delimiter that cannot occur inside valid content, instruct the model to end with it, and configure the provider stop-sequence parameter.",
+    measure: "Compare output tokens and incomplete-output rate, including delimiter-collision and escaping tests.",
+    caveat: "Stop support differs by model, and structured outputs are safer for complex JSON or content that may contain the delimiter.",
+    source: { label: "Google prompt design strategies", url: "https://ai.google.dev/gemini-api/docs/prompting-strategies" },
   },
   {
     id: "route-by-accepted-cost",
@@ -230,7 +245,7 @@ export const tokenTips: readonly TokenTip[] = [
     id: "low-verbosity",
     title: "Use low verbosity for machine-consumed answers",
     category: "Output",
-    access: "pro",
+    access: "free",
     grade: official,
     summary: "GPT-5.6 supports a low text-verbosity setting for shorter responses without relying only on prompt wording.",
     action: "Use low verbosity for extraction, classification, routing, and other outputs where elaboration has no product value.",
@@ -359,54 +374,6 @@ export const tokenTips: readonly TokenTip[] = [
     source: { label: "OpenAI cost optimization", url: "https://developers.openai.com/api/docs/guides/cost-optimization" },
   },
   {
-    id: "randomize-paired-order",
-    title: "Randomize paired test order",
-    category: "Experiment design",
-    access: "pro",
-    grade: experiment,
-    summary: "Always running the optimized arm second can confound comparisons with transient load, cache warmth, and model variation.",
-    action: "Randomize A/B order while keeping cache experiments in explicit cold and warm phases.",
-    measure: "Store arm order, latency, cache details, model snapshot, and usage for every run.",
-    caveat: "Cache tests require controlled ordering rather than random ordering because warmth is the variable under test.",
-    source: { label: "OpenAI evals", url: "https://developers.openai.com/api/docs/guides/evals" },
-  },
-  {
-    id: "repeat-nondeterministic-tests",
-    title: "Repeat each example at least three times",
-    category: "Experiment design",
-    access: "pro",
-    grade: experiment,
-    summary: "A single generation cannot separate a real optimization effect from ordinary model variation.",
-    action: "Run paired repeats on a fixed, versioned evaluation set and report medians plus spread.",
-    measure: "Record median and P90 tokens, cost, latency, and quality for each arm.",
-    caveat: "Three repeats are a practical MVP floor, not statistical proof for a high-stakes rollout.",
-    source: { label: "OpenAI evals", url: "https://developers.openai.com/api/docs/guides/evals" },
-  },
-  {
-    id: "declare-quality-margin",
-    title: "Declare the quality margin before seeing results",
-    category: "Experiment design",
-    access: "pro",
-    grade: experiment,
-    summary: "Token reduction is useful only when the optimized path remains good enough for the product.",
-    action: "Choose the acceptance rubric and non-inferiority margin before running the comparison.",
-    measure: "Adopt only changes that meet both the cost target and the predeclared quality threshold.",
-    caveat: "Changing the rubric after seeing outputs turns measurement into storytelling.",
-    source: { label: "OpenAI evals", url: "https://developers.openai.com/api/docs/guides/evals" },
-  },
-  {
-    id: "pin-model-snapshots",
-    title: "Pin model snapshots for repeatable benchmarks",
-    category: "Experiment design",
-    access: "pro",
-    grade: official,
-    summary: "Moving aliases can change behavior over time, making a before/after result impossible to reproduce cleanly.",
-    action: "Use a dated snapshot where available and record the exact model returned in response metadata.",
-    measure: "Include the snapshot and run date in every benchmark export.",
-    caveat: "Production may still use a moving alias; retest before promoting an old optimization result.",
-    source: { label: "OpenAI models", url: "https://developers.openai.com/api/docs/models/all" },
-  },
-  {
     id: "separate-tool-fees",
     title: "Separate tokens from non-token fees",
     category: "Measurement",
@@ -418,7 +385,115 @@ export const tokenTips: readonly TokenTip[] = [
     caveat: "A token-saving change can still increase the invoice when it adds expensive tool calls.",
     source: { label: "OpenAI pricing", url: "https://developers.openai.com/api/docs/pricing" },
   },
+  {
+    id: "concise-example-length-target",
+    title: "Demonstrate the target answer length",
+    category: "Prompt design",
+    access: "free",
+    grade: official,
+    summary: "A compact example can teach the desired response length and structure more concretely than a vague request to be concise.",
+    action: "Add one short example that contains every required element and no optional commentary, then remove prose that the example makes redundant.",
+    measure: "Compare median output tokens, required-element recall, and retry rate with and without the concise example.",
+    caveat: "The example adds input tokens on every uncached request, so keep it only when output or retry savings exceed that recurring cost.",
+    source: { label: "Google prompt design strategies", url: "https://ai.google.dev/gemini-api/docs/prompting-strategies" },
+  },
+  {
+    id: "no-preamble-or-restatement",
+    title: "Remove preambles and task restatements",
+    category: "Output",
+    access: "free",
+    grade: derived,
+    summary: "Machine-consumed answers rarely need to repeat the request or announce that the model is about to answer it.",
+    action: "Tell the candidate to begin with the answer, omit greetings and conclusions, and never restate the task unless clarification is required.",
+    measure: "Track output tokens, first-useful-token position, completeness, and the rate of confusingly abrupt answers.",
+    caveat: "Customer-facing explanations may need context or tone; do not remove framing that users demonstrably rely on.",
+    source: { label: "OpenAI model guidance", url: "https://developers.openai.com/api/docs/guides/latest-model" },
+  },
+  {
+    id: "required-before-optional",
+    title: "Put required answer elements before optional detail",
+    category: "Output",
+    access: "free",
+    grade: experiment,
+    summary: "A response budget is safer when the must-have fields or conclusions appear before explanation that can be shortened or omitted.",
+    action: "List the required answer elements in priority order and tell the candidate to add optional rationale only when budget remains.",
+    measure: "Compare required-field recall, truncation failures, output tokens, and human preference on the same tasks.",
+    caveat: "Some reasoning-heavy tasks need explanation before a defensible conclusion; use the product acceptance rubric, not length alone.",
+    source: { label: "OpenAI model guidance", url: "https://developers.openai.com/api/docs/guides/latest-model" },
+  },
+  {
+    id: "compact-choice-labels",
+    title: "Encode closed choices as compact labels",
+    category: "Structured output",
+    access: "free",
+    grade: derived,
+    summary: "A fixed decision can usually be returned as a short enum, boolean, or identifier instead of a repeated prose description.",
+    action: "Give each allowed decision a stable compact label, ask for exactly one label, and map it to user-facing text in application code.",
+    measure: "Compare output tokens, invalid-label rate, decision accuracy, and any repair calls against the prose response.",
+    caveat: "Compact labels hide nuance; keep a separate explanation field when downstream users need the reasoning.",
+    source: { label: "OpenAI Structured Outputs", url: "https://developers.openai.com/api/docs/guides/structured-outputs" },
+  },
+  {
+    id: "one-line-success-criteria",
+    title: "Replace style boilerplate with one success criterion",
+    category: "Prompt design",
+    access: "free",
+    grade: experiment,
+    summary: "Several overlapping style instructions can often become one observable definition of a successful answer.",
+    action: "Replace generic adjectives such as clear, helpful, thorough, and professional with one testable sentence describing what the answer must let the reader do.",
+    measure: "Compare input tokens, evaluator pass rate, clarification requests, and output length across a representative task set.",
+    caveat: "Do not collapse distinct safety, policy, or contractual requirements merely because their wording looks repetitive.",
+    source: { label: "OpenAI model guidance", url: "https://developers.openai.com/api/docs/guides/latest-model" },
+  },
+  {
+    id: "fixed-response-budget",
+    title: "State a concrete response budget",
+    category: "Output",
+    access: "free",
+    grade: experiment,
+    summary: "A measurable word, sentence, bullet, or field budget gives the model a clearer stopping target than an unqualified request for brevity.",
+    action: "Choose the smallest task-appropriate budget—for example three bullets or six fields—and state both the limit and the content that must fit inside it.",
+    measure: "Track output tokens, budget violations, missing requirements, truncation, and retries against the current prompt.",
+    caveat: "Prompt budgets are soft controls; pair them with a safe API output ceiling for worst-case spend and leave headroom for valid edge cases.",
+    source: { label: "OpenAI model guidance", url: "https://developers.openai.com/api/docs/guides/latest-model" },
+  },
 ];
+
+const compiledResearchMethods = researchMethods as readonly TipInput[];
+
+const aliases: Readonly<Record<string, readonly string[]>> = {
+  "cache-key-partition": ["research-pc-08"],
+  "research-pc-15": ["research-ca-06"],
+  "research-ctx-10": ["research-pd-09"],
+  "research-ctx-11": ["research-pd-06"],
+  "research-ctx-12": ["research-pd-07"],
+  "structured-output-retries": ["research-so-01"],
+  "limit-initial-tools": ["research-tl-01"],
+  "combine-sequential-tools": ["research-tl-09"],
+  "lower-reasoning-effort": ["research-oc-05", "research-oc-06", "research-oc-07"],
+  "server-compaction": ["research-cmp-04"],
+  "stop-at-known-delimiter": ["research-oc-03"],
+};
+
+const requestConfigIds = new Set(["lower-reasoning-effort", "low-verbosity", "cap-output"]);
+const supportedExperimentIds = new Set(["lower-reasoning-effort", "low-verbosity"]);
+
+export const tokenTips: readonly TokenTip[] = [...coreTips, ...compiledResearchMethods].map((tip) => {
+  const experimentType: ExperimentType = tip.experimentType ?? (requestConfigIds.has(tip.id) ? "request_config" : tip.access === "free" ? "prompt_diff" : "guided");
+  const experimentSupport: ExperimentSupport = tip.experimentSupport ?? (supportedExperimentIds.has(tip.id) ? "supported" : tip.id === "cap-output" || tip.id === "stop-at-known-delimiter" ? "not-supported" : "guided-only");
+  const provider = tip.providers ?? providerFromSource(tip.source.url);
+  return {
+    ...tip,
+    canonicalId: tip.canonicalId ?? tip.id,
+    intervention: tip.intervention ?? tip.action,
+    aliases: tip.aliases ?? aliases[tip.id] ?? [],
+    providers: provider,
+    sources: tip.sources ?? [tip.source],
+    lastVerified: tip.lastVerified ?? "2026-08-15",
+    experimentType,
+    experimentSupport,
+  };
+});
 
 export const publicTips = tokenTips.filter((tip) => tip.access === "free");
 export const proTips = tokenTips.filter((tip) => tip.access === "pro");
@@ -428,3 +503,12 @@ export const evidenceLabels: Record<EvidenceGrade, string> = {
   derived: "Derived math",
   experiment: "Test protocol",
 };
+
+function providerFromSource(url: string): string {
+  if (url.includes("openai.com")) return "OpenAI";
+  if (url.includes("google.com") || url.includes("google.dev")) return "Google Gemini";
+  if (url.includes("anthropic.com") || url.includes("claude.com")) return "Anthropic Claude";
+  if (url.includes("aws.amazon.com")) return "Amazon Bedrock";
+  if (url.includes("arxiv.org")) return "Provider-agnostic";
+  return "Provider scope stated in source";
+}

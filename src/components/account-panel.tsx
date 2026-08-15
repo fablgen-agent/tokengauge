@@ -55,12 +55,12 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
         ) : (
           <div className="checkout-stack">
             <button className="button button-lime" type="button" disabled={busy || !account.checkoutReady} onClick={checkout}>
-              {busy ? "Opening secure checkout…" : account.checkoutReady ? "Get founding access — £9" : "Checkout setup in progress"}
+              {busy ? "Opening secure checkout…" : account.checkoutReady ? "Get Pro access — £9 once" : "Checkout setup in progress"}
             </button>
             <small>{account.stripeMode === "test" ? "Test mode — no real charges" : "One-time payment via Stripe"}</small>
           </div>
         )
-      ) : <p className="account-explainer">Connect to purchase and run private A/B tests using your own ChatGPT allowance.</p>}
+      ) : <p className="account-explainer">Connecting does not charge you. It enables the free lab and lets TokenGauge attach Pro access to your account before Stripe checkout.</p>}
       {error ? <p className="form-error" role="alert">{error}</p> : null}
     </div>
   );

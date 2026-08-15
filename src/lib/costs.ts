@@ -1,36 +1,89 @@
-export const priceSnapshotDate = "2026-08-15";
+import pricingSnapshot from "@/data/pricing-snapshot.json";
+
+export type ProviderId =
+  | "openai"
+  | "anthropic"
+  | "google"
+  | "xai"
+  | "deepseek"
+  | "kimi"
+  | "qwen"
+  | "mistral"
+  | "cohere";
 
 export type ModelPrice = {
   id: string;
+  modelId: string;
+  provider: ProviderId;
+  providerLabel: string;
   label: string;
+  tierLabel: string;
   inputPerMillionUsd: number;
-  cachedInputPerMillionUsd: number;
+  cachedInputPerMillionUsd: number | null;
+  cacheWritePerMillionUsd?: number;
+  cacheWriteOneHourPerMillionUsd?: number;
+  explicitCacheReadPerMillionUsd?: number;
+  explicitCacheStoragePerMillionTokenHourUsd?: number;
   outputPerMillionUsd: number;
+  contextWindowTokens?: number;
+  minInputTokensExclusive?: number;
+  minInputTokensInclusive?: number;
+  maxInputTokensExclusive?: number;
+  maxInputTokensInclusive?: number;
+  region: string;
+  sourceUrl: string;
+  sourceLabel: string;
+  effectiveFrom?: string;
+  effectiveUntil?: string;
 };
 
-export const modelPrices: readonly ModelPrice[] = [
-  {
-    id: "gpt-5.6-sol",
-    label: "GPT-5.6 Sol",
-    inputPerMillionUsd: 5,
-    cachedInputPerMillionUsd: 0.5,
-    outputPerMillionUsd: 30,
-  },
-  {
-    id: "gpt-5.6-terra",
-    label: "GPT-5.6 Terra",
-    inputPerMillionUsd: 2.5,
-    cachedInputPerMillionUsd: 0.25,
-    outputPerMillionUsd: 15,
-  },
-  {
-    id: "gpt-5.6-luna",
-    label: "GPT-5.6 Luna",
-    inputPerMillionUsd: 1,
-    cachedInputPerMillionUsd: 0.1,
-    outputPerMillionUsd: 6,
-  },
-] as const;
+type PricingSnapshot = {
+  observedAt: string;
+  currency: "USD";
+  unitTokens: 1_000_000;
+  models: ModelPrice[];
+};
+
+const snapshot = pricingSnapshot as PricingSnapshot;
+
+export const priceSnapshotDate = snapshot.observedAt.slice(0, 10);
+export const priceSnapshotObservedAt = snapshot.observedAt;
+export const modelPrices: readonly ModelPrice[] = snapshot.models;
+
+export const priceProviders = Array.from(
+  new Map(modelPrices.map((model) => [model.provider, model.providerLabel])).entries(),
+).map(([id, label]) => ({ id: id as ProviderId, label }));
+
+export function isPriceEffective(price: ModelPrice, at = new Date()): boolean {
+  const timestamp = at.getTime();
+  const starts = price.effectiveFrom ? Date.parse(price.effectiveFrom) : Number.NEGATIVE_INFINITY;
+  const ends = price.effectiveUntil ? Date.parse(price.effectiveUntil) : Number.POSITIVE_INFINITY;
+  return timestamp >= starts && timestamp < ends;
+}
+
+export function getSelectableModelPrices(at = new Date()): readonly ModelPrice[] {
+  return modelPrices.filter((price) => isPriceEffective(price, at));
+}
+
+export function isInputWithinPriceTier(price: ModelPrice, inputTokens: number): boolean {
+  const input = Math.max(inputTokens, 0);
+  if (price.contextWindowTokens !== undefined && input > price.contextWindowTokens) return false;
+  if (price.minInputTokensExclusive !== undefined && input <= price.minInputTokensExclusive) return false;
+  if (price.minInputTokensInclusive !== undefined && input < price.minInputTokensInclusive) return false;
+  if (price.maxInputTokensExclusive !== undefined && input >= price.maxInputTokensExclusive) return false;
+  if (price.maxInputTokensInclusive !== undefined && input > price.maxInputTokensInclusive) return false;
+  return true;
+}
+
+export function resolvePriceForInput(selected: ModelPrice, inputTokens: number, at = new Date()): ModelPrice | undefined {
+  if (isPriceEffective(selected, at) && isInputWithinPriceTier(selected, inputTokens)) return selected;
+  return getSelectableModelPrices(at).find((candidate) =>
+    candidate.provider === selected.provider &&
+    candidate.modelId === selected.modelId &&
+    candidate.region === selected.region &&
+    isInputWithinPriceTier(candidate, inputTokens),
+  );
+}
 
 export type TokenUsage = {
   inputTokens: number;
@@ -39,15 +92,19 @@ export type TokenUsage = {
 };
 
 export function calculateCostUsd(price: ModelPrice, usage: TokenUsage): number {
+  if (!isInputWithinPriceTier(price, usage.inputTokens)) {
+    throw new RangeError(`${price.id} does not cover ${usage.inputTokens} input tokens.`);
+  }
   const cached = Math.min(
     Math.max(usage.cachedInputTokens ?? 0, 0),
     Math.max(usage.inputTokens, 0),
   );
   const uncached = Math.max(usage.inputTokens - cached, 0);
+  const cachedRate = price.cachedInputPerMillionUsd ?? price.inputPerMillionUsd;
 
   return (
     (uncached * price.inputPerMillionUsd +
-      cached * price.cachedInputPerMillionUsd +
+      cached * cachedRate +
       Math.max(usage.outputTokens, 0) * price.outputPerMillionUsd) /
     1_000_000
   );
@@ -74,4 +131,11 @@ export function formatUsd(value: number): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+export function formatRate(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  if (value < 0.01) return `$${value.toFixed(4)}`;
+  if (value < 1) return `$${value.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}`;
+  return `$${value.toFixed(2).replace(/\.00$/, "")}`;
 }

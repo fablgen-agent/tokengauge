@@ -1,0 +1,410 @@
+{
+  "checkedAt": "2026-08-15T16:14:22.765Z",
+  "errors": [],
+  "sources": [
+    {
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "fetchedUrl": "https://developers.openai.com/api/docs/pricing.md",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "sha256": "9d64e55b063ded909cd6d1eab62e0c8bead1fdcdc1704d373e7e760bc2dd07f5",
+      "checkedRows": [
+        {
+          "modelId": "gpt-5.6-sol",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gpt-5.6-sol",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gpt-5.6-terra",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gpt-5.6-terra",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gpt-5.6-luna",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gpt-5.6-luna",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "fetchedUrl": "https://platform.claude.com/docs/en/about-claude/pricing.md",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "sha256": "f5f156f59fa140cca57fd65ba6f6de5df38605d718d36e9562963dabda09e1da",
+      "checkedRows": [
+        {
+          "modelId": "claude-fable-5",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "claude-opus-5",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "claude-sonnet-5",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "claude-sonnet-4-6",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "claude-haiku-4-5",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "fetchedUrl": "https://ai.google.dev/gemini-api/docs/pricing?hl=en",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "sha256": "7fee5b687ddda0d53fab6e4d94c6820d865ec4c80bca4d124d408bf8e88cf8b6",
+      "checkedRows": [
+        {
+          "modelId": "gemini-3.7-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gemini-3.6-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gemini-3.5-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gemini-3.5-flash-lite",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gemini-3.1-flash-lite",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gemini-3.1-pro-preview",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "gemini-3.1-pro-preview",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://docs.x.ai/developers/models",
+      "fetchedUrl": "https://docs.x.ai/developers/models",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "sha256": "3b646100565158e3c1f6211565a152e59cb5e777d1b271be8c756ee6d3045c5f",
+      "checkedRows": [
+        {
+          "modelId": "grok-4.6",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "grok-4.6",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "grok-4.5",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "grok-4.3",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "grok-4.3",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "grok-build-0.1",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "grok-4.20-0309-reasoning",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "fetchedUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "status": 200,
+      "contentType": "text/html",
+      "sha256": "06e1f6873722403538b2d8fbf1c3872329c31df546b8663986b8ca9451cabe0f",
+      "checkedRows": [
+        {
+          "modelId": "deepseek-v4-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-pro",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-pro",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-pro",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://platform.kimi.ai/docs/pricing/chat-k3",
+      "fetchedUrl": "https://platform.kimi.ai/docs/pricing/chat-k3.md",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "sha256": "46b6b081a39180a75bb3a60547973eff92e61c1d8227a04106b635e1b56ab711",
+      "checkedRows": [
+        {
+          "modelId": "kimi-k3",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://platform.kimi.ai/docs/pricing/chat-k27-code",
+      "fetchedUrl": "https://platform.kimi.ai/docs/pricing/chat-k27-code.md",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "sha256": "6ff64935d5a5dc03653fc07801510251c062f75930aed220b866ae4dd0ca1342",
+      "checkedRows": [
+        {
+          "modelId": "kimi-k2.7-code",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "kimi-k2.7-code-highspeed",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://platform.kimi.ai/docs/pricing/chat-k26",
+      "fetchedUrl": "https://platform.kimi.ai/docs/pricing/chat-k26.md",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "sha256": "cbcc9b94f151655b743c06a005985b3926e16ba1b5e2f5cf66c027c7444931ea",
+      "checkedRows": [
+        {
+          "modelId": "kimi-k2.6",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-max",
+      "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-max",
+      "status": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "sha256": "715c279566687c0c00acfadb04d01311e5a798454f4803deb7fda16a072c3e8f",
+      "checkedRows": [
+        {
+          "modelId": "qwen3.7-max",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-plus",
+      "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-plus",
+      "status": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "sha256": "9e4c734b0c20aa2b905a3ce5b1d7d0a08ace44e15d04ffe045820fbceb6f0e75",
+      "checkedRows": [
+        {
+          "modelId": "qwen3.7-plus",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "qwen3.7-plus",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-flash",
+      "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-flash",
+      "status": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "sha256": "2aa887f299f54b9d18a6809c7a0aac82eb17cb12a629423b0c369d06602937e7",
+      "checkedRows": [
+        {
+          "modelId": "qwen3.7-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "qwen3.7-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "qwen3.7-flash",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://mistral.ai/pricing/api/",
+      "fetchedUrl": "https://mistral.ai/pricing/api/",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "sha256": "7a9aa14dc25fb38055e3fda362ea7464f0307e6a3ef12e1b5a8cc06074b76fcc",
+      "checkedRows": [
+        {
+          "modelId": "mistral-medium-latest",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "mistral-small-latest",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "mistral-large-latest",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "codestral-latest",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "ministral-3b-latest",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "ministral-8b-latest",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "ministral-14b-latest",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://docs.cohere.com/docs/command-a",
+      "fetchedUrl": "https://docs.cohere.com/docs/command-a",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "sha256": "ca8f555c25442fc81ee869d0708b889001134e98a5eb959c849da64505e044ac",
+      "checkedRows": [
+        {
+          "modelId": "command-a-03-2025",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://docs.cohere.com/v2/docs/command-r7b",
+      "fetchedUrl": "https://docs.cohere.com/v2/docs/command-r7b",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "sha256": "66875d4c07eb3ae309fc198ec6bc47b6e4a208971b8bd0e522d3fdb28eae5df0",
+      "checkedRows": [
+        {
+          "modelId": "command-r7b-12-2024",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://docs.cohere.com/docs/command-r",
+      "fetchedUrl": "https://docs.cohere.com/docs/command-r",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "sha256": "20d0a0da98589b76ad50009250b8be37c19048eb3060e1bb05afe68b7580b124",
+      "checkedRows": [
+        {
+          "modelId": "command-r-08-2024",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "url": "https://docs.cohere.com/docs/command-r-plus",
+      "fetchedUrl": "https://docs.cohere.com/docs/command-r-plus",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "sha256": "e56b279f98b3fda8e26fc45fb3e7b2ec7f16356dd0b064da7354c3daa065c8a3",
+      "checkedRows": [
+        {
+          "modelId": "command-r-plus-08-2024",
+          "ok": true,
+          "missing": []
+        }
+      ]
+    }
+  ]
+}
