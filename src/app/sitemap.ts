@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getAppUrl } from "@/lib/env";
+import { providerComparisons } from "@/lib/provider-comparisons";
 import { providerPageProfiles } from "@/lib/provider-pages";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -10,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: origin, lastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${origin}/pricing`, lastModified, changeFrequency: "weekly", priority: .95 },
     ...providerPageProfiles.map((provider) => ({ url: `${origin}/pricing/${provider.id}`, lastModified, changeFrequency: "weekly" as const, priority: .9 })),
+    { url: `${origin}/compare`, lastModified, changeFrequency: "weekly", priority: .9 },
+    ...providerComparisons.map((comparison) => ({ url: `${origin}/compare/${comparison.slug}`, lastModified, changeFrequency: "weekly" as const, priority: .88 })),
     { url: `${origin}/library`, lastModified, changeFrequency: "weekly", priority: .9 },
     { url: `${origin}/lab`, lastModified, changeFrequency: "monthly", priority: .8 },
     { url: `${origin}/privacy`, lastModified, changeFrequency: "yearly", priority: .3 },

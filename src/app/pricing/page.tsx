@@ -5,6 +5,7 @@ import { CostCalculator } from "@/components/calculator";
 import { PricingDirectory } from "@/components/pricing-directory";
 import { SiteHeader } from "@/components/site-header";
 import { modelPrices, priceSnapshotDate } from "@/lib/costs";
+import { providerComparisons } from "@/lib/provider-comparisons";
 import { providerLabel, providerPageProfiles, providerRateCards, uniqueProviderModels } from "@/lib/provider-pages";
 
 export const metadata: Metadata = {
@@ -54,6 +55,14 @@ export default function PricingHub() {
               </Link>
             ))}
           </div>
+        </section>
+
+        <section className="section-pad provider-index comparison-index" aria-labelledby="comparison-index-title">
+          <div className="section-heading split-heading"><div><span className="eyebrow">PAIRWISE API COSTS</span><h2 id="comparison-index-title">Put two providers on one workload.</h2></div><p>Choose exact model tiers, reuse the same request and token inputs, then set separate quality pass rates before calling either side cheaper.</p></div>
+          <div className="provider-page-grid comparison-page-grid">
+            {providerComparisons.map((comparison) => <Link href={`/compare/${comparison.slug}`} key={comparison.slug}><span>{providerLabel(comparison.left)} / {providerLabel(comparison.right)}</span><strong>{comparison.searchTitle}</strong><p>{comparison.description}</p><b>Open comparison →</b></Link>)}
+          </div>
+          <p className="comparison-index-link"><Link className="text-link" href="/compare">View every provider comparison <span aria-hidden="true">→</span></Link></p>
         </section>
 
         <section id="rates" className="section-pad section-block rates-section">
