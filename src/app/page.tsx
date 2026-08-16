@@ -60,7 +60,7 @@ export default async function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <SiteHeader />
       <main>
-        {launchActive ? <aside className="launch-banner" aria-label="Launch offer"><strong>LAUNCH 100</strong><span>First 100 authenticated accounts: Pro £5 · Pro+ £15 · Ultimate £20</span><span>{launchOffer.eligible ? `Signup ${launchOffer.ordinal} price secured` : `${launchOffer.remaining} places remain`}</span><Link href={launchOffer.eligible ? "/#pricing" : "/account"}>{launchOffer.eligible ? "Use your launch price" : "Secure your account price"} <span aria-hidden="true">→</span></Link></aside> : null}
+        {launchActive ? <aside className="launch-banner" aria-label="Launch offer"><strong>LAUNCH 100</strong><span>First 100 authenticated accounts: Pro £5 · Pro+ £15 · Ultimate £20</span><span>{launchOffer.eligible ? `Signup ${launchOffer.ordinal} price secured` : `${launchOffer.remaining} places remain`}</span><Link href={launchOffer.eligible ? "/#pricing" : "/account"} data-funnel-event={launchOffer.eligible ? "cta_pricing" : "cta_account"}>{launchOffer.eligible ? "Use your launch price" : "Secure your account price"} <span aria-hidden="true">→</span></Link></aside> : null}
         <section className="hero section-pad">
           <div className="hero-copy">
             <span className="eyebrow eyebrow-lime">LLM COST INTELLIGENCE</span>
@@ -68,7 +68,7 @@ export default async function Home() {
             <p className="hero-lede">Compare official API rates, model realistic savings, and test token-reduction methods without hiding quality failures.</p>
             <div className="hero-actions">
               <Link className="button button-lime" href="#rates">Compare current rates</Link>
-              <Link className="text-link" href="/lab">Open the A/B lab <span>→</span></Link>
+              <Link className="text-link" href="/lab" data-funnel-event="cta_lab">Open the A/B lab <span>→</span></Link>
             </div>
           </div>
           <aside className="coverage-panel" aria-label="Pricing coverage">
@@ -111,7 +111,7 @@ export default async function Home() {
           <div className="free-library-link"><Link href="/library">View all {publicTips.length} free methods <span aria-hidden="true">→</span></Link><span>Supported lab recipes are labeled individually; every card includes a guided measurement plan.</span></div>
           <div className="locked-preview">
             <div><span className="lock-icon" aria-hidden="true">+</span><h3>{proTips.length} Pro cards + 2,500 research rows</h3><p>The curated cards stay distinct from 1,316 atomic candidates and 1,184 compound configurations in the server-filtered research atlas.</p></div>
-            <div className="locked-preview-actions"><Link className="text-link" href="/atlas">Preview the atlas <span>→</span></Link><Link className="button button-dark" href="#pricing">See one-time Pro access</Link></div>
+            <div className="locked-preview-actions"><Link className="text-link" href="/atlas" data-funnel-event="cta_atlas">Preview the atlas <span>→</span></Link><Link className="button button-dark" href="#pricing" data-funnel-event="cta_pricing">See one-time Pro access</Link></div>
           </div>
         </section>
 

@@ -41,9 +41,9 @@ export function SiteHeader() {
         {access === "pro" ? (
           <Link className="nav-cta nav-cta-active" href="/account" aria-label="TokenGauge Pro access is active">Pro active</Link>
         ) : access === "launch" ? (
-          <Link className="nav-cta" href="/#pricing" aria-label="Get launch Pro access for £5 one time">Get Pro £5</Link>
+          <Link className="nav-cta" href="/#pricing" data-funnel-event="cta_pricing" aria-label="Get launch Pro access for £5 one time">Get Pro £5</Link>
         ) : access === "free" ? (
-          <Link className="nav-cta" href="/#pricing" aria-label="Get Pro access for £9 one time">Get Pro £9</Link>
+          <Link className="nav-cta" href="/#pricing" data-funnel-event="cta_pricing" aria-label="Get Pro access for £9 one time">Get Pro £9</Link>
         ) : (
           <span className="nav-cta nav-cta-pending" aria-label="Checking TokenGauge access">Checking…</span>
         )}

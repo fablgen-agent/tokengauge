@@ -6,6 +6,7 @@ import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
 import { highestPlan, type PaidPlanId, type PlanId } from "@/lib/plans";
+import type { FunnelEvent } from "@/lib/funnel-events";
 
 let singleton: DatabaseSync | undefined;
 
@@ -106,6 +107,14 @@ export function getDatabase(): DatabaseSync {
       joined_at INTEGER NOT NULL,
       FOREIGN KEY (account_id) REFERENCES users(account_id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS funnel_daily (
+      day TEXT NOT NULL,
+      event TEXT NOT NULL,
+      count INTEGER NOT NULL DEFAULT 0 CHECK (count >= 0),
+      first_at INTEGER NOT NULL,
+      last_at INTEGER NOT NULL,
+      PRIMARY KEY (day, event)
+    );
   `);
   const experimentColumns = singleton.prepare("PRAGMA table_info(experiments)").all() as { name: string }[];
   if (!experimentColumns.some((column) => column.name === "provider_id")) {
@@ -119,6 +128,25 @@ export function getDatabase(): DatabaseSync {
     singleton.exec("ALTER TABLE entitlements ADD COLUMN currency TEXT");
   }
   return singleton;
+}
+
+export function recordFunnelEvent(event: FunnelEvent, observedAt = Date.now()): void {
+  const day = new Date(observedAt).toISOString().slice(0, 10);
+  getDatabase().prepare(`
+    INSERT INTO funnel_daily (day, event, count, first_at, last_at)
+    VALUES (?, ?, 1, ?, ?)
+    ON CONFLICT(day, event) DO UPDATE SET
+      count = funnel_daily.count + 1,
+      last_at = excluded.last_at
+  `).run(day, event, observedAt, observedAt);
+}
+
+export type FunnelDailyRow = { day: string; event: FunnelEvent; count: number };
+
+export function funnelDailyRows(sinceDay: string): FunnelDailyRow[] {
+  return getDatabase()
+    .prepare("SELECT day, event, count FROM funnel_daily WHERE day >= ? ORDER BY day, event")
+    .all(sinceDay) as FunnelDailyRow[];
 }
 
 export class SqliteKeyValueStore<T> implements KeyValueStore<T> {
