@@ -20,20 +20,21 @@ export async function generateMetadata(): Promise<Metadata> {
   const request = new Request("http://tokengauge.internal/", { headers: await headers() });
   const owner = await getOwnerAccountContext(request);
   const offer = launchOfferStatus(owner?.accountId);
+  const value = "Compare official LLM API rates, calculate realistic workloads, and test token-saving strategies without storing prompts or outputs.";
   const description = offer.eligible
-    ? "Your Launch 100 account can get Pro £5, Pro+ £15, or Ultimate £20."
+    ? `${value} Your Launch 100 prices are secured.`
     : offer.remaining > 0
-      ? `Launch 100: Pro £5, Pro+ £15, or Ultimate £20 for the first 100 authenticated accounts. ${offer.remaining} places currently remain.`
-    : "Compare official model rates, test token-saving methods, and measure paired experiments without storing prompts or outputs.";
+      ? `${value} ${offer.remaining} Launch 100 places remain.`
+      : value;
   return {
-    title: "TokenGauge — Evidence-backed AI cost optimization",
+    title: "TokenGauge Workbench — Evidence-backed AI cost optimization",
     description,
     openGraph: {
-      title: "TokenGauge Launch 100",
+      title: "TokenGauge Workbench — LLM API cost intelligence",
       description,
       images: [{ url: "/images/tokengauge-launch-social.jpg", width: 1270, height: 760, alt: "TokenGauge model-cost measurement workbench" }],
     },
-    twitter: { title: "TokenGauge Launch 100", description, images: ["/images/tokengauge-launch-social.jpg"] },
+    twitter: { title: "TokenGauge Workbench — LLM API cost intelligence", description, images: ["/images/tokengauge-launch-social.jpg"] },
   };
 }
 
@@ -45,10 +46,13 @@ export default async function Home() {
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "TokenGauge",
+    name: "TokenGauge Workbench",
+    alternateName: "TokenGauge",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description: "Official AI model rate cards, evidence-backed token-saving methods, and controlled multi-provider A/B experiments.",
+    url: "https://tokengauge.enby.fish/",
+    sameAs: "https://github.com/fablgen-agent/tokengauge",
     offers: paidPlans.map((plan) => ({ "@type": "Offer", name: `TokenGauge ${plan.name}`, price: launchActive ? launchPricesGbp[plan.id] : plan.priceGbp, priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://tokengauge.enby.fish/#pricing" })),
   };
   return (
