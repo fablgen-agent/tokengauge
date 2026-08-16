@@ -32,6 +32,7 @@ export function SiteHeader() {
       <nav aria-label="Main navigation">
         <Link href="/pricing">Rates</Link>
         <Link href="/pricing#calculator">Calculator</Link>
+        <Link href="/ledger">Ledger</Link>
         <Link href="/library">Methods</Link>
         <Link href="/atlas">Atlas</Link>
         <Link href="/lab">Lab</Link>

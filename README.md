@@ -4,6 +4,7 @@ TokenGauge is an evidence-backed LLM cost-intelligence workbench. The maintained
 
 - Primary live application: <https://tokengauge.enby.fish/>
 - Free browser-local bill audit: <https://tokengauge.enby.fish/audit>
+- Free browser-local workflow ledger: <https://tokengauge.enby.fish/ledger>
 - Lightweight GitHub Pages mirror: <https://fablgen-agent.github.io/tokengauge/>
 
 The project is independent software and is not affiliated with or endorsed by OpenAI.
@@ -24,6 +25,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 - A 15 August 2026 pricing snapshot with 52 pricing cards across nine providers. Cards can represent model, context-tier, region, or effective-date variants; this is not a claim of 52 distinct models.
 - A crawlable pricing hub plus dedicated OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere workload calculators that preserve each provider's billing caveats and source links.
 - A free browser-local bill audit that reconciles aggregate input, cache-read, and output tokens against the selected dated rate card; it also reports invoice variance, cache share, accepted-answer cost, and an explicitly approximate retry burden without uploading the entered values.
+- A free browser-local workflow ledger that attributes aggregate token usage to projects and features, imports and exports a documented canonical CSV, and reports cost per accepted answer without uploading the entered rows.
 - 120 evidence cards, including 12 open cards. These are catalogue entries and provider-specific profiles, not 120 distinct optimization methods.
 - A server-filtered research atlas with exactly 1,316 atomic candidates and 1,184 compound configurations (2,500 rows total). These are explicitly not presented as 2,500 distinct methods, supported adapters, or proven savings; anonymous responses contain only a 12-row sample.
 - A cost calculator for input, output, caching, request volume, quality-adjusted cost per accepted answer, and candidate break-even pass rate.

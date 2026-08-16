@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: origin, lastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${origin}/pricing`, lastModified, changeFrequency: "weekly", priority: .95 },
     { url: `${origin}/audit`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .95 },
+    { url: `${origin}/ledger`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .95 },
     ...providerPageProfiles.map((provider) => ({ url: `${origin}/pricing/${provider.id}`, lastModified, changeFrequency: "weekly" as const, priority: .9 })),
     { url: `${origin}/compare`, lastModified, changeFrequency: "weekly", priority: .9 },
     ...providerComparisons.map((comparison) => ({ url: `${origin}/compare/${comparison.slug}`, lastModified, changeFrequency: "weekly" as const, priority: .88 })),

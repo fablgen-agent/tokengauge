@@ -18,8 +18,8 @@ export function getDatabase(): DatabaseSync {
   if (singleton) return singleton;
 
   const path = databasePath();
-  mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-  chmodSync(dirname(path), 0o700);
+  const createdDirectory = mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+  if (createdDirectory) chmodSync(dirname(path), 0o700);
   singleton = new DatabaseSync(path);
   singleton.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
   chmodSync(path, 0o600);
