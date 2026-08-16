@@ -110,8 +110,8 @@ export default async function Home() {
           <div className="tips-grid">{publicTips.slice(0, 3).map((tip) => <TipCard tip={tip} compact key={tip.id} />)}</div>
           <div className="free-library-link"><Link href="/library">View all {publicTips.length} free methods <span aria-hidden="true">→</span></Link><span>Supported lab recipes are labeled individually; every card includes a guided measurement plan.</span></div>
           <div className="locked-preview">
-            <div><span className="lock-icon" aria-hidden="true">+</span><h3>{proTips.length} Pro evidence cards</h3><p>Caching, context, routing, retrieval, schemas, tools, retries, batch processing, and provider-specific billing tactics with guided measurement plans.</p></div>
-            <Link className="button button-dark" href="#pricing">See one-time Pro access</Link>
+            <div><span className="lock-icon" aria-hidden="true">+</span><h3>{proTips.length} Pro cards + 2,500 research rows</h3><p>The curated cards stay distinct from 1,316 atomic candidates and 1,184 compound configurations in the server-filtered research atlas.</p></div>
+            <div className="locked-preview-actions"><Link className="text-link" href="/atlas">Preview the atlas <span>→</span></Link><Link className="button button-dark" href="#pricing">See one-time Pro access</Link></div>
           </div>
         </section>
 

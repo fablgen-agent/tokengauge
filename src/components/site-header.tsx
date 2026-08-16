@@ -33,6 +33,7 @@ export function SiteHeader() {
         <Link href="/pricing">Rates</Link>
         <Link href="/pricing#calculator">Calculator</Link>
         <Link href="/library">Methods</Link>
+        <Link href="/atlas">Atlas</Link>
         <Link href="/lab">Lab</Link>
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/account">Account</Link>
