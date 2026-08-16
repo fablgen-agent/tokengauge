@@ -88,7 +88,7 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
           </div>
         ) : (
           <div className="checkout-stack">
-            <button className="button button-lime" type="button" disabled={busy || !checkoutConfigured} onClick={checkout}>
+            <button className="button button-lime" type="button" data-funnel-event="cta_pricing" disabled={busy || !checkoutConfigured} onClick={checkout}>
               {busy ? "Opening secure checkout…" : checkoutConfigured ? `${account.accessPlan === "free" ? "Get" : "Upgrade to"} ${target.name} — £${checkoutPrice} once` : "Checkout setup in progress"}
             </button>
             <small>{account.stripeMode === "test" ? "Test mode — no real charges" : usesLaunchOffer ? `Launch offer secured as signup ${account.launchOffer.ordinal} of ${account.launchOffer.limit}` : account.accessPlan === "free" ? "One-time payment via Stripe" : "Your existing paid tier is credited automatically"}</small>
@@ -97,11 +97,11 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
       ) : targetPlan === "pro" && account?.pro && account.chatgpt.legacyPro ? (
         <div className="checkout-stack">
           <span className="status-chip">Pro currently attached to ChatGPT</span>
-          <Link className="button button-lime" href="/account">Create an account and move access</Link>
+          <Link className="button button-lime" href="/account" data-funnel-event="cta_account">Create an account and move access</Link>
         </div>
       ) : (
         <div className="checkout-stack">
-          <Link className="button button-lime" href="/account">{account?.accountSystemReady ? "Create or sign in" : "TokenGauge account"}</Link>
+          <Link className="button button-lime" href="/account" data-funnel-event="cta_account">{account?.accountSystemReady ? "Create or sign in" : "TokenGauge account"}</Link>
           <small>{account?.accountSystemReady ? "Continue with ChatGPT or verified email before checkout" : "ChatGPT sign-in is available"}</small>
         </div>
       )}

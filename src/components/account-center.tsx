@@ -141,7 +141,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity }: { account
             {mode === "create" ? <label>Name<input name="name" autoComplete="name" minLength={2} maxLength={80} required /></label> : null}
             <label>Email<input name="email" type="email" autoComplete="email" maxLength={254} required /></label>
             {mode !== "forgot" ? <label>Password<input name="password" type="password" autoComplete={mode === "create" ? "new-password" : "current-password"} minLength={12} maxLength={128} required /><small>At least 12 characters.</small></label> : null}
-            <button className="button button-lime" type="submit" disabled={busy || (mode === "create" && !accountSystemReady)}>{busy ? "Working…" : mode === "create" ? "Create account" : mode === "forgot" ? "Send reset link" : "Sign in"}</button>
+            <button className="button button-lime" type="submit" data-funnel-event={mode === "create" ? "account_signup_attempt" : mode === "forgot" ? "account_reset_attempt" : "account_signin_attempt"} disabled={busy || (mode === "create" && !accountSystemReady)}>{busy ? "Working…" : mode === "create" ? "Create account" : mode === "forgot" ? "Send reset link" : "Sign in"}</button>
           </form>
           <button className="text-button" type="button" onClick={() => setMode(mode === "forgot" ? "sign-in" : "forgot")}>{mode === "forgot" ? "Back to sign in" : "Forgot password?"}</button>
           {notice ? <p className="form-notice" role="status">{notice}</p> : null}

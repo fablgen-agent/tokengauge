@@ -37,6 +37,17 @@ describe("durable state", () => {
     expect(db.markStripeEvent("evt_one", "checkout.session.completed")).toBe(false);
   });
 
+  it("stores only daily aggregate funnel counts", () => {
+    const first = Date.UTC(2026, 7, 16, 1, 2, 3);
+    db.recordFunnelEvent("view_home", first);
+    db.recordFunnelEvent("view_home", first + 1000);
+    db.recordFunnelEvent("cta_pricing", first + 2000);
+    expect(db.funnelDailyRows("2026-08-16")).toEqual([
+      { day: "2026-08-16", event: "cta_pricing", count: 1 },
+      { day: "2026-08-16", event: "view_home", count: 2 },
+    ]);
+  });
+
   it("moves a legacy ChatGPT entitlement only after an explicit account link", () => {
     db.upsertUser({ accountId: "chatgpt-legacy", billingUserId: "tg-chatgpt-legacy" });
     db.upsertUser({ accountId: "product-user", billingUserId: "tg-product-user" });

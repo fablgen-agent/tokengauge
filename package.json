@@ -17,6 +17,7 @@
     "catalogue:compile": "node scripts/compile-method-catalogue.mjs",
     "atlas:compile": "node scripts/compile-research-atlas.mjs",
     "atlas:verify": "node scripts/compile-research-atlas.mjs --check",
+    "funnel:report": "node scripts/report-funnel.mjs",
     "check": "npm run atlas:verify && npm run lint && npm run typecheck && npm test && npm run build"
   },
   "dependencies": {

@@ -1,11 +1,19 @@
 import { requireOwnerAccount } from "@/lib/access";
-import { entitlementCredit, launchOfferStatus } from "@/lib/db";
+import { entitlementCredit, launchOfferStatus, recordFunnelEvent } from "@/lib/db";
 import { getAppUrl, getStripeConfig } from "@/lib/env";
 import { getOrCreateUpgradeCoupon, getStripe } from "@/lib/stripe";
 import { isPaidPlanId, launchPricesGbp, planAtLeast, planDefinition } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function safelyRecord(event: "checkout_created" | "checkout_failed"): void {
+  try {
+    recordFunnelEvent(event);
+  } catch (error) {
+    console.error("Unable to record aggregate funnel event", error);
+  }
+}
 
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -61,12 +69,14 @@ export async function POST(request: Request): Promise<Response> {
     });
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL.");
+    safelyRecord("checkout_created");
     return Response.json({ url: session.url });
   } catch (error) {
     if (error instanceof Response) return error;
     if (error instanceof SyntaxError) {
       return Response.json({ error: "Choose a valid TokenGauge plan." }, { status: 400 });
     }
+    safelyRecord("checkout_failed");
     console.error("Unable to create checkout session", error);
     return Response.json({ error: "Checkout could not be started." }, { status: 500 });
   }

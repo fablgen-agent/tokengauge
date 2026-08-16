@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
+
+import { FunnelTracker } from "@/components/funnel-tracker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -45,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body>{children}</body>
+      <body><FunnelTracker />{children}</body>
     </html>
   );
 }
