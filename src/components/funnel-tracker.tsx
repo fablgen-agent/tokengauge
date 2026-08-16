@@ -15,6 +15,7 @@ const routeEvents: Array<[string, FunnelEvent]> = [
   ["/dashboard", "view_dashboard"],
   ["/settings", "view_settings"],
   ["/audit", "view_audit"],
+  ["/ledger", "view_ledger"],
 ];
 
 function routeEvent(pathname: string): FunnelEvent | undefined {
