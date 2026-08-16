@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Audit an AI API bill locally in your browser, then inspect TokenGauge's dated LLM pricing snapshot, evidence catalogue, and quality-gated cost workflow.">
+  <meta name="description" content="Audit an AI API bill locally, attribute LLM cost to customers and features, then inspect TokenGauge's dated pricing and quality-gated cost workflow.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="TokenGauge — Know what every model call costs">
-  <meta property="og:description" content="Reconcile aggregate token usage against dated model rates without uploading your bill, then test the largest controllable cost bucket.">
+  <meta property="og:description" content="Reconcile aggregate token usage, attribute cost to opaque customer and feature labels, and test the largest controllable cost bucket.">
   <meta property="og:url" content="https://tokengauge.enby.fish/">
   <meta property="og:image" content="https://tokengauge.enby.fish/images/tokengauge-launch-social.jpg">
   <meta property="og:image:width" content="1270">
   <meta property="og:image:height" content="760">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="TokenGauge — Know what every model call costs">
-  <meta name="twitter:description" content="A free browser-local AI API bill audit backed by dated rates across nine providers.">
+  <meta name="twitter:description" content="Free browser-local bill reconciliation and a practical LLM cost-per-customer attribution guide.">
   <meta name="twitter:image" content="https://tokengauge.enby.fish/images/tokengauge-launch-social.jpg">
   <title>TokenGauge — public data mirror</title>
   <link rel="icon" href="favicon.ico">
@@ -28,6 +28,7 @@
       <a href="#access">Access</a>
       <a href="https://tokengauge.enby.fish/audit">Bill audit</a>
       <a href="https://tokengauge.enby.fish/ledger">Workflow ledger</a>
+      <a href="https://tokengauge.enby.fish/guides/llm-cost-per-customer-feature">Attribution guide</a>
       <a href="https://tokengauge.enby.fish/services/attribution">£75 setup</a>
       <a class="header-link" href="https://tokengauge.enby.fish/">Open live app <span aria-hidden="true">↗</span></a>
     </nav>
@@ -37,10 +38,10 @@
       <div class="hero-copy">
         <span class="eyebrow">PUBLIC DATA MIRROR · VERIFIED 15 AUGUST 2026</span>
         <h1>A clearer ledger for LLM cost decisions.</h1>
-        <p>TokenGauge keeps provider pricing, evidence strength, and experiment limits visible. Start with the free browser-local bill audit, then use the maintained application for rate filtering, research, and controlled tests.</p>
+        <p>TokenGauge keeps provider pricing, application attribution, evidence strength, and experiment limits visible. Reconcile a bill locally, map spend to customers and features, then test one controllable cost bucket.</p>
         <div class="actions">
           <a class="button" href="https://tokengauge.enby.fish/audit">Audit an AI API bill <span aria-hidden="true">↗</span></a>
-          <a class="text-link" href="#snapshot">Review the snapshot <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="https://tokengauge.enby.fish/guides/llm-cost-per-customer-feature">Read the attribution guide <span aria-hidden="true">→</span></a>
         </div>
       </div>
       <aside class="ledger" aria-label="Current data coverage">
@@ -67,6 +68,21 @@
           <p><span>03</span><strong>Test one change</strong>Take the largest controllable bucket into a quality-gated experiment.</p>
         </div>
         <div class="audit-privacy"><p>Your entered usage and bill values stay in the browser. Reconcile the bill, attribute it with the free ledger, or request a fixed £75 implementation for one authorized workflow.</p><div class="actions"><a class="button button-dark" href="https://tokengauge.enby.fish/audit">Run the free bill audit <span aria-hidden="true">→</span></a><a class="text-link" href="https://tokengauge.enby.fish/ledger">Attribute workflow cost <span aria-hidden="true">→</span></a><a class="text-link" href="https://tokengauge.enby.fish/services/attribution">See the £75 scope <span aria-hidden="true">→</span></a></div></div>
+      </div>
+    </section>
+    <section class="attribution-band" aria-labelledby="attribution-title">
+      <div class="page-width attribution-band-inner">
+        <div>
+          <span class="eyebrow">COST PER CUSTOMER · FEATURE · ACCEPTED ANSWER</span>
+          <h2 id="attribution-title">Turn the provider total into accountable rows.</h2>
+          <p>The provider knows which model and token buckets were billed. Your application knows which customer and feature caused the call. The guide shows how to join those ledgers with opaque labels, count retries, price the correct rate window, and leave invoice residuals visible.</p>
+          <div class="actions"><a class="button" href="https://tokengauge.enby.fish/guides/llm-cost-per-customer-feature">Read the free guide <span aria-hidden="true">→</span></a><a class="text-link" href="https://tokengauge.enby.fish/services/attribution">Get one workflow implemented for £75 <span aria-hidden="true">→</span></a></div>
+        </div>
+        <ol aria-label="Attribution workflow">
+          <li><span>01</span><div><strong>Label</strong><p>Use stable opaque customer, project, and workflow labels—never email addresses or prompt content.</p></div></li>
+          <li><span>02</span><div><strong>Price</strong><p>Keep uncached input, cache reads, output, attempts, and accepted answers attached to the effective rate card.</p></div></li>
+          <li><span>03</span><div><strong>Reconcile</strong><p>Compare request and token counts first, then explain credits, tools, storage, commitments, taxes, and other residuals.</p></div></li>
+        </ol>
       </div>
     </section>
     <section class="section page-width" id="snapshot">
