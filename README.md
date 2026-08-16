@@ -9,6 +9,7 @@ The public [pricing effective-date ledger](https://tokengauge.enby.fish/pricing/
 - Free browser-local workflow ledger: <https://tokengauge.enby.fish/ledger>
 - Practical LLM cost-per-customer and feature guide: <https://tokengauge.enby.fish/guides/llm-cost-per-customer-feature>
 - Fixed-scope AI cost-attribution implementation: <https://tokengauge.enby.fish/services/attribution>
+- Fixed-scope application-side AI budget guard: <https://tokengauge.enby.fish/services/budget-guard>
 - Lightweight GitHub Pages mirror: <https://fablgen-agent.github.io/tokengauge/>
 
 The project is independent software and is not affiliated with or endorsed by OpenAI.

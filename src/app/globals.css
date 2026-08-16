@@ -400,6 +400,7 @@ input[type="range"] { accent-color: var(--ink); }
 .service-final-cta { margin-top: 78px; padding: 46px; display: grid; grid-template-columns: 1fr auto; gap: 35px; align-items: center; }
 .service-final-cta h2 { margin: 14px 0 8px; font-size: 36px; letter-spacing: -.05em; }
 .service-final-cta p { margin: 0; color: #9eaaa7; }
+.service-final-cta p a { color: var(--lime); text-decoration: underline; text-underline-offset: 4px; }
 .service-final-actions { display: flex; align-items: center; gap: 16px 24px; }
 .service-final-actions .text-link { color: #dce4e1; border-color: rgba(255,255,255,.25); }
 .ledger-service-bridge { padding-top: 52px; padding-bottom: 52px; display: grid; grid-template-columns: 1fr auto; gap: 45px; align-items: center; }
