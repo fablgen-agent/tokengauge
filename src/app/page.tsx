@@ -67,7 +67,7 @@ export default async function Home() {
             <h1>Know what every model call costs.</h1>
             <p className="hero-lede">Compare official API rates, model realistic savings, and test token-reduction methods without hiding quality failures.</p>
             <div className="hero-actions">
-              <Link className="button button-lime" href="#rates">Compare current rates</Link>
+              <Link className="button button-lime" href="/audit" data-funnel-event="cta_audit">Audit an AI API bill</Link>
               <Link className="text-link" href="/lab" data-funnel-event="cta_lab">Open the A/B lab <span>→</span></Link>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default async function Home() {
       </main>
       <footer className="site-footer section-pad">
         <div><span className="brand"><span className="brand-mark">T</span>TokenGauge</span><p>Measure the cost. Preserve the answer.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link><Link href="/dashboard">Dashboard</Link><Link href="/settings">Settings</Link></nav>
+        <nav aria-label="Footer navigation"><Link href="/audit">Bill audit</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/library">Library</Link><Link href="/dashboard">Dashboard</Link><Link href="/settings">Settings</Link></nav>
         <p>Independent software. Not affiliated with or endorsed by any listed model provider.</p>
       </footer>
     </div>
