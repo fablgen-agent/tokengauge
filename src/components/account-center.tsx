@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { AccountPanel } from "@/components/account-panel";
 import { ChatGPTPanel } from "@/components/chatgpt-panel";
-import { planDefinition, type PlanId } from "@/lib/plans";
+import { planDefinition, type PaidPlanId, type PlanId } from "@/lib/plans";
 
 type Enrollment = { totpURI: string; backupCodes: string[] };
 type ChatGPTIdentity = { name?: string; email?: string; plan?: string; accessPlan: PlanId };
@@ -20,7 +20,7 @@ function messageOf(error: { message?: string; code?: string } | null | undefined
   return error.message || fallback;
 }
 
-export function AccountCenter({ accountSystemReady, chatgptIdentity }: { accountSystemReady: boolean; chatgptIdentity?: ChatGPTIdentity }) {
+export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan = "pro" }: { accountSystemReady: boolean; chatgptIdentity?: ChatGPTIdentity; targetPlan?: PaidPlanId }) {
   const session = authClient.useSession();
   const [mode, setMode] = useState<"sign-in" | "create" | "forgot">("sign-in");
   const [notice, setNotice] = useState<string>();
@@ -28,6 +28,8 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity }: { account
   const [busy, setBusy] = useState(false);
   const [enrollment, setEnrollment] = useState<Enrollment>();
   const [qrCode, setQrCode] = useState<string>();
+  const accountCallbackURL = `/account?plan=${encodeURIComponent(targetPlan)}`;
+  const target = planDefinition(targetPlan);
 
   useEffect(() => {
     if (!enrollment) return;
@@ -49,11 +51,11 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity }: { account
         if (result.error) throw result.error;
         setNotice("If that address has an account, a password-reset link is on its way.");
       } else if (mode === "create") {
-        const result = await authClient.signUp.email({ email, password, name, callbackURL: "/account" });
+        const result = await authClient.signUp.email({ email, password, name, callbackURL: accountCallbackURL });
         if (result.error) throw result.error;
         setNotice("Check your inbox for the verification link. It expires in one hour.");
       } else {
-        const result = await authClient.signIn.email({ email, password, callbackURL: "/account" });
+        const result = await authClient.signIn.email({ email, password, callbackURL: accountCallbackURL });
         if (result.error) {
           throw result.error;
         }
@@ -123,7 +125,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity }: { account
             <div className="security-actions"><Link className="button button-lime" href="/dashboard">Dashboard</Link><Link className="button button-dark" href="/settings">Settings</Link></div>
             <ChatGPTPanel compact purpose="sign-in" />
           </section>
-          <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">ONE LESS ACCOUNT</span><h2>ChatGPT is your TokenGauge login.</h2><p>Your ChatGPT identity now resolves TokenGauge purchases, provider connections, and experiment history. TokenGauge does not receive your ChatGPT password.</p><AccountPanel compact /></aside>
+          <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span><h2>ChatGPT is your TokenGauge login.</h2><p>Your ChatGPT identity now resolves TokenGauge purchases, provider connections, and experiment history. TokenGauge does not receive your ChatGPT password.</p><AccountPanel compact targetPlan={targetPlan} /></aside>
         </div>
       );
     }
@@ -147,7 +149,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity }: { account
           {notice ? <p className="form-notice" role="status">{notice}</p> : null}
           {error ? <p className="form-error" role="alert">{error}</p> : null}
         </section>
-        <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">TWO VALID PATHS</span><h2>Reuse ChatGPT or keep identities separate.</h2><ul><li>ChatGPT sign-in requires no TokenGauge password</li><li>Email accounts require verification</li><li>12-character password minimum and optional TOTP 2FA</li><li>Provider keys and Stripe billing remain separate</li></ul></aside>
+        <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span><h2>Your selected plan stays selected.</h2><p>After ChatGPT or email verification, you will continue to {target.name} checkout.</p><ul><li>ChatGPT sign-in requires no TokenGauge password</li><li>Email accounts require verification</li><li>12-character password minimum and optional TOTP 2FA</li><li>Provider keys and Stripe billing remain separate</li></ul></aside>
       </div>
     );
   }
@@ -185,7 +187,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity }: { account
         {error ? <p className="form-error" role="alert">{error}</p> : null}
       </section>
 
-      <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan. If your earlier test purchase belongs to ChatGPT, explicitly move it to this verified account here.</p><ChatGPTPanel compact /><AccountPanel compact /></section>
+      <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan. If your earlier test purchase belongs to ChatGPT, explicitly move it to this verified account here.</p><ChatGPTPanel compact /><AccountPanel compact targetPlan={targetPlan} /></section>
     </div>
   );
 }
