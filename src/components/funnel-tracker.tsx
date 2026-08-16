@@ -16,6 +16,7 @@ const routeEvents: Array<[string, FunnelEvent]> = [
   ["/settings", "view_settings"],
   ["/audit", "view_audit"],
   ["/ledger", "view_ledger"],
+  ["/guides/llm-cost-per-customer-feature", "view_attribution_guide"],
   ["/services/attribution", "view_service_attribution"],
 ];
 
