@@ -91,6 +91,8 @@ Run the atlas compiler after changing its six research sources. The check verifi
 
 The reference deployment runs the Next.js standalone server behind a named Cloudflare Tunnel. An alternative Caddy configuration is included for hosts with public ports. Templates are in [`ops/`](ops/). Keep environment and tunnel credential files outside the repository and make secret-bearing files readable only by the service account. Set `APP_URL` to the public origin so cookie-authenticated POST requests retain strict origin checking when a reverse proxy uses a local upstream host.
 
+The reference host uses [`scripts/backup-database.mjs`](scripts/backup-database.mjs) for SQLite's online backup API, an integrity check, mode-600 output, and automatic expiry after 14 days. The deployment script creates a backup before validation, and the included systemd timer runs the same bounded rotation daily. Privacy copy must distinguish deletion from the active database from expiry of retained operational backups.
+
 GitHub Pages serves only [`docs/`](docs/), which deliberately contains no authentication or payment code.
 
 ## Security and privacy

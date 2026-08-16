@@ -1,0 +1,11 @@
+[Unit]
+Description=Run TokenGauge database backup rotation daily
+
+[Timer]
+OnCalendar=*-*-* 03:20:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=tokengauge-backup.service
+
+[Install]
+WantedBy=timers.target

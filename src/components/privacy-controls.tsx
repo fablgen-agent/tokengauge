@@ -39,7 +39,7 @@ export function PrivacyControls() {
     <section className="settings-stack" aria-labelledby="privacy-controls-title">
       <div className="settings-intro">
         <div><span className="eyebrow">PRIVACY CONTROLS</span><h2 id="privacy-controls-title">Export it or erase it.</h2></div>
-        <p>Download the account data TokenGauge can associate with you, or remove every optional provider connection, experiment total, and method status in one operation.</p>
+        <p>Download the account data TokenGauge can associate with you, or remove every optional provider connection, experiment total, and method status from the active database in one operation.</p>
       </div>
       {notice ? <p className="form-notice" role="status">{notice}</p> : null}
       {error ? <p className="form-error" role="alert">{error}</p> : null}
@@ -51,7 +51,7 @@ export function PrivacyControls() {
         </article>
         <form className="settings-card account-form privacy-delete-card" onSubmit={(event) => void clearWorkbenchData(event)}>
           <h3>Clear workbench data</h3>
-          <p>This permanently removes provider credentials, experiment metadata, and method statuses. It keeps login security, plan/payment records, and your Launch 100 place.</p>
+          <p>This removes provider credentials, experiment metadata, and method statuses from the active database. Mode-600 operational backups follow a 14-day retention schedule and are pruned daily. Login security, plan/payment records, and your Launch 100 place remain.</p>
           <label>Type <code>{confirmationPhrase}</code>
             <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} autoComplete="off" spellCheck={false} required />
           </label>
