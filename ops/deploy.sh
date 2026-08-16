@@ -14,6 +14,7 @@ if [[ "${APP_URL:-}" != https://* ]]; then
   echo "APP_URL must be an HTTPS production origin before deployment." >&2
   exit 1
 fi
+PATH="$NODE_BIN_DIR:$PATH" node scripts/backup-database.mjs
 PATH="$NODE_BIN_DIR:$PATH" npm run check
 if grep -R -q 'http://127\.0\.0\.1:3000' "$APP_DIR/.next/server/app/pricing"*.html; then
   echo "Loopback canonical found in the production pricing build." >&2
