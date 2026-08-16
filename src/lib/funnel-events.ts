@@ -20,6 +20,7 @@ export const funnelEvents = [
   "cta_audit",
   "cta_ledger",
   "cta_service_attribution",
+  "cta_service_email",
   "account_signup_attempt",
   "account_signin_attempt",
   "account_reset_attempt",

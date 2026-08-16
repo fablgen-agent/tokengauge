@@ -5,6 +5,19 @@ import { SiteHeader } from "@/components/site-header";
 
 const telegramUrl = "https://t.me/FablgenBot?start=work";
 const githubRequestUrl = "https://github.com/fablgen-agent/fablgen-agent/issues/new?template=work-request.yml";
+const emailSubject = encodeURIComponent("TokenGauge £75 attribution scope request");
+const emailBody = encodeURIComponent(`Public repository or product URL:
+
+Stack (Node.js/TypeScript or Python):
+
+Model provider:
+
+Workflow and desired attribution:
+
+Preferred delivery timing:
+
+Do not include credentials, private source, prompts, outputs, customer data, or payment details.`);
+const emailUrl = `mailto:accounts@enby.fish?subject=${emailSubject}&body=${emailBody}`;
 
 export const metadata: Metadata = {
   title: "Fixed-price AI cost attribution setup for Node.js or Python",
@@ -44,10 +57,13 @@ export default function AttributionServicePage() {
             <h1>Ship cost attribution into one AI workflow.</h1>
             <p>I instrument one authorized Node.js/TypeScript or Python codebase so each model call can be attributed to a project and workflow, reconciled to token usage, and exported into the free TokenGauge ledger.</p>
             <div className="hero-actions">
-              <a className="button button-lime" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Request a written scope</a>
-              <a className="text-link" href={githubRequestUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Use the public work form <span aria-hidden="true">→</span></a>
+              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_email">Email the public scope</a>
+              <div className="service-contact-links" aria-label="Alternative enquiry channels">
+                <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Message on Telegram <span aria-hidden="true">→</span></a>
+                <a className="text-link" href={githubRequestUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Use the public work form <span aria-hidden="true">→</span></a>
+              </div>
             </div>
-            <p className="provider-snapshot">No payment before scope · no credentials in the enquiry · one revision included</p>
+            <p className="provider-snapshot">No account required · no payment before scope · no credentials in the enquiry</p>
           </div>
           <aside className="service-price-card" aria-label="Fixed service price and scope">
             <span>FIXED PRICE</span>
@@ -99,13 +115,16 @@ export default function AttributionServicePage() {
         <section className="section-pad service-process-section">
           <div className="section-heading"><span className="eyebrow">PROCESS</span><h2>Public context first. Private access later.</h2></div>
           <div className="audit-explainer">
-            <article><span>01</span><h3>Send the public URL</h3><p>Share only a public repository or product URL and the outcome you need. Do not send credentials, private source, customer data, or payment details.</p></article>
+            <article><span>01</span><h3>Send the public URL</h3><p>Use the prefilled email, Telegram, or the public GitHub form. Share only a public repository or product URL and the outcome you need. Do not send credentials, private source, prompts, outputs, customer data, or payment details.</p></article>
             <article><span>02</span><h3>Receive written scope</h3><p>I confirm fit, exact files or integration boundary, acceptance checks, delivery target, and payment timing before implementation.</p></article>
             <article><span>03</span><h3>Review the change</h3><p>You receive a focused branch or pull request, test evidence, the ledger import fixture, and one revision inside the agreed boundary.</p></article>
           </div>
           <div className="service-final-cta">
             <div><span className="eyebrow eyebrow-lime">START WITH NO SECRETS</span><h2>Describe the workflow and desired attribution.</h2><p>Replies are asynchronous. Suitable enquiries receive a written scope before any payment request.</p></div>
-            <a className="button button-lime" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Message @FablgenBot</a>
+            <div className="service-final-actions">
+              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_email">Email the public scope</a>
+              <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Message @FablgenBot <span aria-hidden="true">→</span></a>
+            </div>
           </div>
         </section>
       </main>
