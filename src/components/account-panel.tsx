@@ -40,6 +40,7 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
   const targetPrice = usesLaunchOffer ? account!.launchOffer.pricesGbp[targetPlan] : target.priceGbp;
   const checkoutPrice = account ? Math.max(0, targetPrice - account.upgradeCreditGbp) : upgradePrice;
   const checkoutConfigured = usesLaunchOffer ? account?.launchCheckoutReady : account?.checkoutPlans?.[targetPlan];
+  const accountHref = `/account?plan=${encodeURIComponent(targetPlan)}`;
 
   async function checkout() {
     setBusy(true);
@@ -97,12 +98,12 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
       ) : targetPlan === "pro" && account?.pro && account.chatgpt.legacyPro ? (
         <div className="checkout-stack">
           <span className="status-chip">Pro currently attached to ChatGPT</span>
-          <Link className="button button-lime" href="/account" data-funnel-event="cta_account">Create an account and move access</Link>
+          <Link className="button button-lime" href={accountHref} data-funnel-event="cta_account">Create an account and move access</Link>
         </div>
       ) : (
         <div className="checkout-stack">
-          <Link className="button button-lime" href="/account" data-funnel-event="cta_account">{account?.accountSystemReady ? "Create or sign in" : "TokenGauge account"}</Link>
-          <small>{account?.accountSystemReady ? "Continue with ChatGPT or verified email before checkout" : "ChatGPT sign-in is available"}</small>
+          <Link className="button button-lime" href={accountHref} data-funnel-event="cta_account">{account?.accountSystemReady ? `Continue to ${target.name}` : "TokenGauge account"}</Link>
+          <small>{account?.accountSystemReady ? `Continue with ChatGPT or verified email before ${target.name} checkout` : "ChatGPT sign-in is available"}</small>
         </div>
       )}
       {error ? <p className="form-error" role="alert">{error}</p> : null}
