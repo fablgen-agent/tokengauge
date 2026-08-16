@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: origin, lastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${origin}/pricing`, lastModified, changeFrequency: "weekly", priority: .95 },
+    { url: `${origin}/pricing/changes`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .92 },
     { url: `${origin}/audit`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .95 },
     { url: `${origin}/ledger`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .95 },
     { url: `${origin}/guides/llm-cost-per-customer-feature`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "monthly", priority: .9 },

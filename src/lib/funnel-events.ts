@@ -1,6 +1,7 @@
 export const funnelEvents = [
   "view_home",
   "view_pricing",
+  "view_pricing_changes",
   "view_provider_pricing",
   "view_compare",
   "view_atlas",

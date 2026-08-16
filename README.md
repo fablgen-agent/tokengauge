@@ -2,6 +2,8 @@
 
 TokenGauge is an evidence-backed LLM cost-intelligence workbench. The maintained application combines a dated API-rate directory, an auditable evidence catalogue, a scenario calculator, a measured-savings dashboard, and a private A/B lab that uses a customer’s own ChatGPT plan or encrypted provider connections.
 
+The public [pricing effective-date ledger](https://tokengauge.enby.fish/pricing/changes) exposes every scheduled start and expiry in the current snapshot. When no successor rate is present, it requires source revalidation instead of treating the missing price as free.
+
 - Primary live application: <https://tokengauge.enby.fish/>
 - Free browser-local bill audit: <https://tokengauge.enby.fish/audit>
 - Free browser-local workflow ledger: <https://tokengauge.enby.fish/ledger>
