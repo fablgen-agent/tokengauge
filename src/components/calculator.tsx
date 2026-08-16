@@ -142,6 +142,7 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
           <p>The estimate is not a saving until the same workload still passes its quality bar. Compare a supported recipe in the lab, or use the evidence library to design a provider-specific test.</p>
           <div>
             <Link className="button button-lime" href="/lab">Run a controlled test</Link>
+            <Link className="text-link" href="/audit" data-funnel-event="cta_audit">Audit an existing bill <span aria-hidden="true">→</span></Link>
             <Link className="text-link" href="/library">Browse evidence methods <span aria-hidden="true">→</span></Link>
             <Link className="text-link" href="/#pricing">See one-time access <span aria-hidden="true">→</span></Link>
           </div>

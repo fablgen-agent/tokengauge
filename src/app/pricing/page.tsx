@@ -40,6 +40,7 @@ export default function PricingHub() {
           <h1>Calculate model costs without flattening the billing rules.</h1>
           <p>Compare {modelPrices.length} official-source rate cards across nine providers. Then model requests, tokens, warm cache reads, and quality pass rates against the exact model tier.</p>
           <p className="provider-snapshot">Snapshot verified {priceSnapshotDate} · USD per one million tokens · consumer chat subscriptions excluded</p>
+          <div className="hero-actions"><Link className="button button-lime" href="/audit" data-funnel-event="cta_audit">Audit an existing bill</Link><Link className="text-link" href="#calculator">Model a future workload <span aria-hidden="true">→</span></Link></div>
         </section>
 
         <section className="section-pad provider-index" aria-labelledby="provider-index-title">
@@ -83,7 +84,7 @@ export default function PricingHub() {
       </main>
       <footer className="site-footer section-pad">
         <div><Link className="brand" href="/"><span className="brand-mark">T</span>TokenGauge</Link><p>Measure the cost. Preserve the answer.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/">Home</Link><Link href="/library">Methods</Link><Link href="/lab">Lab</Link><Link href="/privacy">Privacy</Link></nav>
+        <nav aria-label="Footer navigation"><Link href="/">Home</Link><Link href="/audit">Bill audit</Link><Link href="/library">Methods</Link><Link href="/lab">Lab</Link><Link href="/privacy">Privacy</Link></nav>
         <p>Independent software. Not affiliated with or endorsed by any listed model provider.</p>
       </footer>
     </div>
