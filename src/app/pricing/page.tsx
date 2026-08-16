@@ -40,7 +40,7 @@ export default function PricingHub() {
           <h1>Calculate model costs without flattening the billing rules.</h1>
           <p>Compare {modelPrices.length} official-source rate cards across nine providers. Then model requests, tokens, warm cache reads, and quality pass rates against the exact model tier.</p>
           <p className="provider-snapshot">Snapshot verified {priceSnapshotDate} · USD per one million tokens · consumer chat subscriptions excluded</p>
-          <div className="hero-actions"><Link className="button button-lime" href="/audit" data-funnel-event="cta_audit">Audit an existing bill</Link><Link className="text-link" href="#calculator">Model a future workload <span aria-hidden="true">→</span></Link></div>
+          <div className="hero-actions"><Link className="button button-lime" href="/audit" data-funnel-event="cta_audit">Audit an existing bill</Link><Link className="text-link" href="#calculator">Model a future workload <span aria-hidden="true">→</span></Link><Link className="text-link" href="/pricing/changes">Review price changes <span aria-hidden="true">→</span></Link></div>
         </section>
 
         <section className="section-pad provider-index" aria-labelledby="provider-index-title">

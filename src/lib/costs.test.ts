@@ -6,6 +6,7 @@ import {
   calculateCostPerAcceptedAnswer,
   calculateCostUsd,
   calculateSavings,
+  formatRate,
   getSelectableModelPrices,
   modelPrices,
   priceProviders,
@@ -18,6 +19,12 @@ describe("cost calculations", () => {
 
   it("prices cached and uncached input separately", () => {
     expect(calculateCostUsd(terraLong, { inputTokens: 1_000_000, cachedInputTokens: 400_000, outputTokens: 100_000 })).toBeCloseTo(4.36, 8);
+  });
+
+  it("preserves provider precision for sub-cent rates", () => {
+    expect(formatRate(0.003625)).toBe("$0.003625");
+    expect(formatRate(0.0028)).toBe("$0.0028");
+    expect(formatRate(0.007)).toBe("$0.007");
   });
 
   it("models cache writes, reads, uncached suffixes, and TTL break-even points", () => {

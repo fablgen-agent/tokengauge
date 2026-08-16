@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import type { FunnelEvent } from "@/lib/funnel-events";
 
 const routeEvents: Array<[string, FunnelEvent]> = [
+  ["/pricing/changes", "view_pricing_changes"],
   ["/pricing", "view_pricing"],
   ["/compare", "view_compare"],
   ["/atlas", "view_atlas"],
@@ -22,6 +23,7 @@ const routeEvents: Array<[string, FunnelEvent]> = [
 
 function routeEvent(pathname: string): FunnelEvent | undefined {
   if (pathname === "/") return "view_home";
+  if (pathname === "/pricing/changes") return "view_pricing_changes";
   if (pathname.startsWith("/pricing/")) return "view_provider_pricing";
   return routeEvents.find(([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`))?.[1];
 }

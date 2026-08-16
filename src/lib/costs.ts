@@ -208,7 +208,7 @@ export function formatUsd(value: number): string {
 
 export function formatRate(value: number | null | undefined): string {
   if (value === null || value === undefined) return "—";
-  if (value < 0.01) return `$${value.toFixed(4)}`;
+  if (value < 0.01) return `$${value.toFixed(6).replace(/0+$/, "").replace(/\.$/, "")}`;
   if (value < 1) return `$${value.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}`;
   return `$${value.toFixed(2).replace(/\.00$/, "")}`;
 }
