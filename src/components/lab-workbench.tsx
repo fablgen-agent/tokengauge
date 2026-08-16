@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { sendFunnelEvent } from "@/components/funnel-tracker";
+
 type Usage = { input: number; cachedRead: number; cachedWrite: number; output: number; reasoning: number; total: number };
 type Variant = { text: string; usage: Usage; settings: { maxOutputTokens: number; reasoningEffort: string; textVerbosity: string } };
 type ExperimentResult = { baseline: Variant; candidate: Variant; executionOrder: string[] };
@@ -50,6 +52,7 @@ export function LabWorkbench({ strategies, sources }: { strategies: readonly Str
 
   async function run(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    sendFunnelEvent("lab_run_attempt");
     setBusy(true);
     setError(undefined);
     setResult(undefined);
@@ -62,7 +65,9 @@ export function LabWorkbench({ strategies, sources }: { strategies: readonly Str
       const data = (await response.json()) as ExperimentResult & { error?: string };
       if (!response.ok) throw new Error(data.error || "Experiment failed.");
       setResult(data);
+      sendFunnelEvent("lab_run_success");
     } catch (cause) {
+      sendFunnelEvent("lab_run_failed");
       setError(cause instanceof Error ? cause.message : "Experiment failed.");
     } finally {
       setBusy(false);

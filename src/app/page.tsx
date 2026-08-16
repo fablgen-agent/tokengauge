@@ -64,11 +64,11 @@ export default async function Home() {
         <section className="hero section-pad">
           <div className="hero-copy">
             <span className="eyebrow eyebrow-lime">LLM COST INTELLIGENCE</span>
-            <h1>Know what every model call costs.</h1>
-            <p className="hero-lede">Compare official API rates, model realistic savings, and test token-reduction methods without hiding quality failures.</p>
+            <h1>Should you lower reasoning effort?</h1>
+            <p className="hero-lede">Run the same task at two settings. Compare the token totals and both outputs before you change a production workflow.</p>
             <div className="hero-actions">
-              <Link className="button button-lime" href="/audit" data-funnel-event="cta_audit">Audit an AI API bill</Link>
-              <Link className="text-link" href="/lab" data-funnel-event="cta_lab">Open the A/B lab <span>→</span></Link>
+              <Link className="button button-lime" href="/lab" data-funnel-event="cta_lab">Run the paired test</Link>
+              <Link className="text-link" href="/audit" data-funnel-event="cta_audit">Audit an AI API bill <span>→</span></Link>
             </div>
           </div>
           <aside className="coverage-panel" aria-label="Pricing coverage">
@@ -81,6 +81,21 @@ export default async function Home() {
             <div className="provider-list">{priceProviders.map((provider) => <Link href={`/pricing/${provider.id}`} key={provider.id}>{provider.label}</Link>)}</div>
             <p>Rates link to the provider’s own page. Region, context tier, cache mode, and effective dates stay visible.</p>
           </aside>
+        </section>
+
+        <section className="decision-demo section-pad" aria-labelledby="decision-demo-title">
+          <div className="decision-demo-copy">
+            <span className="eyebrow">CONTROLLED DEMONSTRATION · 2026-08-16</span>
+            <h2 id="decision-demo-title">One step lower used 15 fewer tokens in this run.</h2>
+            <p>The same short task and shared instructions ran on GPT-5.5 at medium and low reasoning effort. Both outputs contained the requested three bullets; a human still has to judge whether either answer meets the real product rubric.</p>
+            <Link className="text-link" href="/lab" data-funnel-event="cta_lab">Repeat it with your own task <span>→</span></Link>
+          </div>
+          <dl className="decision-demo-result">
+            <div><dt>Medium effort</dt><dd>172</dd><small>63 input · 109 output · 20 reasoning</small></div>
+            <div><dt>Low effort</dt><dd>157</dd><small>63 input · 94 output · 0 reasoning</small></div>
+            <div><dt>Observed delta</dt><dd>−8.7%</dd><small>15 fewer total tokens</small></div>
+          </dl>
+          <p className="decision-demo-caveat">Demonstration, not customer evidence or an API invoice. ChatGPT-plan requests count against plan limits; provider-key requests are billed by that provider. Token reduction is not a quality verdict or guaranteed saving.</p>
         </section>
 
         <section id="rates" className="section-pad section-block rates-section">
