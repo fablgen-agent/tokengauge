@@ -5,6 +5,7 @@ TokenGauge is an evidence-backed LLM cost-intelligence workbench. The maintained
 - Primary live application: <https://tokengauge.enby.fish/>
 - Free browser-local bill audit: <https://tokengauge.enby.fish/audit>
 - Free browser-local workflow ledger: <https://tokengauge.enby.fish/ledger>
+- Fixed-scope AI cost-attribution implementation: <https://tokengauge.enby.fish/services/attribution>
 - Lightweight GitHub Pages mirror: <https://fablgen-agent.github.io/tokengauge/>
 
 The project is independent software and is not affiliated with or endorsed by OpenAI.

@@ -73,7 +73,7 @@ h1 { max-width: 720px; margin: 22px 0 24px; font-size: clamp(48px, 6.5vw, 80px);
 .audit-steps p > strong { margin: auto 0 10px; color: var(--ink); font-size: 15px; }
 .audit-privacy { grid-column: 1 / -1; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 30px; background: var(--panel); border: 1px solid var(--line-dark); }
 .audit-privacy p { max-width: 760px; margin: 0; color: var(--ink-soft); font-size: 13px; }
-.audit-privacy .actions { margin: 0; }
+.audit-privacy .actions { margin: 0; flex-wrap: wrap; justify-content: flex-end; }
 .audit-privacy .button { flex: none; }
 
 .section { padding-block: 104px; border-top: 1px solid var(--line); }
