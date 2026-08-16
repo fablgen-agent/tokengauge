@@ -462,6 +462,27 @@ export type ExperimentSummary = {
   createdAt: number;
 };
 
+function mapExperimentRows(rows: Array<{
+  id: string;
+  provider_id: string;
+  model: string;
+  strategy_id: string;
+  baseline_total: number;
+  optimized_total: number;
+  created_at: number;
+}>): ExperimentSummary[] {
+  return rows.map((row) => ({
+    id: row.id,
+    providerId: row.provider_id,
+    model: row.model,
+    strategyId: row.strategy_id,
+    baselineTotal: row.baseline_total,
+    optimizedTotal: row.optimized_total,
+    tokenDelta: row.baseline_total - row.optimized_total,
+    createdAt: row.created_at,
+  }));
+}
+
 export function experimentSummaries(accountId: string, limit = 100): ExperimentSummary[] {
   const boundedLimit = Math.max(1, Math.min(1_000, Math.trunc(limit)));
   const rows = getDatabase().prepare(`
@@ -479,16 +500,25 @@ export function experimentSummaries(accountId: string, limit = 100): ExperimentS
     optimized_total: number;
     created_at: number;
   }>;
-  return rows.map((row) => ({
-    id: row.id,
-    providerId: row.provider_id,
-    model: row.model,
-    strategyId: row.strategy_id,
-    baselineTotal: row.baseline_total,
-    optimizedTotal: row.optimized_total,
-    tokenDelta: row.baseline_total - row.optimized_total,
-    createdAt: row.created_at,
-  }));
+  return mapExperimentRows(rows);
+}
+
+function allExperimentSummaries(accountId: string): ExperimentSummary[] {
+  const rows = getDatabase().prepare(`
+    SELECT id, provider_id, model, strategy_id, baseline_total, optimized_total, created_at
+    FROM experiments
+    WHERE account_id = ?
+    ORDER BY created_at DESC
+  `).all(accountId) as Array<{
+    id: string;
+    provider_id: string;
+    model: string;
+    strategy_id: string;
+    baseline_total: number;
+    optimized_total: number;
+    created_at: number;
+  }>;
+  return mapExperimentRows(rows);
 }
 
 export function methodProgress(accountId: string): Record<string, string> {
@@ -508,6 +538,132 @@ export function setMethodProgress(accountId: string, methodId: string, status: "
     VALUES (?, ?, ?, ?)
     ON CONFLICT(account_id, method_id) DO UPDATE SET status = excluded.status, updated_at = excluded.updated_at
   `).run(accountId, methodId, status, Date.now());
+}
+
+export type AccountPrivacyExport = {
+  profile: {
+    name: string | null;
+    email: string | null;
+    createdAt: number;
+    updatedAt: number;
+  } | null;
+  access: Array<{
+    plan: string;
+    amountPaidMinor: number;
+    currency: string | null;
+    active: boolean;
+    grantedAt: number;
+    revokedAt: number | null;
+  }>;
+  launchOffer: { ordinal: number; joinedAt: number } | null;
+  chatgptLinked: boolean;
+  providerConnections: Array<{
+    providerId: string;
+    keyHint: string;
+    configuration: Record<string, string>;
+    createdAt: number;
+    updatedAt: number;
+  }>;
+  experiments: ExperimentSummary[];
+  methodProgress: Array<{ methodId: string; status: string; updatedAt: number }>;
+};
+
+/**
+ * Return user-visible account data without credential ciphertext, billing IDs,
+ * Stripe object IDs, auth sessions, password hashes, or security secrets.
+ */
+export function accountPrivacyExport(accountId: string): AccountPrivacyExport {
+  const database = getDatabase();
+  const profile = database.prepare(`
+    SELECT name, email, created_at, updated_at FROM users WHERE account_id = ?
+  `).get(accountId) as {
+    name: string | null;
+    email: string | null;
+    created_at: number;
+    updated_at: number;
+  } | undefined;
+  const access = database.prepare(`
+    SELECT entitlement_key, amount_paid, currency, active, granted_at, revoked_at
+    FROM entitlements WHERE account_id = ? ORDER BY granted_at
+  `).all(accountId) as Array<{
+    entitlement_key: string;
+    amount_paid: number;
+    currency: string | null;
+    active: number;
+    granted_at: number;
+    revoked_at: number | null;
+  }>;
+  const launchOffer = database.prepare(`
+    SELECT ordinal, joined_at FROM launch_offer_members WHERE account_id = ?
+  `).get(accountId) as { ordinal: number; joined_at: number } | undefined;
+  const providerConnections = listProviderConnectionRecords(accountId).map((record) => {
+    let configuration: Record<string, string> = {};
+    try { configuration = JSON.parse(record.configuration) as Record<string, string>; } catch { /* Invalid legacy configuration is omitted. */ }
+    return {
+      providerId: record.provider_id,
+      keyHint: record.key_hint,
+      configuration,
+      createdAt: record.created_at,
+      updatedAt: record.updated_at,
+    };
+  });
+  const progress = database.prepare(`
+    SELECT method_id, status, updated_at FROM method_progress
+    WHERE account_id = ? ORDER BY method_id
+  `).all(accountId) as Array<{ method_id: string; status: string; updated_at: number }>;
+  const link = database.prepare(`
+    SELECT 1 AS linked FROM chatgpt_links
+    WHERE product_account_id = ? OR chatgpt_account_id = ? LIMIT 1
+  `).get(accountId, accountId) as { linked: number } | undefined;
+
+  return {
+    profile: profile ? {
+      name: profile.name,
+      email: profile.email,
+      createdAt: profile.created_at,
+      updatedAt: profile.updated_at,
+    } : null,
+    access: access.map((row) => ({
+      plan: row.entitlement_key,
+      amountPaidMinor: row.amount_paid,
+      currency: row.currency,
+      active: row.active === 1,
+      grantedAt: row.granted_at,
+      revokedAt: row.revoked_at,
+    })),
+    launchOffer: launchOffer ? { ordinal: launchOffer.ordinal, joinedAt: launchOffer.joined_at } : null,
+    chatgptLinked: Boolean(link),
+    providerConnections,
+    experiments: allExperimentSummaries(accountId),
+    methodProgress: progress.map((row) => ({
+      methodId: row.method_id,
+      status: row.status,
+      updatedAt: row.updated_at,
+    })),
+  };
+}
+
+export type ClearedWorkbenchData = {
+  providerConnections: number;
+  experiments: number;
+  methodProgress: number;
+};
+
+export function clearAccountWorkbenchData(accountId: string): ClearedWorkbenchData {
+  const database = getDatabase();
+  database.exec("BEGIN IMMEDIATE");
+  try {
+    const result = {
+      providerConnections: Number(database.prepare("DELETE FROM provider_connections WHERE account_id = ?").run(accountId).changes),
+      experiments: Number(database.prepare("DELETE FROM experiments WHERE account_id = ?").run(accountId).changes),
+      methodProgress: Number(database.prepare("DELETE FROM method_progress WHERE account_id = ?").run(accountId).changes),
+    };
+    database.exec("COMMIT");
+    return result;
+  } catch (error) {
+    database.exec("ROLLBACK");
+    throw error;
+  }
 }
 
 export function linkChatGPTAccount(input: {

@@ -133,4 +133,49 @@ describe("durable state", () => {
     db.upsertUser({ accountId: "launch-overflow", billingUserId: "tg-launch-overflow" });
     expect(db.ensureLaunchOffer("launch-overflow")).toMatchObject({ eligible: false, joined: 100, remaining: 0 });
   });
+
+  it("exports user-visible data without credential material and clears optional workbench records", () => {
+    db.upsertUser({ accountId: "privacy-user", billingUserId: "tg-privacy-user", name: "Privacy User", email: "privacy@example.test" });
+    db.grantEntitlement({
+      accountId: "privacy-user",
+      checkoutSessionId: "cs_privacy",
+      paymentIntentId: "pi_privacy",
+      amountPaid: 500,
+      currency: "gbp",
+    });
+    vault.saveProviderCredential({ accountId: "privacy-user", providerId: "openai", apiKey: "sk-private-export-secret" });
+    db.saveExperiment({
+      id: "privacy-experiment",
+      accountId: "privacy-user",
+      providerId: "openai",
+      strategyId: "cap-output",
+      model: "gpt-test",
+      baseline: { input: 10, output: 20, total: 30 },
+      optimized: { input: 10, output: 10, total: 20 },
+    });
+    db.setMethodProgress("privacy-user", "cap-output", "adopted");
+
+    const exported = db.accountPrivacyExport("privacy-user");
+    expect(exported.profile).toMatchObject({ name: "Privacy User", email: "privacy@example.test" });
+    expect(exported.access[0]).toMatchObject({ plan: "pro", amountPaidMinor: 500, currency: "gbp" });
+    expect(exported.providerConnections[0]).toMatchObject({ providerId: "openai", keyHint: "cret" });
+    expect(exported.experiments).toHaveLength(1);
+    expect(exported.methodProgress).toHaveLength(1);
+    expect(JSON.stringify(exported)).not.toContain("sk-private-export-secret");
+    expect(JSON.stringify(exported)).not.toContain("encrypted_key");
+    expect(JSON.stringify(exported)).not.toContain("cs_privacy");
+    expect(JSON.stringify(exported)).not.toContain("pi_privacy");
+
+    expect(db.clearAccountWorkbenchData("privacy-user")).toEqual({
+      providerConnections: 1,
+      experiments: 1,
+      methodProgress: 1,
+    });
+    const cleared = db.accountPrivacyExport("privacy-user");
+    expect(cleared.providerConnections).toEqual([]);
+    expect(cleared.experiments).toEqual([]);
+    expect(cleared.methodProgress).toEqual([]);
+    expect(cleared.profile).not.toBeNull();
+    expect(cleared.access).toHaveLength(1);
+  });
 });
