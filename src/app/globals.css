@@ -371,6 +371,37 @@ input[type="range"] { accent-color: var(--ink); }
 .site-footer > p { grid-column: span 2; border-top: 1px solid rgba(255,255,255,.1); padding-top: 20px; margin: 0; }
 .site-footer nav { display: flex; gap: 25px; color: #a5b0b3; font-size: 12px; }
 
+.service-hero { min-height: 600px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .46fr); gap: 70px; align-items: center; }
+.service-price-card { border: 1px solid rgba(255,255,255,.2); background: #17211f; padding: 34px; }
+.service-price-card > span { color: var(--lime); font: 10px/1.4 var(--font-geist-mono), monospace; letter-spacing: .08em; }
+.service-price-card > strong { display: block; margin: 24px 0 8px; color: white; font-size: 78px; line-height: .9; letter-spacing: -.075em; }
+.service-price-card > p { color: #d4dcda; font-size: 15px; }
+.service-price-card > small { display: block; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.14); color: #879592; line-height: 1.55; }
+.service-scope-section { background: var(--paper); padding-top: 85px; padding-bottom: 90px; }
+.service-scope-grid { margin-top: 42px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); }
+.service-scope-grid article { min-width: 0; padding: 34px; border-right: 1px solid var(--line); background: white; }
+.service-scope-grid article:last-child { border-right: 0; }
+.service-scope-grid span { color: #9a4a36; font: 10px/1 var(--font-geist-mono), monospace; }
+.service-scope-grid h3 { margin: 32px 0 12px; font-size: 26px; letter-spacing: -.04em; }
+.service-scope-grid p { color: var(--muted); font-size: 13px; line-height: 1.65; }
+.service-acceptance-section { background: #e8ece5; padding-top: 82px; padding-bottom: 82px; }
+.service-acceptance-grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); background: var(--paper); }
+.service-acceptance-grid > div { min-width: 0; padding: 42px; }
+.service-acceptance-grid > div:first-child { background: var(--ink); color: white; }
+.service-acceptance-grid h2 { margin: 18px 0 28px; font-size: 36px; letter-spacing: -.05em; }
+.service-acceptance-grid ul { margin: 0; padding-left: 20px; }
+.service-acceptance-grid li { margin: 12px 0; color: var(--muted); line-height: 1.55; }
+.service-acceptance-grid > div:first-child li { color: #acb8b5; }
+.service-process-section { padding-top: 85px; padding-bottom: 0; }
+.service-process-section .audit-explainer { margin-top: 38px; }
+.service-final-cta, .ledger-service-bridge { background: var(--ink); color: white; }
+.service-final-cta { margin-top: 78px; padding: 46px; display: grid; grid-template-columns: 1fr auto; gap: 35px; align-items: center; }
+.service-final-cta h2 { margin: 14px 0 8px; font-size: 36px; letter-spacing: -.05em; }
+.service-final-cta p { margin: 0; color: #9eaaa7; }
+.ledger-service-bridge { padding-top: 52px; padding-bottom: 52px; display: grid; grid-template-columns: 1fr auto; gap: 45px; align-items: center; }
+.ledger-service-bridge h2 { margin: 13px 0 8px; font-size: 36px; letter-spacing: -.05em; }
+.ledger-service-bridge p { max-width: 760px; margin: 0; color: #a6b2af; line-height: 1.6; }
+
 .subpage { min-height: 100vh; background: var(--paper); }
 .subpage .site-header { position: relative; background: var(--ink); }
 .subpage-hero { background: var(--ink); color: white; padding-top: 90px; padding-bottom: 85px; }
@@ -627,6 +658,8 @@ input[type="range"] { accent-color: var(--ink); }
   .ledger-toolbar-actions { justify-content: flex-start; }
   .ledger-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ledger-result-heading, .ledger-attribution-grid { grid-template-columns: 1fr; gap: 28px; }
+  .service-hero { grid-template-columns: 1fr; gap: 38px; }
+  .service-price-card { max-width: 560px; }
 }
 
 @media (max-width: 620px) {
@@ -689,6 +722,11 @@ input[type="range"] { accent-color: var(--ink); }
   .ledger-kpis > div:last-child { border-bottom: 0; }
   .ledger-attribution-grid > div > article { align-items: flex-start; flex-direction: column; }
   .ledger-attribution-grid article div:last-child { align-items: flex-start; text-align: left; }
+  .service-scope-grid, .service-acceptance-grid { grid-template-columns: 1fr; }
+  .service-scope-grid article { border-right: 0; border-bottom: 1px solid var(--line); }
+  .service-scope-grid article:last-child { border-bottom: 0; }
+  .service-final-cta, .ledger-service-bridge { grid-template-columns: 1fr; align-items: start; }
+  .service-final-cta .button, .ledger-service-bridge .button { justify-self: start; }
   .tip-sources a, .free-library-link a, .rate-source, .site-footer nav a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
   .tips-grid { grid-template-columns: 1fr; }
   .legend { justify-content: flex-start; margin-top: 12px; }
