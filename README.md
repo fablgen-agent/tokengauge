@@ -23,6 +23,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 - A 15 August 2026 pricing snapshot with 52 pricing cards across nine providers. Cards can represent model, context-tier, region, or effective-date variants; this is not a claim of 52 distinct models.
 - A crawlable pricing hub plus dedicated OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere workload calculators that preserve each provider's billing caveats and source links.
 - 120 evidence cards, including 12 open cards. These are catalogue entries and provider-specific profiles, not 120 distinct optimization methods.
+- A server-filtered research atlas with exactly 1,316 atomic candidates and 1,184 compound configurations (2,500 rows total). These are explicitly not presented as 2,500 distinct methods, supported adapters, or proven savings; anonymous responses contain only a 12-row sample.
 - A cost calculator for input, output, caching, request volume, quality-adjusted cost per accepted answer, and candidate break-even pass rate.
 - Login with ChatGPT via [`@opencoredev/loginwithchatgpt`](https://github.com/opencoredev/login-with-chatgpt).
 - Verified-email accounts with password recovery, authenticator-app 2FA, recovery codes, session controls, and separate ChatGPT linking.
@@ -70,10 +71,11 @@ Never expose secret-key or webhook values through `NEXT_PUBLIC_*` variables. Set
 ## Validation
 
 ```bash
+npm run atlas:compile
 npm run check
 ```
 
-The check runs ESLint, strict TypeScript, Vitest, and a production Next.js build. Browser smoke testing is performed separately against the deployed build.
+Run the atlas compiler after changing its six research sources. The check verifies that generated atlas data is current, then runs ESLint, strict TypeScript, Vitest, and a production Next.js build. Browser smoke testing is performed separately against the deployed build.
 
 ## Deployment
 

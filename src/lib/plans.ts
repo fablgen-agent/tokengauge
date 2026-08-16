@@ -24,8 +24,8 @@ export const plans: readonly PlanDefinition[] = [
     name: "Pro",
     priceGbp: 9,
     rank: 1,
-    summary: "The complete evidence library and every supported bring-your-own-key adapter.",
-    features: ["All 120 evidence cards", "All nine encrypted provider connections", "100-row experiment dashboard"],
+    summary: "The complete evidence library, research atlas, and every supported bring-your-own-key adapter.",
+    features: ["All 120 evidence cards + 2,500-row research atlas", "All nine encrypted provider connections", "100-row experiment dashboard"],
   },
   {
     id: "pro_plus",
