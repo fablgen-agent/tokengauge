@@ -43,8 +43,10 @@ describe("durable state", () => {
     db.recordFunnelEvent("view_home", first + 1000);
     db.recordFunnelEvent("view_attribution_guide", first + 1500);
     db.recordFunnelEvent("cta_pricing", first + 2000);
+    db.recordFunnelEvent("cta_service_email", first + 2500);
     expect(db.funnelDailyRows("2026-08-16")).toEqual([
       { day: "2026-08-16", event: "cta_pricing", count: 1 },
+      { day: "2026-08-16", event: "cta_service_email", count: 1 },
       { day: "2026-08-16", event: "view_attribution_guide", count: 1 },
       { day: "2026-08-16", event: "view_home", count: 2 },
     ]);
