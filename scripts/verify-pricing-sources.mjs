@@ -11,6 +11,8 @@ const writeSnapshot = process.argv.includes("--write");
 
 const snapshot = JSON.parse(await readFile(snapshotPath, "utf8"));
 const sourceGroups = new Map();
+const checkedAt = new Date().toISOString();
+const checkedAtMs = Date.parse(checkedAt);
 
 for (const model of snapshot.models) {
   const url = model.sourceUrl.split("#")[0];
@@ -42,7 +44,18 @@ for (const [url, models] of sourceGroups) {
 
   const body = await response.text();
   const normalized = normalize(body);
-  const rowResults = models.map((model) => verifyRow(model, normalized));
+  const rowResults = models.map((model) => {
+    if (model.effectiveUntil && Date.parse(model.effectiveUntil) <= checkedAtMs) {
+      return {
+        modelId: model.modelId,
+        ok: true,
+        skipped: "expired-historical",
+        effectiveUntil: model.effectiveUntil,
+        missing: [],
+      };
+    }
+    return verifyRow(model, normalized);
+  });
   for (const row of rowResults) {
     if (!row.ok) errors.push(`${url}: ${row.modelId} missing ${row.missing.join(", ")}`);
   }
@@ -57,7 +70,6 @@ for (const [url, models] of sourceGroups) {
   });
 }
 
-const checkedAt = new Date().toISOString();
 await writeFile(reportPath, `${JSON.stringify({ checkedAt, errors, sources: results }, null, 2)}\n`);
 
 if (errors.length > 0) {
@@ -69,7 +81,12 @@ if (errors.length > 0) {
     snapshot.observedAt = checkedAt;
     await writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`);
   }
-  console.log(`Verified ${snapshot.models.length} rate rows against ${results.length} official source pages at ${checkedAt}.`);
+  const expiredRows = snapshot.models.filter(
+    (model) => model.effectiveUntil && Date.parse(model.effectiveUntil) <= checkedAtMs,
+  ).length;
+  console.log(
+    `Verified ${snapshot.models.length - expiredRows} current/future rate rows against ${results.length} official source pages at ${checkedAt}; retained ${expiredRows} expired historical row(s).`,
+  );
 }
 
 function verifyRow(model, source) {
