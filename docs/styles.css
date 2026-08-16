@@ -64,6 +64,17 @@ h1 { max-width: 720px; margin: 22px 0 24px; font-size: clamp(48px, 6.5vw, 80px);
 .ledger dd { margin: 0; font: 700 24px/1 var(--mono); }
 .ledger > p { margin: 0; padding: 17px 18px 19px; color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
 
+.audit-band { padding-block: 74px; background: var(--accent-light); border-top: 1px solid var(--line-dark); }
+.audit-band-inner { display: grid; grid-template-columns: .75fr 1.25fr; gap: 64px 80px; }
+.audit-band h2 { max-width: 500px; margin: 18px 0 0; font-size: clamp(36px, 4.4vw, 58px); line-height: 1.02; letter-spacing: -.05em; }
+.audit-steps { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line-dark); border-left: 1px solid var(--line); }
+.audit-steps p { min-height: 180px; margin: 0; padding: 20px; display: flex; flex-direction: column; color: var(--ink-soft); font-size: 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.audit-steps p > span { color: var(--warm); font: 700 10px/1 var(--mono); }
+.audit-steps p > strong { margin: auto 0 10px; color: var(--ink); font-size: 15px; }
+.audit-privacy { grid-column: 1 / -1; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 30px; background: var(--panel); border: 1px solid var(--line-dark); }
+.audit-privacy p { max-width: 760px; margin: 0; color: var(--ink-soft); font-size: 13px; }
+.audit-privacy .button { flex: none; }
+
 .section { padding-block: 104px; border-top: 1px solid var(--line); }
 .section-tint { background: var(--tint); }
 .section-heading { max-width: 760px; margin-bottom: 46px; }
@@ -123,7 +134,8 @@ h1 { max-width: 720px; margin: 22px 0 24px; font-size: clamp(48px, 6.5vw, 80px);
   .site-header nav > a:not(.header-link) { display: none; }
   .hero { min-height: auto; grid-template-columns: 1fr; gap: 50px; padding-block: 70px; }
   .ledger { max-width: 620px; }
-  .split-heading, .annotation, .launch-note { grid-template-columns: 1fr; gap: 20px; }
+  .split-heading, .annotation, .launch-note, .audit-band-inner { grid-template-columns: 1fr; gap: 28px; }
+  .audit-privacy { grid-column: auto; }
   .provider-grid, .evidence-grid { grid-template-columns: repeat(2, 1fr); }
   .access-grid { grid-template-columns: repeat(2, 1fr); }
   .access-grid article:nth-child(odd) { border-left: 0; }
@@ -141,6 +153,9 @@ h1 { max-width: 720px; margin: 22px 0 24px; font-size: clamp(48px, 6.5vw, 80px);
   .actions { align-items: flex-start; flex-direction: column; }
   .section { padding-block: 74px; }
   .provider-grid, .evidence-grid { grid-template-columns: 1fr; }
+  .audit-steps { grid-template-columns: 1fr; }
+  .audit-steps p { min-height: 150px; }
+  .audit-privacy { align-items: flex-start; flex-direction: column; }
   .quality-rule, .connection-note { grid-template-columns: 1fr; gap: 10px; }
   .access-grid { grid-template-columns: 1fr; }
   .access-grid article + article { border-left: 0; border-top: 1px solid var(--line-dark); }
