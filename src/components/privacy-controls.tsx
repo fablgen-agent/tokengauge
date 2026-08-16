@@ -27,6 +27,7 @@ export function PrivacyControls() {
       const total = result.deleted.providerConnections + result.deleted.experiments + result.deleted.methodProgress;
       setConfirmation("");
       setNotice(`${total} optional record${total === 1 ? "" : "s"} deleted. Account and payment records were retained.`);
+      window.dispatchEvent(new Event("tokengauge:workbench-cleared"));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Workbench data could not be deleted.");
     } finally {

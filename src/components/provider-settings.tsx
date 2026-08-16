@@ -37,16 +37,23 @@ export function ProviderSettings() {
 
   useEffect(() => {
     let ignored = false;
-    void fetch("/api/account/providers", { cache: "no-store" })
-      .then(async (response) => {
-        const next = await response.json() as ProviderResponse;
-        if (!response.ok) throw new Error(next.error || "Provider connections could not be loaded.");
-        if (!ignored) setData(next);
-      })
-      .catch((cause) => {
-        if (!ignored) setError(cause instanceof Error ? cause.message : "Provider connections could not be loaded.");
-      });
-    return () => { ignored = true; };
+    const refresh = () => {
+      void fetch("/api/account/providers", { cache: "no-store" })
+        .then(async (response) => {
+          const next = await response.json() as ProviderResponse;
+          if (!response.ok) throw new Error(next.error || "Provider connections could not be loaded.");
+          if (!ignored) setData(next);
+        })
+        .catch((cause) => {
+          if (!ignored) setError(cause instanceof Error ? cause.message : "Provider connections could not be loaded.");
+        });
+    };
+    refresh();
+    window.addEventListener("tokengauge:workbench-cleared", refresh);
+    return () => {
+      ignored = true;
+      window.removeEventListener("tokengauge:workbench-cleared", refresh);
+    };
   }, []);
 
   async function save(event: React.FormEvent<HTMLFormElement>, providerId: string) {
