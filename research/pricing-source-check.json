@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-08-15T16:38:49.180Z",
+  "checkedAt": "2026-08-16T18:14:21.648Z",
   "errors": [],
   "sources": [
     {
@@ -80,7 +80,7 @@
       "fetchedUrl": "https://ai.google.dev/gemini-api/docs/pricing?hl=en",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "sha256": "c9e781a5e0ebbb6269b380db693765c3d187bb367d369a85011e298f61d9ce87",
+      "sha256": "0847eda7c5a457473d0377ba9a38d181cdce1acb86008b23089ecfe16df72dee",
       "checkedRows": [
         {
           "modelId": "gemini-3.7-flash",
@@ -124,7 +124,7 @@
       "fetchedUrl": "https://docs.x.ai/developers/models",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "1f8763a3c20712c001f318074d72df4c91b24e3be9bc73e0bcd407cf6458cda9",
+      "sha256": "81258eaf98ddf78b20a820258af9c5c3951631914c1ea1f0f3afd15e98af9b72",
       "checkedRows": [
         {
           "modelId": "grok-4.6",
@@ -168,11 +168,13 @@
       "fetchedUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
       "status": 200,
       "contentType": "text/html",
-      "sha256": "06e1f6873722403538b2d8fbf1c3872329c31df546b8663986b8ca9451cabe0f",
+      "sha256": "1ccc6df3da4fea4df677f20538b6195f881e33786e227e478d09b3b6363c796d",
       "checkedRows": [
         {
           "modelId": "deepseek-v4-flash",
           "ok": true,
+          "skipped": "expired-historical",
+          "effectiveUntil": "2026-08-16T16:00:00Z",
           "missing": []
         },
         {
@@ -188,6 +190,8 @@
         {
           "modelId": "deepseek-v4-pro",
           "ok": true,
+          "skipped": "expired-historical",
+          "effectiveUntil": "2026-08-16T16:00:00Z",
           "missing": []
         },
         {
@@ -207,7 +211,7 @@
       "fetchedUrl": "https://platform.kimi.ai/docs/pricing/chat-k3.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "46b6b081a39180a75bb3a60547973eff92e61c1d8227a04106b635e1b56ab711",
+      "sha256": "e7a996c2f8e6da02713362aae8b82e4b3a3ad76ac39b2e1e208282be6446de52",
       "checkedRows": [
         {
           "modelId": "kimi-k3",
@@ -221,7 +225,7 @@
       "fetchedUrl": "https://platform.kimi.ai/docs/pricing/chat-k27-code.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "6ff64935d5a5dc03653fc07801510251c062f75930aed220b866ae4dd0ca1342",
+      "sha256": "f0cbf10d084ada0cb4f03fc38dc7352390a9955f4a5196505b525cfddb280bba",
       "checkedRows": [
         {
           "modelId": "kimi-k2.7-code",
@@ -240,7 +244,7 @@
       "fetchedUrl": "https://platform.kimi.ai/docs/pricing/chat-k26.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "cbcc9b94f151655b743c06a005985b3926e16ba1b5e2f5cf66c027c7444931ea",
+      "sha256": "f58595dc0415a95629dcc1ae00bd78d08f7473b1394b0ebc0f25693ebdd99338",
       "checkedRows": [
         {
           "modelId": "kimi-k2.6",
@@ -254,7 +258,7 @@
       "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-max",
       "status": 200,
       "contentType": "text/html;charset=UTF-8",
-      "sha256": "6cfce0fa0987f2081ef1fbf0256dad7397fb8a591fef9225b1dc839d91e3aec7",
+      "sha256": "c79fb95964ddbbb00143b23becd7b9439dbb4b4ab37eff7038cbbc2a11f68eac",
       "checkedRows": [
         {
           "modelId": "qwen3.7-max",
@@ -268,7 +272,7 @@
       "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-plus",
       "status": 200,
       "contentType": "text/html;charset=UTF-8",
-      "sha256": "00046868e505f48bb87ffde8ce5dd4bb9454a57ad71aa008b6c0011050f0fad3",
+      "sha256": "df578e7e3f526e5e974e1f73974ac732fb4148ab40055239c2a89b5cf1a9a8f9",
       "checkedRows": [
         {
           "modelId": "qwen3.7-plus",
@@ -287,7 +291,7 @@
       "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-flash",
       "status": 200,
       "contentType": "text/html;charset=UTF-8",
-      "sha256": "0e4d156fc8fb3f5bd852c5cfe8f79e2727ed381013fee723f4949a24301e9a6b",
+      "sha256": "7989a59a79150f7c6cc084ad6345a6b3a23756096a107da3e6fa784ef49ffaaf",
       "checkedRows": [
         {
           "modelId": "qwen3.7-flash",
