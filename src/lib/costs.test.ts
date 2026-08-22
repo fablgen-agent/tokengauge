@@ -5,6 +5,7 @@ import {
   calculateCacheEpisodeCosts,
   calculateCostPerAcceptedAnswer,
   calculateCostUsd,
+  calculateOperationalCostScenario,
   calculateSavings,
   formatRate,
   getSelectableModelPrices,
@@ -81,6 +82,40 @@ describe("cost calculations", () => {
     expect(calculateCostPerAcceptedAnswer(10, 100, 0)).toBeNull();
     expect(calculateBreakEvenAcceptanceRate(0, 5, 90)).toBeNull();
     expect(calculateCostPerAcceptedAnswer(10, 100, 120)).toBe(0.1);
+  });
+
+  it("includes retry overhead in accepted-answer cost and keeps latency as a separate gate", () => {
+    expect(calculateOperationalCostScenario({
+      tasks: 10_000,
+      costPerAttemptUsd: 0.03,
+      retryOverheadPercentage: 10,
+      qualityPassRatePercentage: 90,
+      observedP95LatencyMs: 2_400,
+      latencyCeilingMs: 2_000,
+    })).toEqual({
+      billedAttempts: 11_000,
+      monthlyCostUsd: 330,
+      acceptedAnswers: 9_000,
+      costPerAcceptedAnswerUsd: 330 / 9_000,
+      meetsLatencyCeiling: false,
+    });
+  });
+
+  it("bounds invalid operational inputs without inventing accepted answers", () => {
+    expect(calculateOperationalCostScenario({
+      tasks: -10,
+      costPerAttemptUsd: -1,
+      retryOverheadPercentage: -20,
+      qualityPassRatePercentage: 0,
+      observedP95LatencyMs: -1,
+      latencyCeilingMs: 0,
+    })).toEqual({
+      billedAttempts: 0,
+      monthlyCostUsd: 0,
+      acceptedAnswers: 0,
+      costPerAcceptedAnswerUsd: null,
+      meetsLatencyCeiling: true,
+    });
   });
 
   it("covers the nine first-class providers with official sources", () => {
