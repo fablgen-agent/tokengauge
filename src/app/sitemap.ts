@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${origin}/audit`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .95 },
     { url: `${origin}/ledger`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "weekly", priority: .95 },
     { url: `${origin}/guides/llm-cost-per-customer-feature`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "monthly", priority: .9 },
+    { url: `${origin}/guides/autonomous-agent-token-budget`, lastModified: new Date("2026-08-22T00:00:00Z"), changeFrequency: "monthly", priority: .9 },
     { url: `${origin}/services/attribution`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "monthly", priority: .82 },
     { url: `${origin}/services/budget-guard`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "monthly", priority: .82 },
     ...providerPageProfiles.map((provider) => ({ url: `${origin}/pricing/${provider.id}`, lastModified, changeFrequency: "weekly" as const, priority: .9 })),

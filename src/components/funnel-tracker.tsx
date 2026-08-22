@@ -18,6 +18,7 @@ const routeEvents: Array<[string, FunnelEvent]> = [
   ["/audit", "view_audit"],
   ["/ledger", "view_ledger"],
   ["/guides/llm-cost-per-customer-feature", "view_attribution_guide"],
+  ["/guides/autonomous-agent-token-budget", "view_budget_guide"],
   ["/services/attribution", "view_service_attribution"],
   ["/services/budget-guard", "view_service_budget_guard"],
 ];

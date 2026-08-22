@@ -13,6 +13,7 @@ export const funnelEvents = [
   "view_audit",
   "view_ledger",
   "view_attribution_guide",
+  "view_budget_guide",
   "view_service_attribution",
   "view_service_budget_guard",
   "cta_account",
