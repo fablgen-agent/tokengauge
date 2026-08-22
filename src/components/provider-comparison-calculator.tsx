@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 import {
-  calculateCostPerAcceptedAnswer,
+  calculateOperationalCostScenario,
   calculateCostUsd,
   formatRate,
   formatUsd,
@@ -26,20 +26,28 @@ export function ProviderComparisonCalculator({ leftId, rightId }: { leftId: Prov
   const [cachedShare, setCachedShare] = useState(0);
   const [leftPassRate, setLeftPassRate] = useState(90);
   const [rightPassRate, setRightPassRate] = useState(90);
+  const [leftRetryOverhead, setLeftRetryOverhead] = useState(5);
+  const [rightRetryOverhead, setRightRetryOverhead] = useState(5);
+  const [leftP95Latency, setLeftP95Latency] = useState(1_500);
+  const [rightP95Latency, setRightP95Latency] = useState(1_500);
+  const [latencyCeiling, setLatencyCeiling] = useState(3_000);
 
   const result = useMemo(() => {
     const leftSelected = leftPrices.find((price) => price.id === leftPriceId) ?? leftPrices[0];
     const rightSelected = rightPrices.find((price) => price.id === rightPriceId) ?? rightPrices[0];
-    const left = priceScenario(leftSelected, calls, inputTokens, outputTokens, cachedShare, leftPassRate);
-    const right = priceScenario(rightSelected, calls, inputTokens, outputTokens, cachedShare, rightPassRate);
+    const left = priceScenario(leftSelected, calls, inputTokens, outputTokens, cachedShare, leftPassRate, leftRetryOverhead, leftP95Latency, latencyCeiling);
+    const right = priceScenario(rightSelected, calls, inputTokens, outputTokens, cachedShare, rightPassRate, rightRetryOverhead, rightP95Latency, latencyCeiling);
     return { left, right };
-  }, [cachedShare, calls, inputTokens, leftPassRate, leftPriceId, leftPrices, outputTokens, rightPassRate, rightPriceId, rightPrices]);
+  }, [cachedShare, calls, inputTokens, latencyCeiling, leftP95Latency, leftPassRate, leftPriceId, leftPrices, leftRetryOverhead, outputTokens, rightP95Latency, rightPassRate, rightPriceId, rightPrices, rightRetryOverhead]);
 
   const error = result.left.error ?? result.right.error;
-  const winner = !error && result.left.acceptedCost !== null && result.right.acceptedCost !== null
-    ? result.left.acceptedCost === result.right.acceptedCost
+  const eligible = [result.left, result.right].filter((scenario) => scenario.meetsLatencyCeiling && scenario.acceptedCost !== null);
+  const winner = !error && eligible.length > 0
+    ? eligible.length === 1
+      ? eligible[0]
+      : eligible[0].acceptedCost === eligible[1].acceptedCost
       ? undefined
-      : result.left.acceptedCost < result.right.acceptedCost ? result.left : result.right
+      : eligible[0].acceptedCost! < eligible[1].acceptedCost! ? eligible[0] : eligible[1]
     : undefined;
 
   return (
@@ -47,43 +55,56 @@ export function ProviderComparisonCalculator({ leftId, rightId }: { leftId: Prov
       <div className="calculator-controls">
         <ModelField label={`${leftPrices[0].providerLabel} model and tier`} prices={leftPrices} value={leftPriceId} onChange={setLeftPriceId} />
         <ModelField label={`${rightPrices[0].providerLabel} model and tier`} prices={rightPrices} value={rightPriceId} onChange={setRightPriceId} />
-        <NumberField label="Requests / month" value={calls} min={1} onChange={setCalls} />
+        <NumberField label="Tasks / month" value={calls} min={1} onChange={setCalls} />
         <NumberField label="Input tokens / request" value={inputTokens} min={0} onChange={setInputTokens} />
         <NumberField label="Output tokens / request" value={outputTokens} min={0} onChange={setOutputTokens} />
         <RangeField label="Warm cache-read share" value={cachedShare} min={0} max={90} onChange={setCachedShare} />
         <RangeField label={`${result.left.price.providerLabel} quality pass rate`} value={leftPassRate} min={1} max={100} onChange={setLeftPassRate} />
         <RangeField label={`${result.right.price.providerLabel} quality pass rate`} value={rightPassRate} min={1} max={100} onChange={setRightPassRate} />
+        <RangeField label={`${result.left.price.providerLabel} retry overhead`} value={leftRetryOverhead} min={0} max={100} onChange={setLeftRetryOverhead} />
+        <RangeField label={`${result.right.price.providerLabel} retry overhead`} value={rightRetryOverhead} min={0} max={100} onChange={setRightRetryOverhead} />
+        <NumberField label={`${result.left.price.providerLabel} observed p95 latency (ms)`} value={leftP95Latency} min={0} onChange={setLeftP95Latency} />
+        <NumberField label={`${result.right.price.providerLabel} observed p95 latency (ms)`} value={rightP95Latency} min={0} onChange={setRightP95Latency} />
+        <NumberField label="Required p95 latency ceiling (ms)" value={latencyCeiling} min={0} onChange={setLatencyCeiling} />
+        <p className="comparison-observation-note"><strong>Use your own observations.</strong> TokenGauge does not invent provider latency or retry benchmarks. Retry overhead means extra billed attempts per 100 tasks; the estimate assumes each retry uses the entered token profile.</p>
       </div>
       <div className="calculator-result" aria-live="polite">
         <span className="eyebrow">SAME WORKLOAD · TWO API RATE CARDS</span>
         {error ? <p className="form-error" role="alert">{error}</p> : <>
           <div className="comparison-result-grid">
-            <ResultCard result={result.left} passRate={leftPassRate} />
-            <ResultCard result={result.right} passRate={rightPassRate} />
+            <ResultCard result={result.left} passRate={leftPassRate} retryOverhead={leftRetryOverhead} p95Latency={leftP95Latency} latencyCeiling={latencyCeiling} />
+            <ResultCard result={result.right} passRate={rightPassRate} retryOverhead={rightRetryOverhead} p95Latency={rightP95Latency} latencyCeiling={latencyCeiling} />
           </div>
           <div className="comparison-verdict">
-            <span className="eyebrow">QUALITY-ADJUSTED RESULT</span>
-            <strong>{winner ? `${winner.price.providerLabel} is lower in this scenario.` : "The configured costs are equal."}</strong>
-            {winner ? <p>At the entered pass rates, its estimated cost per accepted answer is {formatAcceptedUsd(winner.acceptedCost!)}. This is scenario math, not evidence that the selected models have equal capabilities.</p> : null}
+            <span className="eyebrow">OPERATIONAL RESULT</span>
+            <strong>{winner ? `${winner.price.providerLabel} is the lower eligible scenario.` : eligible.length === 0 ? "Neither scenario meets the latency ceiling." : "The eligible costs are equal."}</strong>
+            {winner ? <p>It meets the entered p95 ceiling and its retry- and quality-adjusted cost per accepted answer is {formatAcceptedUsd(winner.acceptedCost!)}. This is scenario math, not evidence that the selected models have equal capabilities.</p> : null}
           </div>
         </>}
-        <p>API rates are USD per one million tokens. The estimate excludes cache writes or storage, tools, retries, regional uplifts, taxes, latency failures, and consumer-plan quotas.</p>
+        <p>API rates are USD per one million tokens. Retry overhead is a uniform-attempt estimate. The calculation excludes cache writes or storage, tools, partial failed-call billing differences, regional uplifts, taxes, and consumer-plan quotas.</p>
       </div>
     </div>
   );
 }
 
-type Scenario = { price: ModelPrice; monthlyCost: number; acceptedCost: number | null; error?: string };
+type Scenario = { price: ModelPrice; monthlyCost: number; acceptedCost: number | null; billedAttempts: number; meetsLatencyCeiling: boolean; error?: string };
 
-function priceScenario(selected: ModelPrice, calls: number, inputTokens: number, outputTokens: number, cachedShare: number, passRate: number): Scenario {
+function priceScenario(selected: ModelPrice, calls: number, inputTokens: number, outputTokens: number, cachedShare: number, passRate: number, retryOverhead: number, observedP95LatencyMs: number, latencyCeilingMs: number): Scenario {
   const price = resolvePriceForInput(selected, inputTokens);
-  if (!price) return { price: selected, monthlyCost: 0, acceptedCost: null, error: `${selected.label} does not cover the entered input size in its published price bands.` };
-  const monthlyCost = calls * calculateCostUsd(price, {
+  if (!price) return { price: selected, monthlyCost: 0, acceptedCost: null, billedAttempts: 0, meetsLatencyCeiling: false, error: `${selected.label} does not cover the entered input size in its published price bands.` };
+  const operational = calculateOperationalCostScenario({
+    tasks: calls,
+    costPerAttemptUsd: calculateCostUsd(price, {
     inputTokens,
     cachedInputTokens: Math.round(inputTokens * cachedShare / 100),
     outputTokens,
+    }),
+    retryOverheadPercentage: retryOverhead,
+    qualityPassRatePercentage: passRate,
+    observedP95LatencyMs,
+    latencyCeilingMs,
   });
-  return { price, monthlyCost, acceptedCost: calculateCostPerAcceptedAnswer(monthlyCost, calls, passRate) };
+  return { price, monthlyCost: operational.monthlyCostUsd, acceptedCost: operational.costPerAcceptedAnswerUsd, billedAttempts: operational.billedAttempts, meetsLatencyCeiling: operational.meetsLatencyCeiling };
 }
 
 function ModelField({ label, prices, value, onChange }: { label: string; prices: readonly ModelPrice[]; value: string; onChange: (value: string) => void }) {
@@ -98,8 +119,8 @@ function RangeField({ label, value, min, max, onChange }: { label: string; value
   return <label className="range-label"><span>{label}<b>{value}%</b></span><input type="range" min={min} max={max} step={min === 1 ? 1 : 5} value={value} onChange={(event) => onChange(Number(event.target.value))} /></label>;
 }
 
-function ResultCard({ result, passRate }: { result: Scenario; passRate: number }) {
-  return <article><span>{result.price.providerLabel}</span><h3>{result.price.label}</h3><small>{result.price.tierLabel} · {result.price.region}</small><dl><div><dt>Monthly API spend</dt><dd>{formatUsd(result.monthlyCost)}</dd></div><div><dt>Cost / accepted answer</dt><dd>{result.acceptedCost === null ? "—" : formatAcceptedUsd(result.acceptedCost)}</dd></div><div><dt>Quality assumption</dt><dd>{passRate}%</dd></div></dl><p>{formatRate(result.price.inputPerMillionUsd)} input · {formatRate(result.price.cachedInputPerMillionUsd)} cache read · {formatRate(result.price.outputPerMillionUsd)} output / 1M</p><a href={result.price.sourceUrl} target="_blank" rel="noreferrer">Official source ↗</a></article>;
+function ResultCard({ result, passRate, retryOverhead, p95Latency, latencyCeiling }: { result: Scenario; passRate: number; retryOverhead: number; p95Latency: number; latencyCeiling: number }) {
+  return <article><span>{result.price.providerLabel}</span><h3>{result.price.label}</h3><small>{result.price.tierLabel} · {result.price.region}</small><dl><div><dt>Monthly API spend</dt><dd>{formatUsd(result.monthlyCost)}</dd></div><div><dt>Estimated billed attempts</dt><dd>{Math.round(result.billedAttempts).toLocaleString()}</dd></div><div><dt>Cost / accepted answer</dt><dd>{result.acceptedCost === null ? "—" : formatAcceptedUsd(result.acceptedCost)}</dd></div><div><dt>Quality / retry</dt><dd>{passRate}% / +{retryOverhead}%</dd></div><div><dt>Observed p95 / ceiling</dt><dd>{p95Latency.toLocaleString()} / {latencyCeiling.toLocaleString()} ms</dd></div><div><dt>Latency gate</dt><dd>{result.meetsLatencyCeiling ? "Meets" : "Misses"}</dd></div></dl><p>{formatRate(result.price.inputPerMillionUsd)} input · {formatRate(result.price.cachedInputPerMillionUsd)} cache read · {formatRate(result.price.outputPerMillionUsd)} output / 1M</p><a href={result.price.sourceUrl} target="_blank" rel="noreferrer">Official source ↗</a></article>;
 }
 
 function formatAcceptedUsd(value: number): string {

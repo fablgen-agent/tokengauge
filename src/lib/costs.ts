@@ -184,6 +184,38 @@ export function calculateCostPerAcceptedAnswer(
   return Math.max(totalCostUsd, 0) / acceptedAnswers;
 }
 
+export function calculateOperationalCostScenario(input: {
+  tasks: number;
+  costPerAttemptUsd: number;
+  retryOverheadPercentage: number;
+  qualityPassRatePercentage: number;
+  observedP95LatencyMs: number;
+  latencyCeilingMs: number;
+}): {
+  billedAttempts: number;
+  monthlyCostUsd: number;
+  acceptedAnswers: number;
+  costPerAcceptedAnswerUsd: number | null;
+  meetsLatencyCeiling: boolean;
+} {
+  const tasks = Math.max(Number.isFinite(input.tasks) ? input.tasks : 0, 0);
+  const retryOverhead = Math.max(Number.isFinite(input.retryOverheadPercentage) ? input.retryOverheadPercentage : 0, 0) / 100;
+  const passRate = Math.min(Math.max(Number.isFinite(input.qualityPassRatePercentage) ? input.qualityPassRatePercentage : 0, 0), 100) / 100;
+  const billedAttempts = tasks * (1 + retryOverhead);
+  const monthlyCostUsd = billedAttempts * Math.max(Number.isFinite(input.costPerAttemptUsd) ? input.costPerAttemptUsd : 0, 0);
+  const acceptedAnswers = tasks * passRate;
+  const observedLatency = Math.max(Number.isFinite(input.observedP95LatencyMs) ? input.observedP95LatencyMs : 0, 0);
+  const latencyCeiling = Math.max(Number.isFinite(input.latencyCeilingMs) ? input.latencyCeilingMs : 0, 0);
+
+  return {
+    billedAttempts,
+    monthlyCostUsd,
+    acceptedAnswers,
+    costPerAcceptedAnswerUsd: acceptedAnswers > 0 ? monthlyCostUsd / acceptedAnswers : null,
+    meetsLatencyCeiling: observedLatency <= latencyCeiling,
+  };
+}
+
 export function calculateBreakEvenAcceptanceRate(
   baselineCostUsd: number,
   candidateCostUsd: number,
