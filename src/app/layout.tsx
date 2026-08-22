@@ -47,6 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head><link rel="describedby" href="/llms.txt" /></head>
       <body><FunnelTracker />{children}</body>
     </html>
   );
