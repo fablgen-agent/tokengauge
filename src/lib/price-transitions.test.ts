@@ -28,6 +28,15 @@ describe("price transitions", () => {
     expect(google?.ends).toHaveLength(2);
   });
 
+  it("records DeepSeek's weekend billing-rule transition", () => {
+    const deepSeek = priceTransitions.find((transition) => transition.effectiveAt === "2026-08-22T16:00:00Z");
+
+    expect(deepSeek?.providers).toEqual(["DeepSeek"]);
+    expect(deepSeek?.ends).toHaveLength(4);
+    expect(deepSeek?.starts).toHaveLength(6);
+    expect(deepSeek?.starts.some((card) => card.modelId === "deepseek-v4-flash-vision-exp")).toBe(true);
+  });
+
   it("sorts valid unique boundaries and accounts for every dated edge", () => {
     const rebuilt = buildPriceTransitions(modelPrices);
     const edges = modelPrices.reduce((count, card) => count + Number(Boolean(card.effectiveFrom)) + Number(Boolean(card.effectiveUntil)), 0);

@@ -27,7 +27,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 
 ## What is included
 
-- A 15 August 2026 pricing snapshot with 52 pricing cards across nine providers. Cards can represent model, context-tier, region, or effective-date variants; this is not a claim of 52 distinct models.
+- A 22 August 2026 pricing snapshot with 58 pricing cards across nine providers. Cards can represent model, context-tier, region, or effective-date variants; this is not a claim of 58 distinct models.
 - A crawlable pricing hub plus dedicated OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere workload calculators that preserve each provider's billing caveats and source links.
 - A free browser-local bill audit that reconciles aggregate input, cache-read, and output tokens against the selected dated rate card; it also reports invoice variance, cache share, accepted-answer cost, and an explicitly approximate retry burden without uploading the entered values.
 - A free browser-local workflow ledger that attributes aggregate token usage to projects and features, imports and exports a documented canonical CSV, and reports cost per accepted answer without uploading the entered rows.

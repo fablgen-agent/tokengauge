@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-08-16T18:14:21.648Z",
+  "checkedAt": "2026-08-22T17:41:08.871Z",
   "errors": [],
   "sources": [
     {
@@ -7,7 +7,7 @@
       "fetchedUrl": "https://developers.openai.com/api/docs/pricing.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "9d64e55b063ded909cd6d1eab62e0c8bead1fdcdc1704d373e7e760bc2dd07f5",
+      "sha256": "1c54363f719988de1b4382035c9ad70422ad3ea6a99e77a094dd43e15a67169d",
       "checkedRows": [
         {
           "modelId": "gpt-5.6-sol",
@@ -46,7 +46,7 @@
       "fetchedUrl": "https://platform.claude.com/docs/en/about-claude/pricing.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "f5f156f59fa140cca57fd65ba6f6de5df38605d718d36e9562963dabda09e1da",
+      "sha256": "c3ea88b25e2906d72bc7b26693bb752bfb97d31952e5b814cf7f62d4087b2f8b",
       "checkedRows": [
         {
           "modelId": "claude-fable-5",
@@ -80,7 +80,7 @@
       "fetchedUrl": "https://ai.google.dev/gemini-api/docs/pricing?hl=en",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "sha256": "0847eda7c5a457473d0377ba9a38d181cdce1acb86008b23089ecfe16df72dee",
+      "sha256": "28ed06e487a8e2d296cfd90d61bff72a788ef05b017ad412fdb3b321be02e116",
       "checkedRows": [
         {
           "modelId": "gemini-3.7-flash",
@@ -124,7 +124,7 @@
       "fetchedUrl": "https://docs.x.ai/developers/models",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "sha256": "81258eaf98ddf78b20a820258af9c5c3951631914c1ea1f0f3afd15e98af9b72",
+      "sha256": "19ef8253782d80bc3010902f2696eb210b2824d9b3956aaac72839345e6ba0af",
       "checkedRows": [
         {
           "modelId": "grok-4.6",
@@ -168,7 +168,7 @@
       "fetchedUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
       "status": 200,
       "contentType": "text/html",
-      "sha256": "1ccc6df3da4fea4df677f20538b6195f881e33786e227e478d09b3b6363c796d",
+      "sha256": "6350d80b78b76fb2c5dec5c2d9f5437eb8c88780f131c8b5fad891c31d669b4e",
       "checkedRows": [
         {
           "modelId": "deepseek-v4-flash",
@@ -180,11 +180,15 @@
         {
           "modelId": "deepseek-v4-flash",
           "ok": true,
+          "skipped": "expired-historical",
+          "effectiveUntil": "2026-08-22T16:00:00Z",
           "missing": []
         },
         {
           "modelId": "deepseek-v4-flash",
           "ok": true,
+          "skipped": "expired-historical",
+          "effectiveUntil": "2026-08-22T16:00:00Z",
           "missing": []
         },
         {
@@ -197,10 +201,44 @@
         {
           "modelId": "deepseek-v4-pro",
           "ok": true,
+          "skipped": "expired-historical",
+          "effectiveUntil": "2026-08-22T16:00:00Z",
           "missing": []
         },
         {
           "modelId": "deepseek-v4-pro",
+          "ok": true,
+          "skipped": "expired-historical",
+          "effectiveUntil": "2026-08-22T16:00:00Z",
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-flash",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-pro",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-pro",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-flash-vision-exp",
+          "ok": true,
+          "missing": []
+        },
+        {
+          "modelId": "deepseek-v4-flash-vision-exp",
           "ok": true,
           "missing": []
         }
@@ -258,7 +296,7 @@
       "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-max",
       "status": 200,
       "contentType": "text/html;charset=UTF-8",
-      "sha256": "c79fb95964ddbbb00143b23becd7b9439dbb4b4ab37eff7038cbbc2a11f68eac",
+      "sha256": "750587a032f20852f9bc3d47a7b0b63c693748be82c06e5bb44605c43d93e7cd",
       "checkedRows": [
         {
           "modelId": "qwen3.7-max",
@@ -272,7 +310,7 @@
       "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-plus",
       "status": 200,
       "contentType": "text/html;charset=UTF-8",
-      "sha256": "df578e7e3f526e5e974e1f73974ac732fb4148ab40055239c2a89b5cf1a9a8f9",
+      "sha256": "0f6c5b877ef674dfdad3d5d457fbb78db975e3e7d065d44a2b07d44f90961ae0",
       "checkedRows": [
         {
           "modelId": "qwen3.7-plus",
@@ -291,7 +329,7 @@
       "fetchedUrl": "https://www.alibabacloud.com/help/en/model-studio/qwen3-7-flash",
       "status": 200,
       "contentType": "text/html;charset=UTF-8",
-      "sha256": "7989a59a79150f7c6cc084ad6345a6b3a23756096a107da3e6fa784ef49ffaaf",
+      "sha256": "3e202faab090bd1971d337869a7c3353459f0a1eee96ccd22c7a111b9fd960ea",
       "checkedRows": [
         {
           "modelId": "qwen3.7-flash",
@@ -315,7 +353,7 @@
       "fetchedUrl": "https://mistral.ai/pricing/api/",
       "status": 200,
       "contentType": "text/html; charset=UTF-8",
-      "sha256": "7a9aa14dc25fb38055e3fda362ea7464f0307e6a3ef12e1b5a8cc06074b76fcc",
+      "sha256": "9d74349f5f6e8c257d5f3670ad17eafa81498b5ef32a01f05e5ffc29aec87678",
       "checkedRows": [
         {
           "modelId": "mistral-medium-latest",
@@ -359,7 +397,7 @@
       "fetchedUrl": "https://docs.cohere.com/docs/command-a",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "sha256": "ca8f555c25442fc81ee869d0708b889001134e98a5eb959c849da64505e044ac",
+      "sha256": "f0f33e9c9e21539fe038ec00823cceedf93ab5f6d602ee37f29bd9c9af5b3851",
       "checkedRows": [
         {
           "modelId": "command-a-03-2025",
@@ -373,7 +411,7 @@
       "fetchedUrl": "https://docs.cohere.com/v2/docs/command-r7b",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "sha256": "66875d4c07eb3ae309fc198ec6bc47b6e4a208971b8bd0e522d3fdb28eae5df0",
+      "sha256": "ffb059d44ad77c4ea5474a6ab3581678f236fdc9aa864763c193a19b0d4c5bb2",
       "checkedRows": [
         {
           "modelId": "command-r7b-12-2024",
@@ -387,7 +425,7 @@
       "fetchedUrl": "https://docs.cohere.com/docs/command-r",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "sha256": "20d0a0da98589b76ad50009250b8be37c19048eb3060e1bb05afe68b7580b124",
+      "sha256": "480a93761adb22b1ab4e482bca2c80c33f879433823cd63d5a37bd37e4765af2",
       "checkedRows": [
         {
           "modelId": "command-r-08-2024",
@@ -401,7 +439,7 @@
       "fetchedUrl": "https://docs.cohere.com/docs/command-r-plus",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "sha256": "e56b279f98b3fda8e26fc45fb3e7b2ec7f16356dd0b064da7354c3daa065c8a3",
+      "sha256": "dddc61b5aa223ded7215b83a20e08600130e154775bb785e334d9659605bcd71",
       "checkedRows": [
         {
           "modelId": "command-r-plus-08-2024",

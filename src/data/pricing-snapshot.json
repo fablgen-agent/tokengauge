@@ -1,5 +1,5 @@
 {
-  "observedAt": "2026-08-16T18:14:21.648Z",
+  "observedAt": "2026-08-22T17:40:13.000Z",
   "currency": "USD",
   "unitTokens": 1000000,
   "models": [
@@ -444,7 +444,8 @@
       "region": "Global",
       "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
       "sourceLabel": "DeepSeek API pricing",
-      "effectiveFrom": "2026-08-16T16:00:00Z"
+      "effectiveFrom": "2026-08-16T16:00:00Z",
+      "effectiveUntil": "2026-08-22T16:00:00Z"
     },
     {
       "id": "deepseek:deepseek-v4-flash:peak",
@@ -460,7 +461,8 @@
       "region": "Global",
       "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
       "sourceLabel": "DeepSeek API pricing",
-      "effectiveFrom": "2026-08-16T16:00:00Z"
+      "effectiveFrom": "2026-08-16T16:00:00Z",
+      "effectiveUntil": "2026-08-22T16:00:00Z"
     },
     {
       "id": "deepseek:deepseek-v4-pro:standard",
@@ -492,7 +494,8 @@
       "region": "Global",
       "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
       "sourceLabel": "DeepSeek API pricing",
-      "effectiveFrom": "2026-08-16T16:00:00Z"
+      "effectiveFrom": "2026-08-16T16:00:00Z",
+      "effectiveUntil": "2026-08-22T16:00:00Z"
     },
     {
       "id": "deepseek:deepseek-v4-pro:peak",
@@ -508,7 +511,104 @@
       "region": "Global",
       "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
       "sourceLabel": "DeepSeek API pricing",
-      "effectiveFrom": "2026-08-16T16:00:00Z"
+      "effectiveFrom": "2026-08-16T16:00:00Z",
+      "effectiveUntil": "2026-08-22T16:00:00Z"
+    },
+    {
+      "id": "deepseek:deepseek-v4-flash:off-peak-weekend",
+      "modelId": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "providerLabel": "DeepSeek",
+      "label": "DeepSeek V4 Flash",
+      "tierLabel": "Off-peak · weekdays outside peak hours; all weekend (Beijing time)",
+      "inputPerMillionUsd": 0.22,
+      "cachedInputPerMillionUsd": 0.007,
+      "outputPerMillionUsd": 0.66,
+      "contextWindowTokens": 1000000,
+      "region": "Global",
+      "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "sourceLabel": "DeepSeek API pricing",
+      "effectiveFrom": "2026-08-22T16:00:00Z"
+    },
+    {
+      "id": "deepseek:deepseek-v4-flash:peak-weekday",
+      "modelId": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "providerLabel": "DeepSeek",
+      "label": "DeepSeek V4 Flash",
+      "tierLabel": "Peak · weekdays 01:00–04:00 and 06:00–10:00 UTC",
+      "inputPerMillionUsd": 0.44,
+      "cachedInputPerMillionUsd": 0.014,
+      "outputPerMillionUsd": 1.32,
+      "contextWindowTokens": 1000000,
+      "region": "Global",
+      "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "sourceLabel": "DeepSeek API pricing",
+      "effectiveFrom": "2026-08-22T16:00:00Z"
+    },
+    {
+      "id": "deepseek:deepseek-v4-pro:off-peak-weekend",
+      "modelId": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "providerLabel": "DeepSeek",
+      "label": "DeepSeek V4 Pro",
+      "tierLabel": "Off-peak · weekdays outside peak hours; all weekend (Beijing time)",
+      "inputPerMillionUsd": 0.66,
+      "cachedInputPerMillionUsd": 0.022,
+      "outputPerMillionUsd": 1.98,
+      "contextWindowTokens": 1000000,
+      "region": "Global",
+      "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "sourceLabel": "DeepSeek API pricing",
+      "effectiveFrom": "2026-08-22T16:00:00Z"
+    },
+    {
+      "id": "deepseek:deepseek-v4-pro:peak-weekday",
+      "modelId": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "providerLabel": "DeepSeek",
+      "label": "DeepSeek V4 Pro",
+      "tierLabel": "Peak · weekdays 01:00–04:00 and 06:00–10:00 UTC",
+      "inputPerMillionUsd": 1.32,
+      "cachedInputPerMillionUsd": 0.044,
+      "outputPerMillionUsd": 3.96,
+      "contextWindowTokens": 1000000,
+      "region": "Global",
+      "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "sourceLabel": "DeepSeek API pricing",
+      "effectiveFrom": "2026-08-22T16:00:00Z"
+    },
+    {
+      "id": "deepseek:deepseek-v4-flash-vision-exp:off-peak-weekend",
+      "modelId": "deepseek-v4-flash-vision-exp",
+      "provider": "deepseek",
+      "providerLabel": "DeepSeek",
+      "label": "DeepSeek V4 Flash Vision Experimental",
+      "tierLabel": "Off-peak · weekdays outside peak hours; all weekend (Beijing time)",
+      "inputPerMillionUsd": 0.22,
+      "cachedInputPerMillionUsd": 0.007,
+      "outputPerMillionUsd": 0.66,
+      "contextWindowTokens": 1000000,
+      "region": "Global · images converted to input tokens",
+      "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "sourceLabel": "DeepSeek API pricing",
+      "effectiveFrom": "2026-08-22T16:00:00Z"
+    },
+    {
+      "id": "deepseek:deepseek-v4-flash-vision-exp:peak-weekday",
+      "modelId": "deepseek-v4-flash-vision-exp",
+      "provider": "deepseek",
+      "providerLabel": "DeepSeek",
+      "label": "DeepSeek V4 Flash Vision Experimental",
+      "tierLabel": "Peak · weekdays 01:00–04:00 and 06:00–10:00 UTC",
+      "inputPerMillionUsd": 0.44,
+      "cachedInputPerMillionUsd": 0.014,
+      "outputPerMillionUsd": 1.32,
+      "contextWindowTokens": 1000000,
+      "region": "Global · images converted to input tokens",
+      "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "sourceLabel": "DeepSeek API pricing",
+      "effectiveFrom": "2026-08-22T16:00:00Z"
     },
     {
       "id": "kimi:kimi-k3:realtime",
