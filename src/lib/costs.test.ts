@@ -84,7 +84,7 @@ describe("cost calculations", () => {
   });
 
   it("covers the nine first-class providers with official sources", () => {
-    expect(modelPrices).toHaveLength(52);
+    expect(modelPrices).toHaveLength(58);
     expect(priceProviders.map((provider) => provider.id)).toEqual([
       "openai", "anthropic", "google", "xai", "deepseek", "kimi", "qwen", "mistral", "cohere",
     ]);
@@ -98,6 +98,15 @@ describe("cost calculations", () => {
     expect(after.some((model) => model.id === "deepseek:deepseek-v4-flash:standard")).toBe(false);
     expect(after.some((model) => model.id === "deepseek:deepseek-v4-flash:off-peak")).toBe(true);
     expect(after.some((model) => model.id === "deepseek:deepseek-v4-flash:peak")).toBe(true);
+  });
+
+  it("switches DeepSeek to weekend-wide off-peak eligibility at the exact boundary", () => {
+    const before = getSelectableModelPrices(new Date("2026-08-22T15:59:59Z"));
+    const after = getSelectableModelPrices(new Date("2026-08-22T16:00:00Z"));
+    expect(before.some((model) => model.id === "deepseek:deepseek-v4-flash:off-peak")).toBe(true);
+    expect(after.some((model) => model.id === "deepseek:deepseek-v4-flash:off-peak")).toBe(false);
+    expect(after.some((model) => model.id === "deepseek:deepseek-v4-flash:off-peak-weekend")).toBe(true);
+    expect(after.some((model) => model.id === "deepseek:deepseek-v4-flash-vision-exp:off-peak-weekend")).toBe(true);
   });
 
   it("keeps OpenAI's exact boundary short and selects long context above it", () => {
