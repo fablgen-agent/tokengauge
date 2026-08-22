@@ -6,21 +6,21 @@ Canonical URL: <https://tokengauge.enby.fish/>
 
 Name: TokenGauge
 
-Tagline: Know what every model call costs.
+Tagline: Measure LLM cost. Preserve the answer.
 
 Short description (260 characters):
 
-> Compare official rates across nine AI providers, model realistic token-cost changes, and run controlled A/B tests with ChatGPT or your own provider keys. Prompts and outputs are not stored.
+> Compare 58 dated rate cards across nine AI providers, model realistic token-cost changes, and run controlled A/B tests with ChatGPT or your own provider keys. Prompts and outputs are not stored.
 
 Launch offer:
 
-> Launch 100: the first 100 authenticated identities can buy Pro for £5, Pro+ for £15, or Ultimate for £20. These are one-time purchases. Normal prices are £9, £19, and £39. API usage is billed separately by the connected provider.
+> Launch 100: the first 100 authenticated accounts can buy Pro for £5, Pro+ for £15, or Ultimate for £20. These are one-time purchases. Normal prices are £9, £19, and £39. API usage is billed separately by the connected provider.
 
 Maker-comment notes for the account owner (rewrite personally; do not paste as an AI-authored comment):
 
 - Why the product exists: pricing tables become stale, while generic saving tips often omit a quality check.
 - What is different: dated provider-specific pricing, explicit evidence labels, browser-local bill and workflow tools, and paired tests for supported request settings.
-- What is free: 52 dated rate cards across nine providers, the pricing calculator, bill audit, workflow ledger, 12 open evidence cards, and controlled lab recipes.
+- What is free: 58 dated rate cards across nine providers, the pricing calculator, bill audit, workflow ledger, 12 open evidence cards, and controlled lab recipes.
 - What paid access adds: the complete curated catalogue and Research Atlas, encrypted provider connections, and deeper experiment history.
 - Useful question to ask in the owner's own words: which provider-specific billing rule has been easiest to get wrong in a real workload?
 
@@ -61,6 +61,8 @@ Launch tags — choose the closest three current options:
 Promo: use the Launch 100 copy above; do not invent a separate coupon or scarcity count. The live page supplies the current remaining-place count.
 
 Submission boundary: Product Hunt's current rules require a real personal account, and a new account must complete onboarding before it can post. Company accounts cannot post, vote, or comment. Product Hunt's current commenting rules prohibit AI-generated comments, so the account owner must personally write the first comment and any replies; the notes above are factual prompts, not paste-ready copy. Share the eventual launch organically and ask for feedback, never for upvotes or coordinated voting.
+
+Current eligibility check (2026-08-22): the one-week waiting period documented by Product Hunt should have elapsed for the existing owner-created account. The authenticated posting page still has to prove that the account is personal, complete, and allowed to post. Do not subscribe to the newsletter merely to bypass the wait, create a branded account, or automate any comment, vote, reply, or CAPTCHA.
 
 ## Claims boundary
 
