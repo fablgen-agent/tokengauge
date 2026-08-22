@@ -310,6 +310,7 @@ input[type="range"] { accent-color: var(--ink); }
 .account-badges span { border: 1px solid var(--line); background: #edf1ea; padding: 7px 10px; color: #385047; font-size: 11px; font-weight: 700; }
 .security-card { grid-column: 2; }
 .connection-card { grid-column: 2; }
+.purchase-card { grid-column: 1; }
 .security-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .two-factor-enrollment > p { color: var(--muted); line-height: 1.6; }
 .two-factor-enrollment > img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); background: white; padding: 9px; }
@@ -779,7 +780,7 @@ input[type="range"] { accent-color: var(--ink); }
   .account-hero { grid-template-columns: 1fr; gap: 35px; }
   .account-hero img { max-width: 560px; height: auto; }
   .auth-card, .account-profile { grid-row: auto; }
-  .security-card, .connection-card { grid-column: 1; }
+  .purchase-card, .security-card, .connection-card { grid-column: 1; }
   .ledger-toolbar { align-items: flex-start; flex-direction: column; }
   .ledger-toolbar-actions { justify-content: flex-start; }
   .ledger-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }

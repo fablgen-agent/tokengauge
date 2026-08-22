@@ -165,6 +165,13 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
         <div className="security-actions"><Link className="button button-lime" href="/dashboard">Dashboard</Link><Link className="button button-dark" href="/settings">Settings</Link><button className="text-button" type="button" onClick={() => void authClient.signOut().then(() => session.refetch())}>Sign out</button></div>
       </section>
 
+      <section className="account-card purchase-card">
+        <span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span>
+        <h2>Your selected plan is ready.</h2>
+        <p>Complete the one-time Stripe checkout here. Your email account is already verified; connecting ChatGPT is optional and is not required to purchase access.</p>
+        <AccountPanel compact targetPlan={targetPlan} />
+      </section>
+
       <section className="account-card security-card">
         <span className="eyebrow">TWO-FACTOR AUTHENTICATION</span>
         <h2>{user.twoFactorEnabled ? "Authenticator protection is on." : "Add an authenticator app."}</h2>
@@ -187,7 +194,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
         {error ? <p className="form-error" role="alert">{error}</p> : null}
       </section>
 
-      <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan. If your earlier test purchase belongs to ChatGPT, explicitly move it to this verified account here.</p><ChatGPTPanel compact /><AccountPanel compact targetPlan={targetPlan} /></section>
+      <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan. It is not required for your TokenGauge account or Stripe purchase.</p><ChatGPTPanel compact /></section>
     </div>
   );
 }
