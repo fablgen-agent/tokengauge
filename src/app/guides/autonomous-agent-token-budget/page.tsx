@@ -77,7 +77,7 @@ export default function AutonomousAgentTokenBudgetGuidePage() {
               <h1>Cap an autonomous agent before the next model call.</h1>
               <p>A growing full-history loop can turn a reasonable call limit into an unpredictable bill. Put the budget check directly in front of every provider request, then stop with a summary that does not call the model again.</p>
               <div className="hero-actions">
-                <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_service_budget_guard">Get one path implemented for £75</Link>
+                <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_budget_guide_service">Get one path implemented for £75</Link>
                 <Link className="text-link" href="/ledger" data-funnel-event="cta_ledger">Measure workflow cost first <span aria-hidden="true">→</span></Link>
               </div>
               <p className="provider-snapshot">Application control · provider billing remains authoritative · no guaranteed saving</p>
@@ -187,7 +187,7 @@ runTokens += reportedOrEstimatedOutputTokens(response)`}</code></pre>
 
           <section className="section-pad guide-final-cta">
             <div><span className="eyebrow eyebrow-lime">ONE CODEBASE · ONE PROVIDER PATH · TESTED REFUSAL</span><h2>Want the guard installed?</h2><p>The fixed £75 scope adds one pre-call exposure reservation, post-call usage reconciliation, an agreed non-AI fallback, focused no-call tests, and one revision. Written scope comes before payment.</p></div>
-            <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_service_budget_guard">See the exact £75 scope</Link>
+            <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_budget_guide_service">See the exact £75 scope</Link>
           </section>
         </article>
       </main>
