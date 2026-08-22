@@ -27,6 +27,16 @@ type RunInput = {
   settings: LabSettings;
 };
 
+export class ProviderRequestError extends Error {
+  readonly status: number;
+
+  constructor(status: number) {
+    super(`Provider request failed with HTTP ${status}.`);
+    this.name = "ProviderRequestError";
+    this.status = status;
+  }
+}
+
 function numeric(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
@@ -39,7 +49,7 @@ async function postJson(url: string, headers: Record<string, string>, body: unkn
     signal: AbortSignal.timeout(120_000),
     cache: "no-store",
   });
-  if (!response.ok) throw new Error(`Provider request failed with HTTP ${response.status}.`);
+  if (!response.ok) throw new ProviderRequestError(response.status);
   return await response.json() as Record<string, unknown>;
 }
 

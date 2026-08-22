@@ -8,7 +8,7 @@ function messageOf(error: { message?: string } | null | undefined, fallback: str
   return error?.message || fallback;
 }
 
-export function AccountSettings({ currentName }: { currentName: string }) {
+export function AccountSettings({ currentName, currentEmail }: { currentName: string; currentEmail: string }) {
   const session = authClient.useSession();
   const [busy, setBusy] = useState<string>();
   const [notice, setNotice] = useState<string>();
@@ -39,6 +39,18 @@ export function AccountSettings({ currentName }: { currentName: string }) {
     setNotice("Password changed. Other sessions were signed out.");
   }
 
+  async function changeEmail(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formElement = event.currentTarget;
+    const newEmail = String(new FormData(formElement).get("newEmail") || "").trim();
+    setBusy("email"); setError(undefined); setNotice(undefined);
+    const result = await authClient.changeEmail({ newEmail, callbackURL: "/settings" });
+    setBusy(undefined);
+    if (result.error) return setError(messageOf(result.error, "Email change could not be started."));
+    formElement.reset();
+    setNotice("Check your current inbox to approve the change, then verify the new address.");
+  }
+
   async function revokeSessions() {
     setBusy("sessions"); setError(undefined); setNotice(undefined);
     const result = await authClient.revokeOtherSessions();
@@ -49,11 +61,12 @@ export function AccountSettings({ currentName }: { currentName: string }) {
 
   return (
     <section className="settings-stack" aria-labelledby="account-settings-title">
-      <div className="settings-intro"><div><span className="eyebrow">ACCOUNT SETTINGS</span><h2 id="account-settings-title">Profile and sessions.</h2></div><p>Update your display name, rotate your password, or invalidate other browser sessions.</p></div>
+      <div className="settings-intro"><div><span className="eyebrow">ACCOUNT SETTINGS</span><h2 id="account-settings-title">Profile and sessions.</h2></div><p>Update your verified identity, rotate your password, or invalidate other browser sessions.</p></div>
       {notice ? <p className="form-notice" role="status">{notice}</p> : null}
       {error ? <p className="form-error" role="alert">{error}</p> : null}
       <div className="settings-grid">
         <form className="settings-card account-form" onSubmit={updateProfile}><h3>Profile</h3><label>Display name<input name="name" defaultValue={currentName} minLength={2} maxLength={80} required /></label><button className="button button-dark" type="submit" disabled={busy === "profile"}>Save name</button></form>
+        <form className="settings-card account-form" onSubmit={changeEmail}><h3>Change email</h3><p>Current address: <strong>{currentEmail}</strong></p><label>New email<input name="newEmail" type="email" autoComplete="email" maxLength={254} required /></label><button className="button button-dark" type="submit" disabled={busy === "email"}>Verify new email</button></form>
         <form className="settings-card account-form" onSubmit={changePassword}><h3>Change password</h3><label>Current password<input name="currentPassword" type="password" autoComplete="current-password" required /></label><label>New password<input name="newPassword" type="password" autoComplete="new-password" minLength={12} maxLength={128} required /></label><button className="button button-dark" type="submit" disabled={busy === "password"}>Change password</button></form>
         <div className="settings-card"><h3>Active sessions</h3><p>Keep this browser signed in and invalidate every other TokenGauge session.</p><button className="button button-dark" type="button" disabled={busy === "sessions"} onClick={() => void revokeSessions()}>Sign out other sessions</button></div>
       </div>

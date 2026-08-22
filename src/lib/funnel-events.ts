@@ -31,6 +31,7 @@ export const funnelEvents = [
   "account_signin_attempt",
   "account_reset_attempt",
   "checkout_created",
+  "checkout_cancelled",
   "checkout_failed",
 ] as const;
 

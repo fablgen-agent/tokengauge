@@ -65,7 +65,7 @@ export async function POST(request: Request): Promise<Response> {
         },
       },
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/#pricing`,
+      cancel_url: `${appUrl}/api/checkout/cancel?plan=${encodeURIComponent(requestedPlan)}`,
     });
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL.");

@@ -1,12 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { authClient } from "@/lib/auth-client";
 
 const confirmationPhrase = "DELETE MY WORKBENCH DATA";
+const accountConfirmationPhrase = "DELETE MY ACCOUNT";
 
-export function PrivacyControls() {
+export function PrivacyControls({ productAccount = false }: { productAccount?: boolean }) {
+  const router = useRouter();
   const [confirmation, setConfirmation] = useState("");
+  const [accountConfirmation, setAccountConfirmation] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [accountBusy, setAccountBusy] = useState(false);
   const [notice, setNotice] = useState<string>();
   const [error, setError] = useState<string>();
 
@@ -35,6 +43,19 @@ export function PrivacyControls() {
     }
   }
 
+  async function deleteAccount(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (accountConfirmation !== accountConfirmationPhrase) return;
+    setAccountBusy(true); setNotice(undefined); setError(undefined);
+    const result = await authClient.deleteUser({ password: accountPassword, callbackURL: "/" });
+    if (result.error) {
+      setAccountBusy(false);
+      setError(result.error.message || "The account could not be deleted.");
+      return;
+    }
+    router.replace("/");
+  }
+
   return (
     <section className="settings-stack" aria-labelledby="privacy-controls-title">
       <div className="settings-intro">
@@ -57,11 +78,16 @@ export function PrivacyControls() {
           </label>
           <button className="button button-danger" type="submit" disabled={busy || confirmation !== confirmationPhrase}>{busy ? "Deleting…" : "Delete workbench data"}</button>
         </form>
-        <article className="settings-card">
+        {productAccount ? <form className="settings-card account-form privacy-delete-card" onSubmit={(event) => void deleteAccount(event)}>
           <h3>Delete the whole account</h3>
-          <p>Full account deletion may require separating records retained for refunds, fraud prevention, accounting, or legal obligations. Email from the address on the account and we will confirm the exact deletion scope.</p>
-          <a className="text-link" href="mailto:accounts@enby.fish?subject=TokenGauge%20account%20deletion">Request full deletion <span>→</span></a>
-        </article>
+          <p>This permanently deletes your TokenGauge login, sessions, 2FA record, ChatGPT link, provider connections, experiment totals, method statuses, and Launch 100 place. A pseudonymous payment ledger is retained only for refunds, accounting, fraud prevention, and legal obligations.</p>
+          <label>Current password<input type="password" value={accountPassword} onChange={(event) => setAccountPassword(event.target.value)} autoComplete="current-password" required /></label>
+          <label>Type <code>{accountConfirmationPhrase}</code><input value={accountConfirmation} onChange={(event) => setAccountConfirmation(event.target.value)} autoComplete="off" spellCheck={false} required /></label>
+          <button className="button button-danger" type="submit" disabled={accountBusy || !accountPassword || accountConfirmation !== accountConfirmationPhrase}>{accountBusy ? "Deleting account…" : "Permanently delete account"}</button>
+        </form> : <article className="settings-card">
+          <h3>Identity deletion</h3>
+          <p>Your login is managed by ChatGPT. Disconnect ChatGPT or delete that identity there; TokenGauge can still erase its optional workbench records above.</p>
+        </article>}
       </div>
     </section>
   );

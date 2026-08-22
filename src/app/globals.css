@@ -267,6 +267,8 @@ input[type="range"] { accent-color: var(--ink); }
 .entitled-note > span { color: #296549; font-weight: 750; }
 .form-error { color: #a62618; font-size: 12px; margin: 0; }
 .form-notice { color: #245b44; background: #e2f4ea; border: 1px solid #b6ddc7; padding: 12px; font-size: 12px; line-height: 1.5; margin: 0; }
+.checkout-return-notice { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border: 1px solid #b6ddc7; background: #e2f4ea; color: #245b44; padding: 14px 16px; font-size: 13px; line-height: 1.5; }
+.checkout-return-notice strong { flex: 0 0 auto; }
 .status-chip { display: inline-flex; align-items: center; min-height: 32px; align-self: flex-start; border: 1px solid var(--line); background: #edf1ea; padding: 0 10px; color: #3e4b47; font-size: 11px; font-weight: 700; }
 .chatgpt-panel.compact { margin-top: 16px; }
 .chatgpt-signin-option { margin-bottom: 28px; padding-bottom: 4px; }
@@ -564,7 +566,7 @@ input[type="range"] { accent-color: var(--ink); }
 .coverage-panel dt { color: #84918e; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
 .coverage-panel dd { margin: 8px 0 0; color: white; font-size: 30px; letter-spacing: -.05em; }
 .provider-list { display: flex; flex-wrap: wrap; gap: 7px; }
-.provider-list a { border: 1px solid rgba(255,255,255,.15); color: #d5dcda; padding: 8px; font: 10px/1 var(--font-geist-mono), monospace; transition: border-color .15s ease, color .15s ease; }
+.provider-list a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border: 1px solid rgba(255,255,255,.15); color: #d5dcda; padding: 8px; font: 10px/1.2 var(--font-geist-mono), monospace; transition: border-color .15s ease, color .15s ease; }
 .provider-list a:hover { border-color: var(--lime); color: var(--lime); }
 .coverage-panel > p { color: #889693; font-size: 11px; line-height: 1.55; margin: 22px 0 0; }
 
@@ -800,6 +802,7 @@ input[type="range"] { accent-color: var(--ink); }
   .site-header .nav-cta { min-height: 44px; padding: 0 6px; }
   .launch-banner { align-items: flex-start; flex-direction: column; gap: 5px; padding: 16px 20px; }
   .launch-banner > span:nth-of-type(2) { border-left: 0; padding-left: 0; }
+  .checkout-return-notice { align-items: flex-start; flex-direction: column; gap: 3px; }
   .has-launch .hero { padding-top: 72px; }
   .hero { padding-top: 218px; padding-bottom: 62px; }
   .hero h1 { font-size: 49px; }
