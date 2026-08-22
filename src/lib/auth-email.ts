@@ -2,7 +2,7 @@ import "server-only";
 
 import nodemailer, { type Transporter } from "nodemailer";
 
-type AuthEmailKind = "verify" | "reset";
+type AuthEmailKind = "verify" | "reset" | "change";
 
 type MailConfig = {
   host: string;
@@ -74,12 +74,13 @@ async function sendAuthEmail(kind: AuthEmailKind, to: string, url: string): Prom
   const mail = config();
   if (!mail) throw new Error("TokenGauge account email is not configured.");
 
-  const verification = kind === "verify";
-  const action = verification ? "Verify email" : "Reset password";
-  const subject = verification ? "Verify your TokenGauge email" : "Reset your TokenGauge password";
-  const intro = verification
-    ? "Confirm this email address to finish creating your TokenGauge account."
-    : "Use this link to choose a new TokenGauge password.";
+  const action = kind === "verify" ? "Verify email" : kind === "reset" ? "Reset password" : "Approve email change";
+  const subject = kind === "verify" ? "Verify your TokenGauge email" : kind === "reset" ? "Reset your TokenGauge password" : "Approve your TokenGauge email change";
+  const intro = kind === "verify"
+    ? "Confirm this email address to finish creating or updating your TokenGauge account."
+    : kind === "reset"
+      ? "Use this link to choose a new TokenGauge password."
+      : "Approve the request to change the email address used by your TokenGauge account.";
   const safeUrl = escapeHtml(url);
 
   await getTransporter(mail).sendMail({

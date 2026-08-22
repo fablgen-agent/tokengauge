@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 
-import { markStripeEvent, revokeEntitlementByPaymentIntent, setEntitlementPaidAmountByPaymentIntent } from "@/lib/db";
+import { markStripeEvent, revokeEntitlementByPaymentIntent, setEntitlementPaidAmountByPaymentIntent, stripeEventProcessed } from "@/lib/db";
 import { getStripeConfig } from "@/lib/env";
 import { fulfilCheckoutSession, getStripe } from "@/lib/stripe";
 
@@ -29,6 +29,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
+    if (stripeEventProcessed(event.id)) {
+      return Response.json({ received: true, duplicate: true });
+    }
     if (
       event.type === "checkout.session.completed" ||
       event.type === "checkout.session.async_payment_succeeded"

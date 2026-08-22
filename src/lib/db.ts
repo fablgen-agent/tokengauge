@@ -339,6 +339,13 @@ export function markStripeEvent(eventId: string, eventType: string): boolean {
   return result.changes === 1;
 }
 
+export function stripeEventProcessed(eventId: string): boolean {
+  const row = getDatabase()
+    .prepare("SELECT 1 AS processed FROM stripe_events WHERE event_id = ?")
+    .get(eventId) as { processed: number } | undefined;
+  return row?.processed === 1;
+}
+
 export function findAccountByBillingId(billingUserId: string): string | undefined {
   const row = getDatabase()
     .prepare("SELECT account_id FROM users WHERE billing_user_id = ?")
@@ -660,6 +667,26 @@ export function clearAccountWorkbenchData(accountId: string): ClearedWorkbenchDa
     };
     database.exec("COMMIT");
     return result;
+  } catch (error) {
+    database.exec("ROLLBACK");
+    throw error;
+  }
+}
+
+export function anonymizeDeletedProductAccount(accountId: string): ClearedWorkbenchData {
+  const database = getDatabase();
+  database.exec("BEGIN IMMEDIATE");
+  try {
+    const deleted = {
+      providerConnections: Number(database.prepare("DELETE FROM provider_connections WHERE account_id = ?").run(accountId).changes),
+      experiments: Number(database.prepare("DELETE FROM experiments WHERE account_id = ?").run(accountId).changes),
+      methodProgress: Number(database.prepare("DELETE FROM method_progress WHERE account_id = ?").run(accountId).changes),
+    };
+    database.prepare("DELETE FROM chatgpt_links WHERE product_account_id = ? OR chatgpt_account_id = ?").run(accountId, accountId);
+    database.prepare("DELETE FROM launch_offer_members WHERE account_id = ?").run(accountId);
+    database.prepare("UPDATE users SET name = NULL, email = NULL, updated_at = ? WHERE account_id = ?").run(Date.now(), accountId);
+    database.exec("COMMIT");
+    return deleted;
   } catch (error) {
     database.exec("ROLLBACK");
     throw error;

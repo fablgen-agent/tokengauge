@@ -1,0 +1,11 @@
+[Unit]
+Description=Replicate TokenGauge database backups offsite daily
+
+[Timer]
+OnCalendar=*-*-* 03:45:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=tokengauge-offsite-backup.service
+
+[Install]
+WantedBy=timers.target

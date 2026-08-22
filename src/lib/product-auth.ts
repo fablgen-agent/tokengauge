@@ -5,7 +5,7 @@ import { twoFactor } from "better-auth/plugins";
 import { createHmac } from "node:crypto";
 
 import { authEmailReady, queueAuthEmail } from "@/lib/auth-email";
-import { getDatabase, upsertUser } from "@/lib/db";
+import { anonymizeDeletedProductAccount, getDatabase, upsertUser } from "@/lib/db";
 import { getAppUrl, getProductAuthSecret } from "@/lib/env";
 
 let singleton: ReturnType<typeof createProductAuth> | undefined;
@@ -40,6 +40,18 @@ function createProductAuth() {
       autoSignInAfterVerification: true,
       expiresIn: 60 * 60,
       sendVerificationEmail: async ({ user, url }) => queueAuthEmail("verify", user.email, url),
+    },
+    user: {
+      changeEmail: {
+        enabled: true,
+        sendChangeEmailConfirmation: async ({ user, url }) => queueAuthEmail("change", user.email, url),
+      },
+      deleteUser: {
+        enabled: true,
+        afterDelete: async (user) => {
+          anonymizeDeletedProductAccount(productAccountId(user.id));
+        },
+      },
     },
     session: {
       expiresIn: 7 * 24 * 60 * 60,

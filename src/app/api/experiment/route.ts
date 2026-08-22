@@ -1,5 +1,5 @@
 import { createChatGPTProxyProvider } from "@opencoredev/loginwithchatgpt-ai";
-import { streamText, type LanguageModelUsage } from "ai";
+import { APICallError, streamText, type LanguageModelUsage } from "ai";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
@@ -8,7 +8,7 @@ import { tokenTips } from "@/lib/catalog";
 import { getChatGPTHandler } from "@/lib/chatgpt";
 import { saveExperiment } from "@/lib/db";
 import { getProviderCredential } from "@/lib/provider-vault";
-import { providerStrategyIds, runProviderText, type LabUsage } from "@/lib/provider-runner";
+import { ProviderRequestError, providerStrategyIds, runProviderText, type LabUsage } from "@/lib/provider-runner";
 import { isProviderId, providerDefinition, type ProviderId } from "@/lib/providers";
 import { planAtLeast, planDefinition } from "@/lib/plans";
 
@@ -51,6 +51,31 @@ function settingsFor(strategyId: string, variant: "baseline" | "candidate") {
     settings.maxOutputTokens = 300;
   }
   return settings;
+}
+
+function experimentFailure(error: unknown): Response {
+  const status = APICallError.isInstance(error)
+    ? error.statusCode
+    : error instanceof ProviderRequestError
+      ? error.status
+      : undefined;
+
+  if (status === 401) {
+    return Response.json({ error: "The model connection expired. Reconnect it and run the test again." }, { status: 401 });
+  }
+  if (status === 429) {
+    return Response.json({ error: "The model source is rate-limiting requests. Wait a minute, then retry." }, { status: 429 });
+  }
+  if (status && status >= 400 && status < 500) {
+    return Response.json({ error: "The model source rejected this model or request setting. Refresh the model list or choose another model." }, { status: 422 });
+  }
+  if (status && status >= 500) {
+    return Response.json({ error: "The model source is temporarily unavailable. No result was stored; retry shortly." }, { status: 502 });
+  }
+  if (error instanceof DOMException && error.name === "TimeoutError") {
+    return Response.json({ error: "The model source did not respond within two minutes. No result was stored." }, { status: 504 });
+  }
+  return Response.json({ error: "The experiment could not be completed. No result was stored; reconnect the model source or retry." }, { status: 500 });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -150,6 +175,6 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: "Check the experiment fields and try again." }, { status: 400 });
     }
     console.error("Experiment failed", error instanceof Error ? error.message : "Unknown error");
-    return Response.json({ error: "The experiment could not be completed." }, { status: 500 });
+    return experimentFailure(error);
   }
 }

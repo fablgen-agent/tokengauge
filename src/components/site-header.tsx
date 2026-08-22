@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type AccessState = "checking" | "free" | "launch" | "pro";
+import type { PlanId } from "@/lib/plans";
+
+type AccessState = "checking" | "free" | "launch" | "pro" | "pro_plus" | "ultimate";
+
+const activePlanNames: Partial<Record<PlanId, string>> = {
+  pro: "Pro",
+  pro_plus: "Pro+",
+  ultimate: "Ultimate",
+};
 
 export function SiteHeader() {
   const [access, setAccess] = useState<AccessState>("checking");
@@ -16,8 +24,8 @@ export function SiteHeader() {
       credentials: "same-origin",
       signal: controller.signal,
     })
-      .then((response) => response.ok ? response.json() as Promise<{ pro?: boolean; launchOffer?: { remaining?: number } }> : undefined)
-      .then((account) => setAccess(account?.pro ? "pro" : (account?.launchOffer?.remaining ?? 0) > 0 ? "launch" : "free"))
+      .then((response) => response.ok ? response.json() as Promise<{ pro?: boolean; accessPlan?: PlanId; launchOffer?: { remaining?: number } }> : undefined)
+      .then((account) => setAccess(account?.pro && account.accessPlan && account.accessPlan !== "free" ? account.accessPlan : (account?.launchOffer?.remaining ?? 0) > 0 ? "launch" : "free"))
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setAccess("free");
@@ -39,8 +47,8 @@ export function SiteHeader() {
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/account">Account</Link>
         <Link href="/settings">Settings</Link>
-        {access === "pro" ? (
-          <Link className="nav-cta nav-cta-active" href="/account" aria-label="TokenGauge Pro access is active">Pro active</Link>
+        {access in activePlanNames ? (
+          <Link className="nav-cta nav-cta-active" href="/account" aria-label={`TokenGauge ${activePlanNames[access as PlanId]} access is active`}>{activePlanNames[access as PlanId]} active</Link>
         ) : access === "launch" ? (
           <Link className="nav-cta" href="/#pricing" data-funnel-event="cta_pricing" aria-label="Get launch Pro access for £5 one time">Get Pro £5</Link>
         ) : access === "free" ? (

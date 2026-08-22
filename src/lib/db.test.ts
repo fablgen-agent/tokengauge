@@ -33,7 +33,9 @@ describe("durable state", () => {
   });
 
   it("deduplicates Stripe event identifiers", () => {
+    expect(db.stripeEventProcessed("evt_one")).toBe(false);
     expect(db.markStripeEvent("evt_one", "checkout.session.completed")).toBe(true);
+    expect(db.stripeEventProcessed("evt_one")).toBe(true);
     expect(db.markStripeEvent("evt_one", "checkout.session.completed")).toBe(false);
   });
 
@@ -177,5 +179,43 @@ describe("durable state", () => {
     expect(cleared.methodProgress).toEqual([]);
     expect(cleared.profile).not.toBeNull();
     expect(cleared.access).toHaveLength(1);
+  });
+
+  it("anonymizes a deleted product account while retaining its payment ledger", () => {
+    db.upsertUser({ accountId: "deleted-user", billingUserId: "tg-deleted-user", name: "Delete Me", email: "delete@example.test" });
+    db.grantEntitlement({
+      accountId: "deleted-user",
+      checkoutSessionId: "cs_deleted_user",
+      paymentIntentId: "pi_deleted_user",
+      amountPaid: 500,
+      currency: "gbp",
+    });
+    db.ensureLaunchOffer("deleted-user");
+    vault.saveProviderCredential({ accountId: "deleted-user", providerId: "openai", apiKey: "sk-delete-this-key" });
+    db.saveExperiment({
+      id: "deleted-experiment",
+      accountId: "deleted-user",
+      providerId: "openai",
+      strategyId: "cap-output",
+      model: "gpt-test",
+      baseline: { input: 10, output: 20, total: 30 },
+      optimized: { input: 10, output: 10, total: 20 },
+    });
+    db.setMethodProgress("deleted-user", "cap-output", "adopted");
+
+    expect(db.anonymizeDeletedProductAccount("deleted-user")).toEqual({
+      providerConnections: 1,
+      experiments: 1,
+      methodProgress: 1,
+    });
+    expect(db.userRecord("deleted-user")).toMatchObject({ name: null, email: null });
+    expect(db.planForAccount("deleted-user")).toBe("pro");
+    expect(db.accountPrivacyExport("deleted-user")).toMatchObject({
+      profile: { name: null, email: null },
+      launchOffer: null,
+      providerConnections: [],
+      experiments: [],
+      methodProgress: [],
+    });
   });
 });

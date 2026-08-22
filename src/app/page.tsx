@@ -12,7 +12,7 @@ import { evidenceLabels, proTips, publicTips, tokenTips } from "@/lib/catalog";
 import { modelPrices, priceProviders, priceSnapshotDate } from "@/lib/costs";
 import { launchOfferStatus } from "@/lib/db";
 import { getOwnerAccountContext } from "@/lib/access";
-import { launchPricesGbp, paidPlans } from "@/lib/plans";
+import { isPaidPlanId, launchPricesGbp, paidPlans, planDefinition } from "@/lib/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +38,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string; plan?: string }>;
+}) {
+  const query = await searchParams;
+  const cancelledPlan = query.checkout === "cancelled" && isPaidPlanId(query.plan)
+    ? planDefinition(query.plan)
+    : undefined;
   const request = new Request("http://tokengauge.internal/", { headers: await headers() });
   const owner = await getOwnerAccountContext(request);
   const launchOffer = launchOfferStatus(owner?.accountId);
@@ -142,6 +150,7 @@ export default async function Home() {
         </section>
 
         <section id="pricing" className="section-pad section-block pricing-section pricing-tiers-section">
+          {cancelledPlan ? <div className="checkout-return-notice" role="status"><strong>No charge was made.</strong><span>Your {cancelledPlan.name} checkout was canceled. The plan and launch price remain available below whenever you are ready.</span></div> : null}
           <div className="pricing-copy">
             <span className="eyebrow eyebrow-lime">ONE-TIME ACCESS</span><h2>Choose the workbench you will actually use.</h2>
             <p>Pro includes the evidence library and every encrypted bring-your-own-key adapter. Higher tiers expand dashboard and export depth instead of withholding providers.</p>
