@@ -8,11 +8,11 @@ import { providerLabel } from "@/lib/provider-pages";
 
 export const metadata: Metadata = {
   title: `AI API provider comparisons — ${priceSnapshotDate}`,
-  description: "Compare OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere API costs with retry, quality, and observed p95 latency assumptions.",
+  description: "Compare OpenAI, Anthropic, Gemini, Grok, DeepSeek, Kimi, Qwen, Mistral, and Cohere API costs with retry, quality, observed p95 latency, and client-compatibility gates.",
   alternates: { canonical: "/compare" },
   openGraph: {
     title: "AI API provider cost comparisons · TokenGauge Workbench",
-    description: "Source-linked model rates, shared workloads, retry-adjusted spend, observed p95 latency gates, and cost per accepted answer.",
+    description: "Source-linked model rates, shared workloads, retry-adjusted spend, p95 latency and client-compatibility gates, and cost per accepted answer.",
     url: "/compare",
   },
 };
@@ -25,7 +25,7 @@ export default function ComparisonIndex() {
         <section className="subpage-hero section-pad pricing-hub-hero">
           <span className="eyebrow eyebrow-lime">AI API COST COMPARISONS</span>
           <h1>Compare providers on the same workload.</h1>
-          <p>Pick exact model tiers, enter one task profile, and compare retry- and quality-adjusted cost per accepted answer under your own observed p95 latency ceiling. No provider-wide minimum is treated as a like-for-like model claim.</p>
+          <p>Pick exact model tiers, enter one task profile, and compare retry- and quality-adjusted cost per accepted answer under your own p95 latency and OpenAI-client compatibility gates. No provider-wide minimum is treated as a like-for-like model claim.</p>
           <p className="provider-snapshot">Snapshot verified {priceSnapshotDate} · official sources linked · consumer chat subscriptions excluded</p>
         </section>
         <section className="section-pad provider-index" aria-labelledby="comparison-index-title">

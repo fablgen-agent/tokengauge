@@ -216,6 +216,22 @@ export function calculateOperationalCostScenario(input: {
   };
 }
 
+export function calculateCompatibilityGate(requiredChecks: number, passedChecks: number): {
+  applied: boolean;
+  requiredChecks: number;
+  passedChecks: number;
+  meetsRequirement: boolean;
+} {
+  const required = Math.max(Math.trunc(Number.isFinite(requiredChecks) ? requiredChecks : 0), 0);
+  const passed = Math.min(Math.max(Math.trunc(Number.isFinite(passedChecks) ? passedChecks : 0), 0), required);
+  return {
+    applied: required > 0,
+    requiredChecks: required,
+    passedChecks: passed,
+    meetsRequirement: required === 0 || passed === required,
+  };
+}
+
 export function calculateBreakEvenAcceptanceRate(
   baselineCostUsd: number,
   candidateCostUsd: number,

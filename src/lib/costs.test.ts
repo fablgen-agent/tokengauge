@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   calculateBreakEvenAcceptanceRate,
   calculateCacheEpisodeCosts,
+  calculateCompatibilityGate,
   calculateCostPerAcceptedAnswer,
   calculateCostUsd,
   calculateOperationalCostScenario,
@@ -116,6 +117,13 @@ describe("cost calculations", () => {
       costPerAcceptedAnswerUsd: null,
       meetsLatencyCeiling: true,
     });
+  });
+
+  it("applies only user-entered compatibility checks and clamps impossible coverage", () => {
+    expect(calculateCompatibilityGate(0, 12)).toEqual({ applied: false, requiredChecks: 0, passedChecks: 0, meetsRequirement: true });
+    expect(calculateCompatibilityGate(6, 5)).toEqual({ applied: true, requiredChecks: 6, passedChecks: 5, meetsRequirement: false });
+    expect(calculateCompatibilityGate(6, 99)).toEqual({ applied: true, requiredChecks: 6, passedChecks: 6, meetsRequirement: true });
+    expect(calculateCompatibilityGate(Number.NaN, -1)).toEqual({ applied: false, requiredChecks: 0, passedChecks: 0, meetsRequirement: true });
   });
 
   it("covers the nine first-class providers with official sources", () => {

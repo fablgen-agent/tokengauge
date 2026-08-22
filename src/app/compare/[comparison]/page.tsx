@@ -42,6 +42,7 @@ export default async function ComparisonPage({ params }: Props) {
     { question: `Which is cheaper, ${leftLabel} or ${rightLabel}?`, answer: "There is no provider-wide answer. Cost depends on the exact model tier, input and output size, cache behavior, region, execution mode, and the share of answers that pass the workload’s quality bar." },
     { question: "Does this comparison prove the models have equal quality?", answer: "No. The calculator keeps separate quality-pass, retry, and observed p95 latency assumptions so you can enter measured results. Equal token counts or prices do not establish equivalent capabilities." },
     { question: "Where do the latency and retry figures come from?", answer: "You enter observations from your own workload. TokenGauge does not publish invented provider benchmarks. Retry overhead is modeled as extra uniform billed attempts, while observed p95 latency is a separate eligibility gate." },
+    { question: "What does the OpenAI-client compatibility gate measure?", answer: "It counts only the checks you run against the behaviors your existing client requires, such as endpoints, streaming events, tool calls, structured output, usage fields, and error handling. Set the requirement to zero until you have test results; TokenGauge does not infer support from provider marketing." },
     { question: "Are consumer subscriptions included?", answer: "No. ChatGPT, Claude, Gemini, Grok, Kimi, and other consumer-plan quotas are separate from API token billing." },
   ];
   const jsonLd = [{
@@ -75,7 +76,7 @@ export default async function ComparisonPage({ params }: Props) {
           </dl>
         </section>
         <section id="comparison-calculator" className="section-pad section-block calculator-section">
-          <div className="section-heading split-heading"><div><span className="eyebrow">SHARED WORKLOAD</span><h2>Change the models, not the accounting.</h2></div><p>Both sides receive the same task and token profile. Add observed quality, retries, and p95 latency so a low token price cannot hide rejected answers or an unusable response-time tail.</p></div>
+          <div className="section-heading split-heading"><div><span className="eyebrow">SHARED WORKLOAD</span><h2>Change the models, not the accounting.</h2></div><p>Both sides receive the same task and token profile. Add observed quality, retries, p95 latency, and required client checks so a low token price cannot hide rejected answers or an unusable integration.</p></div>
           <ProviderComparisonCalculator leftId={comparison.left} rightId={comparison.right} />
           <p className="snapshot-note">{comparison.billingCaveat}</p>
         </section>
