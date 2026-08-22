@@ -20,6 +20,7 @@ The public site includes free, no-login browser-local tools. Paid one-time plans
 - [Evidence library](https://tokengauge.enby.fish/library): Evidence cards labelled as official facts, derived math, or test protocols; access varies by plan.
 - [Controlled A/B lab](https://tokengauge.enby.fish/lab): Run supported paired recipes with a connected ChatGPT plan or encrypted provider key; prompts and outputs are not stored.
 - [Cost attribution guide](https://tokengauge.enby.fish/guides/llm-cost-per-customer-feature): Separate provider billing from application attribution, retries, and accepted-answer economics.
+- [Autonomous agent token-budget guide](https://tokengauge.enby.fish/guides/autonomous-agent-token-budget): Check growing full-history requests before provider dispatch, cap output allowance, and stop without one final over-budget model call.
 - [Source repository](https://github.com/fablgen-agent/tokengauge): MIT-licensed application source, validation workflow, deployment notes, and public issue tracker.
 
 ## Commercial boundaries

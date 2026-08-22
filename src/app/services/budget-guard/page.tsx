@@ -122,7 +122,7 @@ export default function BudgetGuardServicePage() {
             <article><span>03</span><h3>Review executable evidence</h3><p>You receive a focused branch or pull request, automated no-call and reconciliation tests, handoff notes, and one revision within the agreed boundary.</p></article>
           </div>
           <div className="service-final-cta">
-            <div><span className="eyebrow eyebrow-lime">START WITH NO SECRETS</span><h2>Describe the call path and budget boundary.</h2><p>Suitable enquiries receive a written scope before any payment request. Need reporting rather than enforcement? <Link href="/services/attribution">See the attribution setup →</Link></p></div>
+            <div><span className="eyebrow eyebrow-lime">START WITH NO SECRETS</span><h2>Describe the call path and budget boundary.</h2><p>Suitable enquiries receive a written scope before any payment request. <Link href="/guides/autonomous-agent-token-budget">Read the implementation guide →</Link> Need reporting rather than enforcement? <Link href="/services/attribution">See the attribution setup →</Link></p></div>
             <div className="service-final-actions">
               <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_email">Email the public scope</a>
               <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_budget_guard">Message @FablgenBot <span aria-hidden="true">→</span></a>
@@ -130,7 +130,7 @@ export default function BudgetGuardServicePage() {
           </div>
         </section>
       </main>
-      <footer className="site-footer section-pad"><div><Link className="brand" href="/"><span className="brand-mark">T</span>TokenGauge</Link><p>Measure the cost. Preserve the answer.</p></div><nav aria-label="Footer navigation"><Link href="/services/attribution">Attribution setup</Link><Link href="/audit">Bill audit</Link><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link></nav><p>Independent software. Service work is accepted only through a written scope for an authorized codebase.</p></footer>
+      <footer className="site-footer section-pad"><div><Link className="brand" href="/"><span className="brand-mark">T</span>TokenGauge</Link><p>Measure the cost. Preserve the answer.</p></div><nav aria-label="Footer navigation"><Link href="/guides/autonomous-agent-token-budget">Implementation guide</Link><Link href="/services/attribution">Attribution setup</Link><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link></nav><p>Independent software. Service work is accepted only through a written scope for an authorized codebase.</p></footer>
     </div>
   );
 }
