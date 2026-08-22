@@ -109,7 +109,7 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
           <div><small>After</small><strong>{formatUsd(result.optimized)}</strong></div>
         </div>
         <div className={`savings-pill ${result.amountUsd < 0 ? "negative" : ""}`}>
-          {result.amountUsd >= 0 ? "Potential saving" : "Potential increase"}: {formatUsd(Math.abs(result.amountUsd))}
+          Modeled raw-spend {result.amountUsd >= 0 ? "decrease" : "increase"}: {formatUsd(Math.abs(result.amountUsd))}
           {result.baseline > 0 ? ` (${Math.abs(result.percentage).toFixed(1)}%)` : ""}
         </div>
         {baselineAcceptedCost !== null && candidateAcceptedCost !== null && acceptedSavings && breakEvenPassRate !== null ? (
