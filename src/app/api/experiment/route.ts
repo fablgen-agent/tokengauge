@@ -101,7 +101,15 @@ export async function POST(request: Request): Promise<Response> {
     const results = new Map<"baseline" | "candidate", { text: string; usage: ReturnType<typeof usageDto>; settings: ReturnType<typeof settingsFor> }>();
     let account: AuthContext;
     if (input.providerId === "chatgpt") {
-      account = await requireChatGPT(request);
+      // The ChatGPT session authorizes the proxy request, while the owner
+      // context is the canonical TokenGauge identity for entitlements and
+      // stored experiment history. These differ after a ChatGPT identity is
+      // linked to a product account.
+      const [, owner] = await Promise.all([
+        requireChatGPT(request),
+        requireOwnerAccount(request),
+      ]);
+      account = owner;
       if (!account.pro && strategy.access !== "free") {
         return Response.json({ error: "That strategy is not available for this account." }, { status: 403 });
       }
