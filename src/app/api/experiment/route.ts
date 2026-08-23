@@ -53,12 +53,47 @@ function settingsFor(strategyId: string, variant: "baseline" | "candidate") {
   return settings;
 }
 
+function errorChain(error: unknown): unknown[] {
+  const pending = [error];
+  const seen = new Set<unknown>();
+  const chain: unknown[] = [];
+
+  while (pending.length > 0 && chain.length < 12) {
+    const current = pending.shift();
+    if (current == null || seen.has(current)) continue;
+    seen.add(current);
+    chain.push(current);
+    if (typeof current !== "object") continue;
+
+    const wrapped = current as { cause?: unknown; lastError?: unknown; errors?: unknown };
+    if (wrapped.lastError != null) pending.push(wrapped.lastError);
+    if (wrapped.cause != null) pending.push(wrapped.cause);
+    if (Array.isArray(wrapped.errors)) pending.push(...wrapped.errors.slice(-3));
+  }
+
+  return chain;
+}
+
+function errorStatus(error: unknown): number | undefined {
+  for (const current of errorChain(error)) {
+    if (APICallError.isInstance(current)) return current.statusCode;
+    if (current instanceof ProviderRequestError) return current.status;
+    if (typeof current !== "object" || current == null) continue;
+    const candidate = current as { status?: unknown; statusCode?: unknown };
+    const status = candidate.statusCode ?? candidate.status;
+    if (typeof status === "number" && Number.isInteger(status) && status >= 400 && status <= 599) return status;
+  }
+  return undefined;
+}
+
+function hasErrorName(error: unknown, name: string): boolean {
+  return errorChain(error).some((current) =>
+    typeof current === "object" && current != null && "name" in current && current.name === name,
+  );
+}
+
 function experimentFailure(error: unknown): Response {
-  const status = APICallError.isInstance(error)
-    ? error.statusCode
-    : error instanceof ProviderRequestError
-      ? error.status
-      : undefined;
+  const status = errorStatus(error);
 
   if (status === 401) {
     return Response.json({ error: "The model connection expired. Reconnect it and run the test again." }, { status: 401 });
@@ -72,8 +107,11 @@ function experimentFailure(error: unknown): Response {
   if (status && status >= 500) {
     return Response.json({ error: "The model source is temporarily unavailable. No result was stored; retry shortly." }, { status: 502 });
   }
-  if (error instanceof DOMException && error.name === "TimeoutError") {
+  if (hasErrorName(error, "TimeoutError")) {
     return Response.json({ error: "The model source did not respond within two minutes. No result was stored." }, { status: 504 });
+  }
+  if (hasErrorName(error, "AI_NoOutputGeneratedError")) {
+    return Response.json({ error: "The model source completed without usable text. No result was stored; retry or choose another model." }, { status: 502 });
   }
   return Response.json({ error: "The experiment could not be completed. No result was stored; reconnect the model source or retry." }, { status: 500 });
 }
@@ -125,6 +163,11 @@ export async function POST(request: Request): Promise<Response> {
           system: variant.instructions,
           prompt: input.task,
           maxOutputTokens: variant.settings.maxOutputTokens,
+          // A lab run promises exactly two model requests. Disable the SDK's
+          // implicit retries so a transient failure cannot silently consume
+          // additional plan usage, and bound each arm so the UI cannot hang.
+          maxRetries: 0,
+          abortSignal: AbortSignal.timeout(120_000),
           providerOptions: { openai: { reasoningEffort: variant.settings.reasoningEffort, textVerbosity: variant.settings.textVerbosity } },
         });
         const [text, usage] = await Promise.all([result.text, result.usage]);
@@ -182,7 +225,12 @@ export async function POST(request: Request): Promise<Response> {
     if (error instanceof z.ZodError || error instanceof SyntaxError) {
       return Response.json({ error: "Check the experiment fields and try again." }, { status: 400 });
     }
-    console.error("Experiment failed", error instanceof Error ? error.message : "Unknown error");
+    const chain = errorChain(error);
+    console.error("Experiment failed", {
+      outerName: error instanceof Error ? error.name : typeof error,
+      terminalName: chain.findLast((item) => item instanceof Error)?.name,
+      status: errorStatus(error),
+    });
     return experimentFailure(error);
   }
 }
