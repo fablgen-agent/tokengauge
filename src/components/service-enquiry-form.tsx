@@ -39,7 +39,7 @@ export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind })
     }
   }
 
-  return <form className="service-enquiry-form" onSubmit={submit}>
+  return <form id="scope-request" className="service-enquiry-form" onSubmit={submit}>
     <div className="service-enquiry-heading"><span className="eyebrow eyebrow-lime">NO ACCOUNT REQUIRED</span><h2>Send the public scope here.</h2><p>The form emails the TokenGauge mailbox. It is not saved in the workbench database.</p></div>
     <div className="service-enquiry-fields">
       <label>Reply email<input name="email" type="email" autoComplete="email" maxLength={254} required /></label>

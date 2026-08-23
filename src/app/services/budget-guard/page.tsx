@@ -60,8 +60,9 @@ export default function BudgetGuardServicePage() {
             <h1>Stop over-budget model calls before they start.</h1>
             <p>I add one application-side budget gate to an authorized Node.js/TypeScript or Python codebase: reserve modeled spend before the call, reconcile returned usage afterward, and take the agreed non-AI path when the remaining allowance is insufficient.</p>
             <div className="hero-actions">
-              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_budget_guard_email">Email the public scope</a>
+              <a className="button button-lime" href="#scope-request" data-funnel-event="cta_service_budget_guard_form">Send the public scope here</a>
               <div className="service-contact-links" aria-label="Alternative enquiry channels">
+                <a className="text-link" href={emailUrl} data-funnel-event="cta_service_budget_guard_email">Use your email app <span aria-hidden="true">→</span></a>
                 <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_budget_guard_telegram">Message on Telegram <span aria-hidden="true">→</span></a>
                 <a className="text-link" href={githubRequestUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_budget_guard_github">Use the public work form <span aria-hidden="true">→</span></a>
               </div>
@@ -126,7 +127,8 @@ export default function BudgetGuardServicePage() {
           <div className="service-final-cta">
             <div><span className="eyebrow eyebrow-lime">START WITH NO SECRETS</span><h2>Describe the call path and budget boundary.</h2><p>Suitable enquiries receive a written scope before any payment request. <Link href="/guides/autonomous-agent-token-budget">Read the implementation guide →</Link> Need reporting rather than enforcement? <Link href="/services/attribution">See the attribution setup →</Link></p></div>
             <div className="service-final-actions">
-              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_budget_guard_email">Email the public scope</a>
+              <a className="button button-lime" href="#scope-request" data-funnel-event="cta_service_budget_guard_form">Open the private form</a>
+              <a className="text-link" href={emailUrl} data-funnel-event="cta_service_budget_guard_email">Use your email app <span aria-hidden="true">→</span></a>
               <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_budget_guard_telegram">Message @FablgenBot <span aria-hidden="true">→</span></a>
             </div>
           </div>
