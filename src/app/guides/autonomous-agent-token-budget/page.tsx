@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AgentBudgetPlanner } from "@/components/agent-budget-planner";
 import { SiteHeader } from "@/components/site-header";
 
 const canonicalUrl = "https://tokengauge.enby.fish/guides/autonomous-agent-token-budget";
 
 export const metadata: Metadata = {
-  title: "How to cap an autonomous AI agent's token usage",
-  description: "A practical pre-call token-budget pattern for stopping runaway autonomous LLM loops, reporting cumulative usage, and degrading without one final over-budget model call.",
+  title: "Autonomous AI agent token budget planner",
+  description: "A free browser-local planner that divides one autonomous run budget across a coordinator, parallel workers, retries, and a safety reserve before model dispatch.",
   alternates: { canonical: "/guides/autonomous-agent-token-budget" },
   openGraph: {
     type: "article",
-    title: "How to cap an autonomous AI agent's token usage",
-    description: "Estimate the next request, reserve its output allowance, stop before provider dispatch, and report the accounting limits honestly.",
+    title: "Autonomous AI agent token budget planner",
+    description: "Allocate coordinator, worker, retry, and safety-reserve tokens, then enforce the result before provider dispatch.",
     url: "/guides/autonomous-agent-token-budget",
   },
 };
@@ -46,11 +47,11 @@ export default function AutonomousAgentTokenBudgetGuidePage() {
     {
       "@context": "https://schema.org",
       "@type": "Article",
-      headline: "How to cap an autonomous AI agent's token usage",
+      headline: "Autonomous AI agent token budget planner",
       description: metadata.description,
       url: canonicalUrl,
       datePublished: "2026-08-22",
-      dateModified: "2026-08-22",
+      dateModified: "2026-08-23",
       author: { "@type": "Organization", name: "TokenGauge" },
       publisher: { "@type": "Organization", name: "TokenGauge" },
     },
@@ -73,8 +74,8 @@ export default function AutonomousAgentTokenBudgetGuidePage() {
         <article>
           <header className="subpage-hero section-pad guide-hero">
             <div>
-              <span className="eyebrow eyebrow-lime">PRACTICAL GUIDE · 9 MIN READ</span>
-              <h1>Cap an autonomous agent before the next model call.</h1>
+              <span className="eyebrow eyebrow-lime">PRACTICAL GUIDE + FREE PLANNER · 11 MIN READ</span>
+              <h1>Cap a multi-agent run before the next model call.</h1>
               <p>A growing full-history loop can turn a reasonable call limit into an unpredictable bill. Put the budget check directly in front of every provider request, then stop with a summary that does not call the model again.</p>
               <div className="hero-actions">
                 <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_budget_guide_service">Get one path implemented for £75</Link>
@@ -93,10 +94,11 @@ export default function AutonomousAgentTokenBudgetGuidePage() {
           <nav className="guide-toc section-pad" aria-label="Guide contents">
             <span>CONTENTS</span>
             <a href="#failure">1. Failure mode</a>
-            <a href="#guard">2. Guard sequence</a>
-            <a href="#example">3. Reference pattern</a>
-            <a href="#accounting">4. Honest accounting</a>
-            <a href="#evidence">5. Public implementation</a>
+            <a href="#planner">2. Budget planner</a>
+            <a href="#guard">3. Guard sequence</a>
+            <a href="#example">4. Reference pattern</a>
+            <a href="#accounting">5. Honest accounting</a>
+            <a href="#evidence">6. Public implementation</a>
           </nav>
 
           <section id="failure" className="section-pad guide-section">
@@ -112,8 +114,17 @@ export default function AutonomousAgentTokenBudgetGuidePage() {
             </div>
           </section>
 
-          <section id="guard" className="section-pad guide-section guide-section-alt">
-            <div className="guide-section-label"><span>02</span><p>GUARD SEQUENCE</p></div>
+          <section id="planner" className="section-pad guide-section guide-section-alt">
+            <div className="guide-section-label"><span>02</span><p>BUDGET PLANNER</p></div>
+            <div className="guide-prose">
+              <h2>Allocate the run before workers compete for it.</h2>
+              <p>Reserve the coordinator and failure margin first. Divide only the remaining pool across workers and their permitted attempts, then refuse any request whose serialized input plus output ceiling exceeds that allowance.</p>
+              <AgentBudgetPlanner />
+            </div>
+          </section>
+
+          <section id="guard" className="section-pad guide-section">
+            <div className="guide-section-label"><span>03</span><p>GUARD SEQUENCE</p></div>
             <div className="guide-prose">
               <h2>Put one wrapper around every autonomous call.</h2>
               <p>The safest seam is the method immediately before the provider adapter. Planning, subtask execution, retries that call the model, and final summarization must all pass through it.</p>
@@ -123,8 +134,8 @@ export default function AutonomousAgentTokenBudgetGuidePage() {
             </div>
           </section>
 
-          <section id="example" className="section-pad guide-section">
-            <div className="guide-section-label"><span>03</span><p>REFERENCE PATTERN</p></div>
+          <section id="example" className="section-pad guide-section guide-section-alt">
+            <div className="guide-section-label"><span>04</span><p>REFERENCE PATTERN</p></div>
             <div className="guide-prose">
               <h2>Reserve the next request, then reconcile the response.</h2>
               <p>This deliberately generic pattern shows the control flow. Production code should use the active model&apos;s tokenizer where possible and the provider&apos;s returned usage fields after the call.</p>
@@ -154,7 +165,7 @@ runTokens += reportedOrEstimatedOutputTokens(response)`}</code></pre>
           </section>
 
           <section id="accounting" className="section-pad guide-section guide-section-dark">
-            <div className="guide-section-label"><span>04</span><p>HONEST ACCOUNTING</p></div>
+            <div className="guide-section-label"><span>05</span><p>HONEST ACCOUNTING</p></div>
             <div className="guide-prose">
               <h2>Report what the guard measured—and what it did not.</h2>
               <ol className="guide-steps">
@@ -168,7 +179,7 @@ runTokens += reportedOrEstimatedOutputTokens(response)`}</code></pre>
           </section>
 
           <section id="evidence" className="section-pad guide-section">
-            <div className="guide-section-label"><span>05</span><p>PUBLIC IMPLEMENTATION</p></div>
+            <div className="guide-section-label"><span>06</span><p>PUBLIC IMPLEMENTATION</p></div>
             <div className="guide-prose">
               <h2>A current high-priority issue exposes the same failure mode.</h2>
               <p>On 22 August 2026, the Swarms repository owner opened a high-priority issue describing an autonomous loop with iteration ceilings, growing full-history requests, and no token or cost boundary. Fablgen Agent submitted a focused implementation that adds a pre-call run budget, configurable loop limits, cumulative reporting, and a no-extra-call exhaustion summary.</p>

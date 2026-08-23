@@ -713,6 +713,23 @@ input[type="range"] { accent-color: var(--ink); }
 .media-cost-breakdown dd { margin: 7px 0 0; color: white; font: 700 18px/1.2 var(--font-geist-mono), monospace; }
 .media-schema-section { background: #e9eee7; padding-top: 88px; padding-bottom: 92px; }
 
+.agent-budget-planner { margin-top: 38px; }
+.agent-budget-note { margin: 4px 0 0; padding: 14px; border-left: 3px solid var(--coral); color: var(--muted); font-size: 11px; line-height: 1.55; }
+.agent-budget-primary { margin-top: 24px; }
+.agent-budget-primary small, .agent-budget-primary strong, .agent-budget-primary span { display: block; }
+.agent-budget-primary small { color: #9aa7a4; font: 10px/1.3 var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .08em; }
+.agent-budget-primary strong { margin-top: 7px; color: white; font-size: clamp(42px, 6vw, 72px); line-height: 1; letter-spacing: -.06em; }
+.agent-budget-primary span { width: fit-content; margin-top: 12px; padding: 7px 10px; background: rgba(200,255,70,.14); color: var(--lime); font: 700 11px/1.35 var(--font-geist-mono), monospace; }
+.agent-budget-breakdown { margin: 26px 0 0; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,.14); border-left: 1px solid rgba(255,255,255,.14); }
+.agent-budget-breakdown div { padding: 16px; border-right: 1px solid rgba(255,255,255,.14); border-bottom: 1px solid rgba(255,255,255,.14); }
+.agent-budget-breakdown dt { color: #8f9c99; font-size: 10px; }
+.agent-budget-breakdown dd { margin: 7px 0 0; color: white; font: 700 18px/1.2 var(--font-geist-mono), monospace; }
+.agent-budget-warning { padding: 14px; color: #ffb19a !important; background: rgba(255,130,93,.12); border: 1px solid rgba(255,130,93,.28); }
+.agent-budget-policy { margin-top: 24px; border: 1px solid rgba(255,255,255,.14); }
+.agent-budget-policy > span { min-height: 42px; padding: 0 15px; display: flex; align-items: center; color: #9aa7a4; border-bottom: 1px solid rgba(255,255,255,.14); font: 10px/1.2 var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .08em; }
+.agent-budget-policy pre { margin: 0; padding: 16px; overflow-x: auto; background: rgba(255,255,255,.035); }
+.agent-budget-policy code { color: #d7e0de; font: 11px/1.55 var(--font-geist-mono), monospace; }
+
 .provider-pricing-page { background: var(--paper); }
 .pricing-hub-hero, .provider-hero { min-height: 470px; display: grid; align-items: center; }
 .pricing-hub-hero { align-content: center; }
