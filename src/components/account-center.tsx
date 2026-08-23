@@ -3,11 +3,13 @@
 import QRCode from "qrcode";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { AccountPanel } from "@/components/account-panel";
 import { ChatGPTPanel } from "@/components/chatgpt-panel";
+import { accountPlanCallbackUrl, type AccountPlanContext } from "@/lib/account-plan";
 import { planDefinition, type PaidPlanId, type PlanId } from "@/lib/plans";
 
 type Enrollment = { totpURI: string; backupCodes: string[] };
@@ -20,7 +22,8 @@ function messageOf(error: { message?: string; code?: string } | null | undefined
   return error.message || fallback;
 }
 
-export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan = "pro" }: { accountSystemReady: boolean; chatgptIdentity?: ChatGPTIdentity; targetPlan?: PaidPlanId }) {
+export function AccountCenter({ accountSystemReady, chatgptIdentity, selectedPlan }: { accountSystemReady: boolean; chatgptIdentity?: ChatGPTIdentity; selectedPlan: AccountPlanContext }) {
+  const router = useRouter();
   const session = authClient.useSession();
   const [mode, setMode] = useState<"sign-in" | "create" | "forgot">("sign-in");
   const [notice, setNotice] = useState<string>();
@@ -28,8 +31,9 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
   const [busy, setBusy] = useState(false);
   const [enrollment, setEnrollment] = useState<Enrollment>();
   const [qrCode, setQrCode] = useState<string>();
-  const accountCallbackURL = `/account?plan=${encodeURIComponent(targetPlan)}`;
+  const targetPlan: PaidPlanId = selectedPlan.id;
   const target = planDefinition(targetPlan);
+  const accountCallbackURL = accountPlanCallbackUrl(targetPlan);
 
   useEffect(() => {
     if (!enrollment) return;
@@ -60,6 +64,10 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
           throw result.error;
         }
         await session.refetch();
+        // Refresh the server-computed plan context after authentication so a
+        // just-reserved (or just-exhausted) Launch 100 place cannot leave stale
+        // anonymous pricing beside the authenticated checkout button.
+        router.refresh();
       }
     } catch (cause) {
       setError(messageOf(cause as { message?: string; code?: string }, "The account request failed."));
@@ -125,7 +133,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
             <div className="security-actions"><Link className="button button-lime" href="/dashboard">Dashboard</Link><Link className="button button-dark" href="/settings">Settings</Link></div>
             <ChatGPTPanel compact purpose="sign-in" />
           </section>
-          <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span><h2>ChatGPT is your TokenGauge login.</h2><p>Your ChatGPT identity now resolves TokenGauge purchases, provider connections, and experiment history. TokenGauge does not receive your ChatGPT password.</p><AccountPanel compact targetPlan={targetPlan} /></aside>
+          <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span><h2>ChatGPT is your TokenGauge login.</h2><p>Your ChatGPT identity now resolves TokenGauge purchases, provider connections, and experiment history. TokenGauge does not receive your ChatGPT password.</p><SelectedPlanSummary plan={selectedPlan} authenticated /><AccountPanel compact targetPlan={targetPlan} /></aside>
         </div>
       );
     }
@@ -149,7 +157,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
           {notice ? <p className="form-notice" role="status">{notice}</p> : null}
           {error ? <p className="form-error" role="alert">{error}</p> : null}
         </section>
-        <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span><h2>Your selected plan stays selected.</h2><p>After ChatGPT or email verification, you will continue to {target.name} checkout.</p><ul><li>ChatGPT sign-in requires no TokenGauge password</li><li>Email accounts require verification</li><li>12-character password minimum and optional TOTP 2FA</li><li>Provider keys and Stripe billing remain separate</li></ul></aside>
+        <aside className="account-card security-summary"><span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span><h2>Your selected plan stays selected.</h2><SelectedPlanSummary plan={selectedPlan} /><ul><li>ChatGPT sign-in requires no TokenGauge password</li><li>Email accounts require verification</li><li>12-character password minimum and optional TOTP 2FA</li><li>Provider keys and Stripe billing remain separate</li></ul></aside>
       </div>
     );
   }
@@ -169,6 +177,7 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
         <span className="eyebrow eyebrow-lime">CONTINUE TO {target.name.toUpperCase()}</span>
         <h2>Your selected plan is ready.</h2>
         <p>Complete the one-time Stripe checkout here. Your email account is already verified; connecting ChatGPT is optional and is not required to purchase access.</p>
+        <SelectedPlanSummary plan={selectedPlan} authenticated />
         <AccountPanel compact targetPlan={targetPlan} />
       </section>
 
@@ -197,6 +206,18 @@ export function AccountCenter({ accountSystemReady, chatgptIdentity, targetPlan 
       <section className="account-card connection-card"><span className="eyebrow">OPTIONAL LAB CONNECTION</span><h2>ChatGPT is separate.</h2><p>Connect only when you want the A/B lab to use models available on your ChatGPT plan. It is not required for your TokenGauge account or Stripe purchase.</p><ChatGPTPanel compact /></section>
     </div>
   );
+}
+
+function SelectedPlanSummary({ plan, authenticated = false }: { plan: AccountPlanContext; authenticated?: boolean }) {
+  return <div className="selected-plan-summary" aria-label={`${plan.name} purchase summary`}>
+    <div><span>Selected plan</span><strong>{plan.name}</strong><b><sup>£</sup>{plan.priceGbp}</b></div>
+    <p>{plan.summary}</p>
+    <p className="selected-plan-boundary">One-time payment · no subscription · no API credits included.</p>
+    {plan.launchPrice ? <small>Launch 100 signup price · standard price £{plan.standardPriceGbp}</small> : <small>Standard one-time price</small>}
+    <p className="selected-plan-auth-note">{authenticated
+      ? "Stripe Checkout starts only when you press the priced purchase button below."
+      : "Authentication attaches the purchase and Launch 100 eligibility to one identity. It does not start Stripe Checkout."}</p>
+  </div>;
 }
 
 function RecoveryCodes({ codes }: { codes: string[] }) {
