@@ -1,13 +1,14 @@
 import { recordFunnelEvent } from "@/lib/db";
 import { getAppUrl } from "@/lib/env";
 import { isFunnelEvent } from "@/lib/funnel-events";
+import { funnelOriginAllowed } from "@/lib/funnel-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<Response> {
   const origin = request.headers.get("origin");
-  if (!origin || origin !== new URL(getAppUrl(request)).origin) {
+  if (!funnelOriginAllowed(origin, getAppUrl(request))) {
     return Response.json({ error: "Same-origin request required." }, { status: 403 });
   }
   try {

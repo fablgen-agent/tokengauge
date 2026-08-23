@@ -34,7 +34,11 @@ export function WorkRequestForm({ initialService }: { initialService: ServiceEnq
       setMessage("Request sent. A suitable project will receive a written scope before any payment request.");
     } catch (error) {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "The request could not be sent.");
+      setMessage(error instanceof TypeError
+        ? "The request could not be sent. Use the email link instead."
+        : error instanceof Error
+          ? error.message
+          : "The request could not be sent. Use the email link instead.");
     }
   }
 

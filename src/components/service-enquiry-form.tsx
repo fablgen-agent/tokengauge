@@ -36,7 +36,11 @@ export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind })
       setMessage("Scope request sent. A suitable project will receive a written reply before any payment request.");
     } catch (error) {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "The request could not be sent.");
+      setMessage(error instanceof TypeError
+        ? "The request could not be sent. Use the email link instead."
+        : error instanceof Error
+          ? error.message
+          : "The request could not be sent. Use the email link instead.");
     }
   }
 
