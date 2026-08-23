@@ -77,7 +77,7 @@ export function MediaCostCalculator() {
           <strong>Reject the request before the provider call when its worst-case cost exceeds the remaining budget.</strong>
           <p>Then reconcile the provider-reported usage or invoice after the call. A catalogue estimate should never silently become the billing authority.</p>
           <div>
-            <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_service_budget_guard">See the fixed £75 implementation scope</Link>
+            <Link className="button button-lime" href="/services/budget-guard" data-funnel-event="cta_media_budget_guard">See the fixed £75 implementation scope</Link>
             <Link className="text-link" href="/guides/autonomous-agent-token-budget">Read the budget-guard pattern <span aria-hidden="true">→</span></Link>
           </div>
         </div>
