@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { accountPlanCallbackUrl } from "@/lib/account-plan";
 import type { AtlasKind, AtlasRecord } from "@/lib/research-atlas";
 
 type AtlasResponse = {
@@ -72,7 +73,7 @@ export function ResearchAtlasBrowser({ pro }: { pro: boolean }) {
       </div>
       {result && result.items.length === 0 ? <p className="empty-state">No research records match those filters.</p> : null}
       {result && result.pageCount > 1 ? <nav className="atlas-pagination" aria-label="Research atlas pages"><button type="button" disabled={result.page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</button><span>Page {result.page} of {result.pageCount}</span><button type="button" disabled={result.page >= result.pageCount} onClick={() => setPage((current) => current + 1)}>Next</button></nav> : null}
-      {!pro ? <div className="atlas-inline-gate"><div><span className="eyebrow">PRO RESEARCH ACCESS</span><h2>{result?.locked.toLocaleString() ?? "2,488"} additional rows stay server-side.</h2><p>The sample is open. Pro unlocks server-filtered access to all 2,500 rows; it does not turn candidates into proven savings or claim that configurations are distinct methods.</p></div><Link className="button button-dark" href="/#pricing">Get launch Pro for £5</Link></div> : null}
+      {!pro ? <div className="atlas-inline-gate"><div><span className="eyebrow">PRO RESEARCH ACCESS</span><h2>{result?.locked.toLocaleString() ?? "2,488"} additional rows stay server-side.</h2><p>The sample is open. Pro unlocks server-filtered access to all 2,500 rows; it does not turn candidates into proven savings or claim that configurations are distinct methods.</p></div><Link className="button button-dark" href={accountPlanCallbackUrl("pro")} data-funnel-event="cta_account">Review Pro access</Link></div> : null}
     </section>
   );
 }

@@ -9,6 +9,10 @@ TokenGauge follows semantic versioning for its public source releases. A release
 - Label ordinary-input fallback whenever cached tokens use a rate card with no separately published cache-read price, including the workload calculator, workflow ledger, and provider-pair comparisons.
 - Keep Pricing Feed v1 null values unchanged and keep zero-cache rows unflagged; no provider rate or canonical workflow CSV field changed.
 
+### Purchase handoff
+
+- Route the free Atlas access gate directly to authoritative Pro account pricing, remove its hard-coded launch price, and record only the existing anonymous aggregate account-intent event.
+
 ## [0.5.0] — 2026-08-23
 
 ### Machine-readable pricing contract
