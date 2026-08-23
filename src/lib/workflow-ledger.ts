@@ -1,4 +1,4 @@
-import type { ModelPrice } from "@/lib/costs";
+import { resolveCacheReadPrice, type CacheRateTreatment, type ModelPrice } from "@/lib/costs";
 
 export const workflowLedgerCsvHeaders = [
   "project",
@@ -37,6 +37,7 @@ export type WorkflowLedgerRowResult = {
   acceptanceRatePercentage: number;
   costPerAcceptedAnswerUsd: number | null;
   nonAcceptedAttemptCostUsd: number;
+  cacheTreatment: CacheRateTreatment;
 };
 
 export type WorkflowLedgerResult = {
@@ -48,6 +49,7 @@ export type WorkflowLedgerResult = {
   acceptanceRatePercentage: number;
   costPerAcceptedAnswerUsd: number | null;
   nonAcceptedAttemptCostUsd: number;
+  cacheFallbackRowCount: number;
   largestWorkflow: WorkflowLedgerRowResult | null;
 };
 
@@ -55,23 +57,27 @@ function finite(value: number): number {
   return Number.isFinite(value) ? Math.max(value, 0) : 0;
 }
 
-function tokenCost(price: ModelPrice, inputTokens: number, cachedInputTokens: number, outputTokens: number): number {
+function tokenCost(price: ModelPrice, inputTokens: number, cachedInputTokens: number, outputTokens: number): {
+  modeledCostUsd: number;
+  cacheTreatment: CacheRateTreatment;
+} {
   const input = finite(inputTokens);
   const cached = Math.min(finite(cachedInputTokens), input);
   const uncached = input - cached;
-  const cacheRate = price.cachedInputPerMillionUsd ?? price.inputPerMillionUsd;
-  return (
+  const cachePrice = resolveCacheReadPrice(price, cached);
+  const modeledCostUsd = (
     uncached * price.inputPerMillionUsd +
-    cached * cacheRate +
+    cached * cachePrice.ratePerMillionUsd +
     finite(outputTokens) * price.outputPerMillionUsd
   ) / 1_000_000;
+  return { modeledCostUsd, cacheTreatment: cachePrice.treatment };
 }
 
 export function calculateWorkflowLedger(inputs: readonly WorkflowLedgerInput[]): WorkflowLedgerResult {
   const rows = inputs.map((input): WorkflowLedgerRowResult => {
     const attempts = Math.trunc(finite(input.attempts));
     const acceptedAnswers = Math.min(Math.trunc(finite(input.acceptedAnswers)), attempts);
-    const modeledCostUsd = tokenCost(input.price, input.inputTokens, input.cachedInputTokens, input.outputTokens);
+    const { modeledCostUsd, cacheTreatment } = tokenCost(input.price, input.inputTokens, input.cachedInputTokens, input.outputTokens);
     const acceptanceRatePercentage = attempts > 0 ? acceptedAnswers / attempts * 100 : 0;
     return {
       id: input.id,
@@ -85,6 +91,7 @@ export function calculateWorkflowLedger(inputs: readonly WorkflowLedgerInput[]):
       acceptanceRatePercentage,
       costPerAcceptedAnswerUsd: acceptedAnswers > 0 ? modeledCostUsd / acceptedAnswers : null,
       nonAcceptedAttemptCostUsd: attempts > 0 ? modeledCostUsd * ((attempts - acceptedAnswers) / attempts) : 0,
+      cacheTreatment,
     };
   });
   const modeledCostUsd = rows.reduce((total, row) => total + row.modeledCostUsd, 0);
@@ -109,6 +116,7 @@ export function calculateWorkflowLedger(inputs: readonly WorkflowLedgerInput[]):
     acceptanceRatePercentage: totalAttempts > 0 ? totalAcceptedAnswers / totalAttempts * 100 : 0,
     costPerAcceptedAnswerUsd: totalAcceptedAnswers > 0 ? modeledCostUsd / totalAcceptedAnswers : null,
     nonAcceptedAttemptCostUsd: rows.reduce((total, row) => total + row.nonAcceptedAttemptCostUsd, 0),
+    cacheFallbackRowCount: rows.filter((row) => row.cacheTreatment === "ordinary-input-fallback").length,
     largestWorkflow,
   };
 }

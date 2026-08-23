@@ -4,6 +4,7 @@ import { modelPrices } from "@/lib/costs";
 import { calculateWorkflowLedger, parseWorkflowLedgerCsv } from "@/lib/workflow-ledger";
 
 const terra = modelPrices.find((price) => price.id === "openai:gpt-5.6-terra:standard:short")!;
+const cohere = modelPrices.find((price) => price.id === "cohere:command-a-03-2025:standard")!;
 
 describe("workflow ledger", () => {
   it("attributes modeled spend and quality-adjusted economics by workflow and project", () => {
@@ -18,8 +19,23 @@ describe("workflow ledger", () => {
     expect(result.acceptanceRatePercentage).toBeCloseTo(86.6667);
     expect(result.costPerAcceptedAnswerUsd).toBeCloseTo(4.44 / 130);
     expect(result.nonAcceptedAttemptCostUsd).toBeCloseTo(.568);
+    expect(result.cacheFallbackRowCount).toBe(0);
+    expect(result.rows.find((row) => row.id === "support")?.cacheTreatment).toBe("published-rate");
+    expect(result.rows.find((row) => row.id === "extract")?.cacheTreatment).toBe("not-used");
     expect(result.largestWorkflow?.workflow).toBe("Support");
     expect(result.projects[0]).toMatchObject({ project: "Product", modeledCostUsd: 2.84 });
+  });
+
+  it("labels ordinary-input fallback only when cached tokens use an unpublished cache rate", () => {
+    const result = calculateWorkflowLedger([
+      { id: "cached", project: "Product", workflow: "Cached search", price: cohere, inputTokens: 1_000_000, cachedInputTokens: 400_000, outputTokens: 0, attempts: 10, acceptedAnswers: 10 },
+      { id: "uncached", project: "Product", workflow: "Fresh search", price: cohere, inputTokens: 1_000_000, cachedInputTokens: 0, outputTokens: 0, attempts: 10, acceptedAnswers: 10 },
+    ]);
+
+    expect(result.modeledCostUsd).toBeCloseTo(2 * cohere.inputPerMillionUsd);
+    expect(result.cacheFallbackRowCount).toBe(1);
+    expect(result.rows.find((row) => row.id === "cached")?.cacheTreatment).toBe("ordinary-input-fallback");
+    expect(result.rows.find((row) => row.id === "uncached")?.cacheTreatment).toBe("not-used");
   });
 
   it("parses the exact portable CSV schema including quoted names", () => {

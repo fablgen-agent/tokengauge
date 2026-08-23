@@ -94,6 +94,21 @@ export type TokenUsage = {
   outputTokens: number;
 };
 
+export type CacheRateTreatment = "not-used" | "published-rate" | "ordinary-input-fallback";
+
+export function resolveCacheReadPrice(price: ModelPrice, cachedInputTokens: number): {
+  ratePerMillionUsd: number;
+  treatment: CacheRateTreatment;
+} {
+  if (Math.max(cachedInputTokens, 0) === 0) {
+    return { ratePerMillionUsd: price.cachedInputPerMillionUsd ?? price.inputPerMillionUsd, treatment: "not-used" };
+  }
+  if (price.cachedInputPerMillionUsd === null) {
+    return { ratePerMillionUsd: price.inputPerMillionUsd, treatment: "ordinary-input-fallback" };
+  }
+  return { ratePerMillionUsd: price.cachedInputPerMillionUsd, treatment: "published-rate" };
+}
+
 export type CacheTtl = "5m" | "1h";
 
 export type CacheEpisodeUsage = {
@@ -151,7 +166,7 @@ export function calculateCostUsd(price: ModelPrice, usage: TokenUsage): number {
     Math.max(usage.inputTokens, 0),
   );
   const uncached = Math.max(usage.inputTokens - cached, 0);
-  const cachedRate = price.cachedInputPerMillionUsd ?? price.inputPerMillionUsd;
+  const { ratePerMillionUsd: cachedRate } = resolveCacheReadPrice(price, cached);
 
   return (
     (uncached * price.inputPerMillionUsd +

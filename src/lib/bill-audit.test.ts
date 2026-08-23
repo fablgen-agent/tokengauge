@@ -43,6 +43,20 @@ describe("bill audit", () => {
     expect(result.cacheRatePublished).toBe(false);
     expect(result.acceptanceRatePercentage).toBe(100);
     expect(result.invoiceVariancePercentage).toBeNull();
+    expect(buildBillAuditReport({
+      providerLabel: withoutCacheRate.providerLabel,
+      modelLabel: withoutCacheRate.label,
+      tierLabel: withoutCacheRate.tierLabel,
+      region: withoutCacheRate.region,
+      snapshotDate: "2026-08-23",
+    }, {
+      inputTokens: 1_000_000,
+      cachedInputTokens: 2_000_000,
+      outputTokens: -1,
+      attempts: 4,
+      acceptedAnswers: 9,
+      reportedBillUsd: 0,
+    }, result)).toContain("No published cache-read rate; cached input conservatively priced as ordinary input");
   });
 
   it("builds a bounded plain-text handoff without prompts or outputs", () => {

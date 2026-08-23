@@ -54,13 +54,13 @@ export const providerPageProfiles: readonly ProviderPageProfile[] = [
     id: "mistral",
     searchName: "Mistral AI",
     description: "Estimate Mistral API input and output token costs from a dated, official-source pricing snapshot.",
-    billingNote: "A missing cache rate is displayed as unavailable, not zero. The calculator falls back to the normal input price whenever no separate cache-read rate is published.",
+    billingNote: "Current cards retain the published cache-read rate separately from ordinary input. Confirm the linked pricing scope before treating a modeled warm-cache share as a realized cache hit.",
   },
   {
     id: "cohere",
     searchName: "Cohere Command",
     description: "Compare Cohere Command API input, output, context, and documented pricing scopes with source provenance attached.",
-    billingNote: "Cards marked for manual review retain their provenance note. Confirm the linked provider page before making a production commitment when a provider's pricing surfaces disagree.",
+    billingNote: "Cards marked for manual review retain their provenance note. A missing cache rate is unavailable, not zero; calculators label any ordinary-input fallback used for cached tokens. Confirm the linked provider page before a production commitment.",
   },
 ];
 

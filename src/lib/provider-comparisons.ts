@@ -48,7 +48,7 @@ export const providerComparisons: readonly ProviderComparison[] = [
     right: "cohere",
     searchTitle: "Mistral vs Cohere API pricing",
     description: "Compare Mistral and Cohere API rates with the same workload plus separate retry, quality, observed p95 latency, and required client-check assumptions.",
-    billingCaveat: "A missing cache rate means no separate published cache-read price was captured; it does not mean cached input is free. Review manual-verification notes before production decisions.",
+    billingCaveat: "A missing cache rate means no separate published cache-read price was captured; it does not mean cached input is free. When cached tokens are entered, the comparison labels its ordinary-input fallback as a conservative placeholder rather than a provider cache price.",
   },
 ];
 

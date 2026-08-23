@@ -2,6 +2,13 @@
 
 TokenGauge follows semantic versioning for its public source releases. A release describes shipped behavior; it is not a claim of customer adoption, savings, or provider endorsement.
 
+## Unreleased
+
+### Pricing-model transparency
+
+- Label ordinary-input fallback whenever cached tokens use a rate card with no separately published cache-read price, including the workload calculator, workflow ledger, and provider-pair comparisons.
+- Keep Pricing Feed v1 null values unchanged and keep zero-cache rows unflagged; no provider rate or canonical workflow CSV field changed.
+
 ## [0.5.0] — 2026-08-23
 
 ### Machine-readable pricing contract
