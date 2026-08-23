@@ -102,8 +102,14 @@ export function AccountPanel({ compact = false, targetPlan = "pro" }: { compact?
         </div>
       ) : (
         <div className="checkout-stack">
-          <Link className="button button-lime" href={accountHref} data-funnel-event="cta_account">{account?.accountSystemReady ? `Continue to ${target.name}` : "TokenGauge account"}</Link>
-          <small>{account?.accountSystemReady ? `Continue with ChatGPT or verified email before ${target.name} checkout` : "ChatGPT sign-in is available"}</small>
+          <Link className="button button-lime" href={accountHref} data-funnel-event="cta_account">
+            {account?.accountSystemReady === false ? `Continue to ${target.name} with ChatGPT` : `Continue to ${target.name}`}
+          </Link>
+          <small>
+            {account?.accountSystemReady === false
+              ? `Continue with ChatGPT before ${target.name} checkout`
+              : `Continue with ChatGPT or verified email before ${target.name} checkout`}
+          </small>
         </div>
       )}
       {error ? <p className="form-error" role="alert">{error}</p> : null}
