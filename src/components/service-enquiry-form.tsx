@@ -16,9 +16,10 @@ export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind })
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus("sending");
     setMessage("");
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const payload = Object.fromEntries(form.entries());
     try {
       const response = await fetch("/api/service-enquiry", {
@@ -29,7 +30,7 @@ export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind })
       });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error || "The request could not be sent.");
-      event.currentTarget.reset();
+      formElement.reset();
       setStatus("sent");
       setMessage("Scope request sent. A suitable project will receive a written reply before any payment request.");
     } catch (error) {
