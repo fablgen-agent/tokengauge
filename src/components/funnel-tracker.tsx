@@ -25,7 +25,8 @@ const routeEvents: Array<[string, FunnelEvent]> = [
   ["/work", "view_work_request"],
 ];
 
-function routeEvent(pathname: string): FunnelEvent | undefined {
+export function routeEvent(pathname: string, hostname = ""): FunnelEvent | undefined {
+  if (hostname === "work.enby.fish" && pathname === "/") return "view_work_request";
   if (pathname === "/") return "view_home";
   if (pathname === "/pricing/changes") return "view_pricing_changes";
   if (pathname.startsWith("/pricing/")) return "view_provider_pricing";
@@ -52,7 +53,7 @@ export function FunnelTracker() {
   }, [pathname]);
 
   useEffect(() => {
-    const event = routeEvent(pathname);
+    const event = routeEvent(pathname, window.location.hostname);
     if (!event) return;
     if (funnelMeasurementDisabled()) return;
     const marker = `tokengauge:funnel:${event}`;
