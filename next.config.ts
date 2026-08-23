@@ -3,6 +3,29 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/",
+          has: [{ type: "host", value: "work.enby.fish" }],
+          destination: "/work",
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
+  async redirects() {
+    return [
+      {
+        source: "/work",
+        has: [{ type: "host", value: "work.enby.fish" }],
+        destination: "https://work.enby.fish/",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
