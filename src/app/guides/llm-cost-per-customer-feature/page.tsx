@@ -52,7 +52,7 @@ export default function LlmCostAttributionGuidePage() {
       description: metadata.description,
       url: canonicalUrl,
       datePublished: "2026-08-16",
-      dateModified: "2026-08-16",
+      dateModified: priceSnapshotDate,
       author: { "@type": "Organization", name: "TokenGauge" },
       publisher: { "@type": "Organization", name: "TokenGauge" },
     },
