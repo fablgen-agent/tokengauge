@@ -12,15 +12,24 @@ import {
   getSelectableModelPrices,
   modelPrices,
   priceProviders,
+  resolveCacheReadPrice,
   resolvePriceForInput,
 } from "./costs";
 
 describe("cost calculations", () => {
   const terra = modelPrices.find((model) => model.id === "openai:gpt-5.6-terra:standard:short")!;
   const terraLong = modelPrices.find((model) => model.id === "openai:gpt-5.6-terra:standard:long")!;
+  const cohere = modelPrices.find((model) => model.id === "cohere:command-a-03-2025:standard")!;
 
   it("prices cached and uncached input separately", () => {
     expect(calculateCostUsd(terraLong, { inputTokens: 1_000_000, cachedInputTokens: 400_000, outputTokens: 100_000 })).toBeCloseTo(4.36, 8);
+  });
+
+  it("uses ordinary-input pricing when cached tokens have no published cache-read rate", () => {
+    expect(calculateCostUsd(cohere, { inputTokens: 100_000, cachedInputTokens: 40_000, outputTokens: 0 })).toBeCloseTo(cohere.inputPerMillionUsd / 10);
+    expect(resolveCacheReadPrice(cohere, 40_000).treatment).toBe("ordinary-input-fallback");
+    expect(resolveCacheReadPrice(cohere, 0).treatment).toBe("not-used");
+    expect(resolveCacheReadPrice(terra, 40_000).treatment).toBe("published-rate");
   });
 
   it("preserves provider precision for sub-cent rates", () => {

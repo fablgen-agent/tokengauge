@@ -53,7 +53,7 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
     const baselinePrice = resolvePriceForInput(selectedPrice, inputTokens);
     const optimizedPrice = resolvePriceForInput(selectedPrice, optimizedInput);
     if (!baselinePrice || !optimizedPrice) {
-      return { baseline: 0, optimized: 0, amountUsd: 0, percentage: 0, baselinePrice: selectedPrice, optimizedPrice: selectedPrice, error: `The entered input does not fit ${selectedPrice.label}'s published context or price bands.` };
+      return { baseline: 0, optimized: 0, amountUsd: 0, percentage: 0, baselinePrice: selectedPrice, optimizedPrice: selectedPrice, optimizedCachedInputTokens: 0, error: `The entered input does not fit ${selectedPrice.label}'s published context or price bands.` };
     }
     const baseline = calls * calculateCostUsd(baselinePrice, { inputTokens, outputTokens, cachedInputTokens: 0 });
     const optimized = calls * calculateCostUsd(optimizedPrice, {
@@ -61,7 +61,8 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
       cachedInputTokens: Math.round(optimizedInput * (cachedShare / 100)),
       outputTokens: optimizedOutput,
     });
-    return { baseline, optimized, baselinePrice, optimizedPrice, error: undefined, ...calculateSavings(baseline, optimized) };
+    const optimizedCachedInputTokens = Math.round(optimizedInput * (cachedShare / 100));
+    return { baseline, optimized, baselinePrice, optimizedPrice, optimizedCachedInputTokens, error: undefined, ...calculateSavings(baseline, optimized) };
   }, [calls, cachedShare, defaultModel, inputReduction, inputTokens, outputReduction, outputTokens, priceId, selectableModels]);
 
   const baselineAcceptedCost = result.error ? null : calculateCostPerAcceptedAnswer(result.baseline, calls, baselinePassRate);
@@ -72,6 +73,7 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
   const breakEvenPassRate = result.error
     ? null
     : calculateBreakEvenAcceptanceRate(result.baseline, result.optimized, baselinePassRate);
+  const cacheFallbackApplied = !result.error && result.optimizedCachedInputTokens > 0 && result.optimizedPrice.cachedInputPerMillionUsd === null;
 
   return (
     <div className="calculator-shell">
@@ -126,7 +128,7 @@ export function CostCalculator({ providerId }: { providerId?: ProviderId } = {})
             </p>
           </div>
         ) : null}</>}
-        <p>Warm cache-read scenario, not general ROI. It excludes cache writes/storage, tools, regional uplifts, retries, and quality failures. A dash means no published cache-read rate.</p>
+        <p>{cacheFallbackApplied ? "No separate cache-read rate is published for the selected after card, so its cached tokens are priced as ordinary input. This is a conservative placeholder, not a provider cache price. " : "Warm cache-read scenario, not general ROI. "}It excludes cache writes/storage, tools, regional uplifts, retries, and quality failures. A dash means no published cache-read rate.</p>
         <a className="rate-source" href={result.baselinePrice.sourceUrl} target="_blank" rel="noreferrer">{result.baselinePrice.sourceLabel} ↗</a>
         <div className="calculator-next-step">
           <span className="eyebrow">NEXT STEP</span>

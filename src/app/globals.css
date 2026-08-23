@@ -193,6 +193,7 @@ input[type="range"] { accent-color: var(--ink); }
 .ledger-attribution-grid article div:last-child { align-items: flex-end; text-align: right; }
 .ledger-attribution-grid article b { font: 12px/1 var(--font-geist-mono), monospace; }
 .ledger-caveat { margin: 28px 0 0; padding: 14px 16px; color: #c4cecb; background: rgba(255,255,255,.06); font-size: 11px; line-height: 1.55; }
+.ledger-caveat strong { color: #f4f7f5; }
 .ledger-source-section { background: #e9eee7; }
 .ledger-source-section .audit-explainer article a { color: #2c624d; font-size: 12px; font-weight: 750; }
 

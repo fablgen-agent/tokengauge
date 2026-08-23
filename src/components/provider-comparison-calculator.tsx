@@ -10,6 +10,8 @@ import {
   formatUsd,
   getSelectableModelPrices,
   resolvePriceForInput,
+  resolveCacheReadPrice,
+  type CacheRateTreatment,
   type ModelPrice,
   type ProviderId,
 } from "@/lib/costs";
@@ -94,17 +96,19 @@ export function ProviderComparisonCalculator({ leftId, rightId }: { leftId: Prov
   );
 }
 
-type Scenario = { price: ModelPrice; monthlyCost: number; acceptedCost: number | null; billedAttempts: number; meetsLatencyCeiling: boolean; compatibility: ReturnType<typeof calculateCompatibilityGate>; error?: string };
+type Scenario = { price: ModelPrice; monthlyCost: number; acceptedCost: number | null; billedAttempts: number; meetsLatencyCeiling: boolean; compatibility: ReturnType<typeof calculateCompatibilityGate>; cacheTreatment: CacheRateTreatment; error?: string };
 
 function priceScenario(selected: ModelPrice, calls: number, inputTokens: number, outputTokens: number, cachedShare: number, passRate: number, retryOverhead: number, observedP95LatencyMs: number, latencyCeilingMs: number, requiredCompatibilityChecks: number, passedCompatibilityChecks: number): Scenario {
   const price = resolvePriceForInput(selected, inputTokens);
   const compatibility = calculateCompatibilityGate(requiredCompatibilityChecks, passedCompatibilityChecks);
-  if (!price) return { price: selected, monthlyCost: 0, acceptedCost: null, billedAttempts: 0, meetsLatencyCeiling: false, compatibility, error: `${selected.label} does not cover the entered input size in its published price bands.` };
+  if (!price) return { price: selected, monthlyCost: 0, acceptedCost: null, billedAttempts: 0, meetsLatencyCeiling: false, compatibility, cacheTreatment: "not-used", error: `${selected.label} does not cover the entered input size in its published price bands.` };
+  const cachedInputTokens = Math.round(inputTokens * cachedShare / 100);
+  const cacheTreatment = resolveCacheReadPrice(price, cachedInputTokens).treatment;
   const operational = calculateOperationalCostScenario({
     tasks: calls,
     costPerAttemptUsd: calculateCostUsd(price, {
     inputTokens,
-    cachedInputTokens: Math.round(inputTokens * cachedShare / 100),
+    cachedInputTokens,
     outputTokens,
     }),
     retryOverheadPercentage: retryOverhead,
@@ -112,7 +116,7 @@ function priceScenario(selected: ModelPrice, calls: number, inputTokens: number,
     observedP95LatencyMs,
     latencyCeilingMs,
   });
-  return { price, monthlyCost: operational.monthlyCostUsd, acceptedCost: operational.costPerAcceptedAnswerUsd, billedAttempts: operational.billedAttempts, meetsLatencyCeiling: operational.meetsLatencyCeiling, compatibility };
+  return { price, monthlyCost: operational.monthlyCostUsd, acceptedCost: operational.costPerAcceptedAnswerUsd, billedAttempts: operational.billedAttempts, meetsLatencyCeiling: operational.meetsLatencyCeiling, compatibility, cacheTreatment };
 }
 
 function ModelField({ label, prices, value, onChange }: { label: string; prices: readonly ModelPrice[]; value: string; onChange: (value: string) => void }) {
@@ -128,7 +132,7 @@ function RangeField({ label, value, min, max, onChange }: { label: string; value
 }
 
 function ResultCard({ result, passRate, retryOverhead, p95Latency, latencyCeiling }: { result: Scenario; passRate: number; retryOverhead: number; p95Latency: number; latencyCeiling: number }) {
-  return <article><span>{result.price.providerLabel}</span><h3>{result.price.label}</h3><small>{result.price.tierLabel} · {result.price.region}</small><dl><div><dt>Monthly API spend</dt><dd>{formatUsd(result.monthlyCost)}</dd></div><div><dt>Estimated billed attempts</dt><dd>{Math.round(result.billedAttempts).toLocaleString()}</dd></div><div><dt>Cost / accepted answer</dt><dd>{result.acceptedCost === null ? "—" : formatAcceptedUsd(result.acceptedCost)}</dd></div><div><dt>Quality / retry</dt><dd>{passRate}% / +{retryOverhead}%</dd></div><div><dt>Observed p95 / ceiling</dt><dd>{p95Latency.toLocaleString()} / {latencyCeiling.toLocaleString()} ms</dd></div><div><dt>Latency gate</dt><dd>{result.meetsLatencyCeiling ? "Meets" : "Misses"}</dd></div><div><dt>Client checks</dt><dd>{result.compatibility.applied ? `${result.compatibility.passedChecks}/${result.compatibility.requiredChecks} · ${result.compatibility.meetsRequirement ? "Meets" : "Misses"}` : "Not applied"}</dd></div></dl><p>{formatRate(result.price.inputPerMillionUsd)} input · {formatRate(result.price.cachedInputPerMillionUsd)} cache read · {formatRate(result.price.outputPerMillionUsd)} output / 1M</p><a href={result.price.sourceUrl} target="_blank" rel="noreferrer">Official source ↗</a></article>;
+  return <article><span>{result.price.providerLabel}</span><h3>{result.price.label}</h3><small>{result.price.tierLabel} · {result.price.region}</small><dl><div><dt>Monthly API spend</dt><dd>{formatUsd(result.monthlyCost)}</dd></div><div><dt>Estimated billed attempts</dt><dd>{Math.round(result.billedAttempts).toLocaleString()}</dd></div><div><dt>Cost / accepted answer</dt><dd>{result.acceptedCost === null ? "—" : formatAcceptedUsd(result.acceptedCost)}</dd></div><div><dt>Quality / retry</dt><dd>{passRate}% / +{retryOverhead}%</dd></div><div><dt>Observed p95 / ceiling</dt><dd>{p95Latency.toLocaleString()} / {latencyCeiling.toLocaleString()} ms</dd></div><div><dt>Latency gate</dt><dd>{result.meetsLatencyCeiling ? "Meets" : "Misses"}</dd></div><div><dt>Client checks</dt><dd>{result.compatibility.applied ? `${result.compatibility.passedChecks}/${result.compatibility.requiredChecks} · ${result.compatibility.meetsRequirement ? "Meets" : "Misses"}` : "Not applied"}</dd></div></dl><p>{formatRate(result.price.inputPerMillionUsd)} input · {formatRate(result.price.cachedInputPerMillionUsd)} cache read · {formatRate(result.price.outputPerMillionUsd)} output / 1M</p>{result.cacheTreatment === "ordinary-input-fallback" ? <p><strong>Cache price unavailable:</strong> cached tokens use ordinary-input pricing as a conservative placeholder, not a provider cache price.</p> : null}<a href={result.price.sourceUrl} target="_blank" rel="noreferrer">Official source ↗</a></article>;
 }
 
 function formatAcceptedUsd(value: number): string {
