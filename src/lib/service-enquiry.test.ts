@@ -13,6 +13,7 @@ const valid = {
   timing: "This month",
   website: "",
   startedAt: now - 5_000,
+  measurementOff: false,
 };
 
 describe("service enquiry validation", () => {
@@ -30,5 +31,10 @@ describe("service enquiry validation", () => {
   it("rejects oversized and control-character fields", () => {
     expect(parseServiceEnquiry({ ...valid, stack: "x".repeat(121) }, now).success).toBe(false);
     expect(parseServiceEnquiry({ ...valid, provider: "OpenAI\u0000bcc" }, now).success).toBe(false);
+  });
+
+  it("accepts only an explicit measurement opt-out", () => {
+    expect(parseServiceEnquiry({ ...valid, measurementOff: true }, now)).toMatchObject({ success: true, data: { measurementOff: true } });
+    expect(parseServiceEnquiry({ ...valid, measurementOff: "true" }, now)).toMatchObject({ success: true, data: { measurementOff: false } });
   });
 });
