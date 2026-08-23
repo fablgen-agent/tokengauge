@@ -16,6 +16,11 @@ describe("funnel events", () => {
     expect(isFunnelEvent("cta_service_budget_guard_github")).toBe(true);
   });
 
+  it("accepts the portfolio work-desk view and aggregate success", () => {
+    expect(isFunnelEvent("view_work_request")).toBe(true);
+    expect(isFunnelEvent("service_portfolio_enquiry_sent")).toBe(true);
+  });
+
   it("rejects arbitrary event names", () => {
     expect(isFunnelEvent("cta_service_attribution_customer_123")).toBe(false);
     expect(isFunnelEvent("cta_service_budget_guard_customer_123")).toBe(false);
