@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: origin, lastModified: pricingLastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${origin}/pricing`, lastModified: pricingLastModified, changeFrequency: "weekly", priority: .95 },
+    { url: `${origin}/pricing/media`, lastModified: new Date("2026-08-23T00:00:00Z"), changeFrequency: "weekly", priority: .94 },
     { url: `${origin}/pricing/changes`, lastModified: pricingLastModified, changeFrequency: "weekly", priority: .92 },
     { url: `${origin}/audit`, lastModified: pricingLastModified, changeFrequency: "weekly", priority: .95 },
     { url: `${origin}/ledger`, lastModified: pricingLastModified, changeFrequency: "weekly", priority: .95 },
