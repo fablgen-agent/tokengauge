@@ -11,9 +11,14 @@ describe("funnel events", () => {
 
   it("accepts each privacy-safe budget-guard conversion step", () => {
     expect(isFunnelEvent("cta_budget_guide_service")).toBe(true);
+    expect(isFunnelEvent("cta_media_budget_guard")).toBe(true);
     expect(isFunnelEvent("cta_service_budget_guard_email")).toBe(true);
     expect(isFunnelEvent("cta_service_budget_guard_telegram")).toBe(true);
     expect(isFunnelEvent("cta_service_budget_guard_github")).toBe(true);
+  });
+
+  it("accepts the media-pricing view without attaching visitor data", () => {
+    expect(isFunnelEvent("view_pricing_media")).toBe(true);
   });
 
   it("accepts the portfolio work-desk view and aggregate success", () => {

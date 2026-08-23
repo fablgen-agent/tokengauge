@@ -8,6 +8,7 @@ import { funnelMeasurementDisabled } from "@/lib/funnel-preference";
 
 const routeEvents: Array<[string, FunnelEvent]> = [
   ["/pricing/changes", "view_pricing_changes"],
+  ["/pricing/media", "view_pricing_media"],
   ["/pricing", "view_pricing"],
   ["/compare", "view_compare"],
   ["/atlas", "view_atlas"],
@@ -29,6 +30,7 @@ export function routeEvent(pathname: string, hostname = ""): FunnelEvent | undef
   if (hostname === "work.enby.fish" && pathname === "/") return "view_work_request";
   if (pathname === "/") return "view_home";
   if (pathname === "/pricing/changes") return "view_pricing_changes";
+  if (pathname === "/pricing/media") return "view_pricing_media";
   if (pathname.startsWith("/pricing/")) return "view_provider_pricing";
   return routeEvents.find(([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`))?.[1];
 }
