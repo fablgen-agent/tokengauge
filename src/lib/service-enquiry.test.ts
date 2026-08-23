@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseServiceEnquiry, portfolioServiceOptions } from "./service-enquiry";
+import { parseServiceEnquiry, portfolioServiceOptions, serviceEnquiryCopy, serviceEnquiryKinds } from "./service-enquiry";
 
 const now = 1_800_000_000_000;
 const valid = {
@@ -70,5 +70,29 @@ describe("service enquiry validation", () => {
       expect(option.scopeUrl).toMatch(/^https:\/\//);
     }
     expect(portfolioServiceOptions.find((option) => option.id === "other")?.scopeUrl).toBeUndefined();
+  });
+
+  it("gives every service lane complete, bounded intake copy", () => {
+    expect(Object.keys(serviceEnquiryCopy).sort()).toEqual([...serviceEnquiryKinds].sort());
+    for (const copy of Object.values(serviceEnquiryCopy)) {
+      expect(copy.stackLabel.length).toBeGreaterThan(3);
+      expect(copy.providerLabel.length).toBeGreaterThan(3);
+      expect(copy.summaryPlaceholder.length).toBeGreaterThan(20);
+      expect(copy.acceptancePlaceholder.length).toBeGreaterThan(20);
+    }
+  });
+
+  it("asks form-repair buyers for delivery evidence instead of a model provider", () => {
+    const copy = serviceEnquiryCopy.static_form;
+    expect(copy.providerLabel).toBe("Current delivery route or Inspector rule");
+    expect(copy.providerPlaceholder).toContain("cancelled-submit-without-delivery");
+    expect(`${copy.stackLabel} ${copy.providerLabel} ${copy.summaryLabel}`).not.toMatch(/model provider/i);
+    expect(copy.acceptanceRequired).toBe(true);
+  });
+
+  it("keeps AI-service intake specific to model usage", () => {
+    expect(serviceEnquiryCopy.attribution.providerLabel).toBe("Model provider");
+    expect(serviceEnquiryCopy.budget_guard.summaryLabel).toBe("Requested budget boundary");
+    expect(serviceEnquiryCopy.attribution.acceptanceRequired).toBe(false);
   });
 });
