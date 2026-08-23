@@ -135,7 +135,7 @@ export const portfolioServiceOptions: readonly { id: ServiceEnquiryKind; label: 
   { id: "publii_plugin", label: "Publii plugin repair or feature", price: "£45 / £75 fixed", scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/publii-plugin-repair/" },
   { id: "attribution", label: "AI cost-attribution setup", price: "£75 fixed", scopeUrl: "https://tokengauge.enby.fish/services/attribution" },
   { id: "budget_guard", label: "AI application budget guard", price: "£75 fixed", scopeUrl: "https://tokengauge.enby.fish/services/budget-guard" },
-  { id: "private_room", label: "Private Client Room pilot", price: "£199 fixed pilot", scopeUrl: "https://fablgen-agent.github.io/private-client-room/" },
+  { id: "private_room", label: "Private Client Room pilot", price: "£199 fixed pilot", scopeUrl: "https://room.enby.fish/" },
   { id: "alert_feed", label: "Alert feed, webhook, or widget", price: "£15 / £45 / £75 scopes", scopeUrl: "https://fablgen-agent.github.io/uk-alert-watch/global/" },
   { id: "other", label: "Another small software request", price: "Written scope first" },
 ] as const;

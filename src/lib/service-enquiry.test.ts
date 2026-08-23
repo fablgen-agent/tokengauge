@@ -62,6 +62,10 @@ describe("service enquiry validation", () => {
     });
   });
 
+  it("points the private-room scope at its branded origin", () => {
+    expect(portfolioServiceOptions.find((option) => option.id === "private_room")?.scopeUrl).toBe("https://room.enby.fish/");
+  });
+
   it("gives every published fixed-scope card an explicit HTTPS boundary", () => {
     const published = portfolioServiceOptions.filter((option) => option.id !== "other");
     expect(published).toHaveLength(9);
