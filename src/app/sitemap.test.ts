@@ -9,7 +9,7 @@ import sitemap from "./sitemap";
 describe("sitemap pricing freshness", () => {
   it("uses the current pricing snapshot date for every pricing-backed route", () => {
     const entries = sitemap();
-    const origin = "http://127.0.0.1:3000";
+    const origin = entries[0].url.replace(/\/$/, "");
     const expectedDate = `${priceSnapshotDate}T00:00:00.000Z`;
     const pricingBackedUrls = [
       origin,
