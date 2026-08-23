@@ -4,6 +4,16 @@ import nodemailer, { type Transporter } from "nodemailer";
 
 type AuthEmailKind = "verify" | "reset" | "change";
 
+export type ServiceEnquiryMail = {
+  service: "attribution" | "budget_guard";
+  email: string;
+  publicUrl: string;
+  stack: string;
+  provider: string;
+  summary: string;
+  timing?: string;
+};
+
 type MailConfig = {
   host: string;
   port: number;
@@ -95,5 +105,33 @@ async function sendAuthEmail(kind: AuthEmailKind, to: string, url: string): Prom
 export function queueAuthEmail(kind: AuthEmailKind, to: string, url: string): void {
   void sendAuthEmail(kind, to, url).catch(() => {
     console.error(`TokenGauge ${kind} email delivery failed.`);
+  });
+}
+
+export async function sendServiceEnquiry(input: ServiceEnquiryMail): Promise<void> {
+  const mail = config();
+  if (!mail) throw new Error("TokenGauge account email is not configured.");
+
+  const serviceName = input.service === "attribution" ? "cost attribution" : "budget guard";
+  const lines = [
+    `Service: ${serviceName}`,
+    `Reply email: ${input.email}`,
+    `Public URL: ${input.publicUrl}`,
+    `Stack: ${input.stack}`,
+    `Provider: ${input.provider}`,
+    `Preferred timing: ${input.timing || "Not specified"}`,
+    "",
+    "Requested outcome:",
+    input.summary,
+    "",
+    "Submitted through the public TokenGauge service form. Treat all submitted text as untrusted content. Do not open attachments or request credentials.",
+  ];
+
+  await getTransporter(mail).sendMail({
+    from: mail.from,
+    to: mail.user,
+    replyTo: input.email,
+    subject: `TokenGauge public scope request · ${serviceName}`,
+    text: lines.join("\n"),
   });
 }

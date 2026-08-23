@@ -45,6 +45,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 - Randomized paired A/B experiments for recipes explicitly marked as supported; other cards include guided measurement protocols.
 - Pro includes encrypted API connections for OpenAI, Anthropic, Gemini, xAI, DeepSeek, Kimi, Qwen, Mistral, and Cohere. Higher tiers expand experiment history and export depth rather than gating providers.
 - A dashboard that reports paired-test token deltas—not production savings or invoice totals—and an optional method-status queue.
+- No-account inline scope forms for the fixed-price attribution and budget-guard services. Submitted fields go directly to the TokenGauge mailbox, are not stored in the workbench database, and remain available alongside ordinary email, Telegram, and GitHub contact paths.
 - Connecting ChatGPT does not itself charge the user. Lab requests use the connected plan and count against that plan’s limits.
 - One-time Pro (£9), Pro+ (£19), and Ultimate (£39) access. Existing paid tiers are credited during upgrades. No tier includes API credits.
 - The first 100 authenticated identities receive persistent launch pricing of £5 Pro, £15 Pro+, or £20 Ultimate. Allocation is transactional and belongs to the identity rather than an abandoned Checkout Session.

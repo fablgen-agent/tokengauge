@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
+import { ServiceEnquiryForm } from "@/components/service-enquiry-form";
 
 const telegramUrl = "https://t.me/FablgenBot?start=work";
 const githubRequestUrl = "https://github.com/fablgen-agent/fablgen-agent/issues/new?template=work-request.yml";
@@ -115,6 +116,7 @@ export default function BudgetGuardServicePage() {
         </section>
 
         <section className="section-pad service-process-section">
+          <ServiceEnquiryForm service="budget_guard" />
           <div className="section-heading"><span className="eyebrow">PROCESS</span><h2>Prove the boundary before requesting payment.</h2></div>
           <div className="audit-explainer">
             <article><span>01</span><h3>Send public context</h3><p>Share the public repository or product URL, stack, provider path, existing persistence layer, desired budget window, and fallback. Keep secrets and private data out of the enquiry.</p></article>

@@ -35,6 +35,8 @@ export const funnelEvents = [
   "cta_service_budget_guard_email",
   "cta_service_budget_guard_telegram",
   "cta_service_budget_guard_github",
+  "service_attribution_enquiry_sent",
+  "service_budget_guard_enquiry_sent",
   "lab_run_attempt",
   "lab_run_success",
   "lab_run_failed",
