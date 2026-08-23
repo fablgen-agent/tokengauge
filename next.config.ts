@@ -11,6 +11,16 @@ const nextConfig: NextConfig = {
           has: [{ type: "host", value: "work.enby.fish" }],
           destination: "/work",
         },
+        {
+          source: "/robots.txt",
+          has: [{ type: "host", value: "work.enby.fish" }],
+          destination: "/work-robots.txt",
+        },
+        {
+          source: "/sitemap.xml",
+          has: [{ type: "host", value: "work.enby.fish" }],
+          destination: "/work-sitemap.xml",
+        },
       ],
       afterFiles: [],
       fallback: [],

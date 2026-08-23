@@ -29,4 +29,13 @@ describe("sitemap pricing freshness", () => {
       expect(new Date(entry!.lastModified!).toISOString(), url).toBe(expectedDate);
     }
   });
+
+  it("contains only TokenGauge-hosted URLs", () => {
+    const entries = sitemap();
+    const origin = new URL(entries[0].url).origin;
+
+    expect(entries).not.toHaveLength(0);
+    expect(entries.every((entry) => new URL(entry.url).origin === origin)).toBe(true);
+    expect(entries.some((entry) => entry.url.includes("work.enby.fish"))).toBe(false);
+  });
 });
