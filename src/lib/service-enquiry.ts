@@ -7,6 +7,7 @@ export const serviceEnquiryKinds = [
   "publii_theme",
   "publii_plugin",
   "private_room",
+  "private_team_threads",
   "alert_feed",
   "other",
 ] as const;
@@ -105,6 +106,16 @@ export const serviceEnquiryCopy: Record<ServiceEnquiryKind, ServiceEnquiryCopy> 
     acceptancePlaceholder: "List the login, message, backup, and owner-admin checks that will prove the pilot works.",
     acceptanceRequired: true,
   },
+  private_team_threads: {
+    stackLabel: "Customer-controlled deployment target",
+    stackPlaceholder: "For example, a fresh Ubuntu 24.04 x86_64 VM",
+    providerLabel: "Public hostname, SMTP, and access route",
+    providerPlaceholder: "For example, owned public DNS, inbound 80/443, Certbot, and customer SMTP",
+    summaryLabel: "Requested threaded-team workflow",
+    summaryPlaceholder: "Describe the initial accounts, private channels, guests, and topic-resolution workflow you need.",
+    acceptancePlaceholder: "List the member/guest boundary, topic resolution, SMTP, backup, and owner-admin checks that must pass.",
+    acceptanceRequired: true,
+  },
   alert_feed: {
     stackLabel: "Consumer stack",
     stackPlaceholder: "For example, a static site, Slack-compatible webhook, or RSS reader",
@@ -136,6 +147,7 @@ export const portfolioServiceOptions: readonly { id: ServiceEnquiryKind; label: 
   { id: "attribution", label: "AI cost-attribution setup", price: "£75 fixed", scopeUrl: "https://tokengauge.enby.fish/services/attribution" },
   { id: "budget_guard", label: "AI application budget guard", price: "£75 fixed", scopeUrl: "https://tokengauge.enby.fish/services/budget-guard" },
   { id: "private_room", label: "Private Client Room pilot", price: "£199 fixed pilot", scopeUrl: "https://room.enby.fish/" },
+  { id: "private_team_threads", label: "Private Team Threads pilot", price: "£199 fixed pilot", scopeUrl: "https://threads.enby.fish/" },
   { id: "alert_feed", label: "Alert feed, webhook, or widget", price: "£15 / £45 / £75 scopes", scopeUrl: "https://fablgen-agent.github.io/uk-alert-watch/global/" },
   { id: "other", label: "Another small software request", price: "Written scope first" },
 ] as const;

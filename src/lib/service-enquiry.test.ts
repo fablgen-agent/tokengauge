@@ -66,9 +66,20 @@ describe("service enquiry validation", () => {
     expect(portfolioServiceOptions.find((option) => option.id === "private_room")?.scopeUrl).toBe("https://room.enby.fish/");
   });
 
+  it("keeps the threaded-team offer separate from the Matrix room", () => {
+    expect(portfolioServiceOptions.find((option) => option.id === "private_team_threads")).toEqual({
+      id: "private_team_threads",
+      label: "Private Team Threads pilot",
+      price: "£199 fixed pilot",
+      scopeUrl: "https://threads.enby.fish/",
+    });
+    expect(serviceEnquiryCopy.private_team_threads.summaryPlaceholder).toMatch(/topic-resolution/i);
+    expect(serviceEnquiryCopy.private_team_threads.acceptanceRequired).toBe(true);
+  });
+
   it("gives every published fixed-scope card an explicit HTTPS boundary", () => {
     const published = portfolioServiceOptions.filter((option) => option.id !== "other");
-    expect(published).toHaveLength(9);
+    expect(published).toHaveLength(10);
     expect(new Set(published.map((option) => option.scopeUrl)).size).toBe(published.length);
     for (const option of published) {
       expect(option.scopeUrl).toMatch(/^https:\/\//);

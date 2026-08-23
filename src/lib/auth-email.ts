@@ -122,6 +122,7 @@ export async function sendServiceEnquiry(input: ServiceEnquiryMail): Promise<voi
     publii_theme: "Publii theme customization",
     publii_plugin: "Publii plugin repair or feature",
     private_room: "Private Client Room pilot",
+    private_team_threads: "Private Team Threads pilot",
     alert_feed: "alert feed, webhook, or widget",
     other: "other small software request",
   } as const)[input.service];
