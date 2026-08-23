@@ -454,11 +454,13 @@ input[type="range"] { accent-color: var(--ink); }
 .work-hero aside p { font-size: 12px; }
 .work-scope { padding-top: 90px; padding-bottom: 95px; }
 .work-scope-grid { margin-top: 40px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); }
-.work-scope-grid article { min-height: 150px; padding: 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: white; }
+.work-scope-grid article { min-height: 190px; padding: 24px; display: flex; flex-direction: column; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: white; }
 .work-scope-grid article:nth-child(4n) { border-right: 0; }
 .work-scope-grid article:nth-last-child(-n+4) { border-bottom: 0; }
 .work-scope-grid span { color: #914633; font: 10px/1.4 var(--font-geist-mono), monospace; }
-.work-scope-grid h3 { margin: 34px 0 0; font-size: 20px; letter-spacing: -.035em; }
+.work-scope-grid h3 { margin: 34px 0 18px; font-size: 20px; letter-spacing: -.035em; }
+.work-scope-grid article > a { min-height: 44px; margin-top: auto; display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ink); border-top: 1px solid var(--line); font-size: 12px; font-weight: 750; }
+.work-scope-grid article > a span { color: #914633; font-size: 15px; }
 .work-request { padding-top: 85px; padding-bottom: 90px; color: white; background: var(--ink); }
 .work-request-intro { max-width: 850px; margin-bottom: 38px; }
 .work-request-intro h2 { margin: 16px 0 10px; font-size: 50px; letter-spacing: -.055em; }

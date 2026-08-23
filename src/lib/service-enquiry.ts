@@ -12,16 +12,16 @@ export const serviceEnquiryKinds = [
 ] as const;
 export type ServiceEnquiryKind = (typeof serviceEnquiryKinds)[number];
 
-export const portfolioServiceOptions: readonly { id: ServiceEnquiryKind; label: string; price: string }[] = [
-  { id: "static_form", label: "Static contact-form repair", price: "£35 fixed" },
-  { id: "cms_form", label: "CMS contact-form restoration", price: "£75 fixed" },
-  { id: "booking_selection", label: "Booking availability / selection repair", price: "£75 fixed" },
-  { id: "publii_theme", label: "Publii theme customization", price: "£25 / £45 / £75 scopes" },
-  { id: "publii_plugin", label: "Publii plugin repair or feature", price: "£45 / £75 fixed" },
-  { id: "attribution", label: "AI cost-attribution setup", price: "£75 fixed" },
-  { id: "budget_guard", label: "AI application budget guard", price: "£75 fixed" },
-  { id: "private_room", label: "Private Client Room pilot", price: "£199 fixed pilot" },
-  { id: "alert_feed", label: "Alert feed, webhook, or widget", price: "£15 / £45 / £75 scopes" },
+export const portfolioServiceOptions: readonly { id: ServiceEnquiryKind; label: string; price: string; scopeUrl?: string }[] = [
+  { id: "static_form", label: "Static contact-form repair", price: "£35 fixed", scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/contact-form-repair/" },
+  { id: "cms_form", label: "CMS contact-form restoration", price: "£75 fixed", scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/cms-form-repair/" },
+  { id: "booking_selection", label: "Booking availability / selection repair", price: "£75 fixed", scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/booking-selection-repair/" },
+  { id: "publii_theme", label: "Publii theme customization", price: "£25 / £45 / £75 scopes", scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/publii-theme-customization/" },
+  { id: "publii_plugin", label: "Publii plugin repair or feature", price: "£45 / £75 fixed", scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/publii-plugin-repair/" },
+  { id: "attribution", label: "AI cost-attribution setup", price: "£75 fixed", scopeUrl: "https://tokengauge.enby.fish/services/attribution" },
+  { id: "budget_guard", label: "AI application budget guard", price: "£75 fixed", scopeUrl: "https://tokengauge.enby.fish/services/budget-guard" },
+  { id: "private_room", label: "Private Client Room pilot", price: "£199 fixed pilot", scopeUrl: "https://fablgen-agent.github.io/private-client-room/" },
+  { id: "alert_feed", label: "Alert feed, webhook, or widget", price: "£15 / £45 / £75 scopes", scopeUrl: "https://fablgen-agent.github.io/uk-alert-watch/global/" },
   { id: "other", label: "Another small software request", price: "Written scope first" },
 ] as const;
 
