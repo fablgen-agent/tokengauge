@@ -58,8 +58,9 @@ export default function AttributionServicePage() {
             <h1>Ship cost attribution into one AI workflow.</h1>
             <p>I instrument one authorized Node.js/TypeScript or Python codebase so each model call can be attributed to a project and workflow, reconciled to token usage, and exported into the free TokenGauge ledger.</p>
             <div className="hero-actions">
-              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_attribution_email">Email the public scope</a>
+              <a className="button button-lime" href="#scope-request" data-funnel-event="cta_service_attribution_form">Send the public scope here</a>
               <div className="service-contact-links" aria-label="Alternative enquiry channels">
+                <a className="text-link" href={emailUrl} data-funnel-event="cta_service_attribution_email">Use your email app <span aria-hidden="true">→</span></a>
                 <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution_telegram">Message on Telegram <span aria-hidden="true">→</span></a>
                 <a className="text-link" href={githubRequestUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution_github">Use the public work form <span aria-hidden="true">→</span></a>
               </div>
@@ -117,14 +118,15 @@ export default function AttributionServicePage() {
           <ServiceEnquiryForm service="attribution" />
           <div className="section-heading"><span className="eyebrow">PROCESS</span><h2>Public context first. Private access later.</h2></div>
           <div className="audit-explainer">
-            <article><span>01</span><h3>Send the public URL</h3><p>Use the prefilled email, Telegram, or the public GitHub form. Share only a public repository or product URL and the outcome you need. Do not send credentials, private source, prompts, outputs, customer data, or payment details.</p></article>
+            <article><span>01</span><h3>Send the public URL</h3><p>Use the private form above without an account, or choose email, Telegram, or the public GitHub form. Share only a public repository or product URL and the outcome you need. Do not send credentials, private source, prompts, outputs, customer data, or payment details.</p></article>
             <article><span>02</span><h3>Receive written scope</h3><p>I confirm fit, exact files or integration boundary, acceptance checks, delivery target, and payment timing before implementation.</p></article>
             <article><span>03</span><h3>Review the change</h3><p>You receive a focused branch or pull request, test evidence, the ledger import fixture, and one revision inside the agreed boundary.</p></article>
           </div>
           <div className="service-final-cta">
             <div><span className="eyebrow eyebrow-lime">START WITH NO SECRETS</span><h2>Describe the workflow and desired attribution.</h2><p>Replies are asynchronous. Suitable enquiries receive a written scope before any payment request. Need enforcement rather than reporting? <Link href="/services/budget-guard">See the budget guard →</Link></p></div>
             <div className="service-final-actions">
-              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_attribution_email">Email the public scope</a>
+              <a className="button button-lime" href="#scope-request" data-funnel-event="cta_service_attribution_form">Open the private form</a>
+              <a className="text-link" href={emailUrl} data-funnel-event="cta_service_attribution_email">Use your email app <span aria-hidden="true">→</span></a>
               <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution_telegram">Message @FablgenBot <span aria-hidden="true">→</span></a>
             </div>
           </div>

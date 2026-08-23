@@ -424,7 +424,7 @@ input[type="range"] { accent-color: var(--ink); }
 .service-final-cta p a { color: var(--lime); text-decoration: underline; text-underline-offset: 4px; }
 .service-final-actions { display: flex; align-items: center; gap: 16px 24px; }
 .service-final-actions .text-link { color: #dce4e1; border-color: rgba(255,255,255,.25); }
-.service-enquiry-form { margin: 0 0 78px; padding: 42px; color: white; background: var(--ink); border: 1px solid #3d4643; }
+.service-enquiry-form { margin: 0 0 78px; padding: 42px; color: white; background: var(--ink); border: 1px solid #3d4643; scroll-margin-top: 24px; }
 .service-enquiry-heading { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1fr); gap: 12px 42px; align-items: end; margin-bottom: 30px; }
 .service-enquiry-heading .eyebrow { grid-column: 1 / -1; }
 .service-enquiry-heading h2 { margin: 0; font-size: 36px; letter-spacing: -.05em; }
