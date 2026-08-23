@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { sendFunnelEvent } from "@/components/funnel-tracker";
+import { orderedArmKeys, qualityVerdict, type ExperimentArmKey, type QualityChoice } from "@/lib/experiment-review";
 
 type Usage = { input: number; cachedRead: number; cachedWrite: number; output: number; reasoning: number; total: number };
 type Variant = { text: string; usage: Usage; settings: { maxOutputTokens: number; reasoningEffort: string; textVerbosity: string } };
@@ -110,32 +111,63 @@ export function LabWorkbench({ strategies, sources }: { strategies: readonly Str
 }
 
 function ExperimentResults({ result }: { result: ExperimentResult }) {
+  const [choice, setChoice] = useState<QualityChoice>();
+  const [firstKey, secondKey] = orderedArmKeys(result.executionOrder);
+  const first = result[firstKey];
+  const second = result[secondKey];
+
   return (
     <section className="experiment-results" aria-live="polite">
-      <div className="experiment-order">Execution order was randomized: {result.executionOrder.join(" → ")}.</div>
+      <div className="experiment-order">Outputs are blinded and shown in randomized execution order. Judge quality before seeing either strategy or token count.</div>
       <div className="result-grid">
-        <VariantResult title="Baseline" variant={result.baseline} />
-        <VariantResult title="Candidate" variant={result.candidate} />
+        <VariantResult title={`Output A${choice ? ` · ${labelFor(firstKey)}` : ""}`} variant={first} revealed={Boolean(choice)} />
+        <VariantResult title={`Output B${choice ? ` · ${labelFor(secondKey)}` : ""}`} variant={second} revealed={Boolean(choice)} />
       </div>
-      <p className="retention-note">Read the outputs now: TokenGauge returns them to this browser but stores only token totals.</p>
+      <fieldset className="quality-review">
+        <legend>Which output is better for the task?</legend>
+        <p>Make a quality judgment before the cost reveal. This choice stays in this browser and is not uploaded or stored.</p>
+        <div>
+          <button type="button" aria-pressed={choice === "first"} onClick={() => setChoice("first")}>Output A</button>
+          <button type="button" aria-pressed={choice === "tie"} onClick={() => setChoice("tie")}>Quality tie</button>
+          <button type="button" aria-pressed={choice === "second"} onClick={() => setChoice("second")}>Output B</button>
+        </div>
+      </fieldset>
+      {choice ? (
+        <div className="quality-verdict" role="status">
+          <strong>Blinding removed.</strong>
+          <span>{qualityVerdict({
+            choice,
+            firstKey,
+            baselineTokens: result.baseline.usage.total,
+            candidateTokens: result.candidate.usage.total,
+          })}</span>
+        </div>
+      ) : null}
+      <p className="retention-note">TokenGauge returns both outputs to this browser but stores only model, strategy label, and usage totals.</p>
     </section>
   );
 }
 
-function VariantResult({ title, variant }: { title: string; variant: Variant }) {
+function labelFor(key: ExperimentArmKey): string {
+  return key === "baseline" ? "Baseline" : "Candidate";
+}
+
+function VariantResult({ title, variant, revealed }: { title: string; variant: Variant; revealed: boolean }) {
   return (
     <article className="variant-result">
-      <div><h3>{title}</h3><strong>{variant.usage.total.toLocaleString()} tokens</strong></div>
-      <dl>
-        <div><dt>Input</dt><dd>{variant.usage.input}</dd></div>
-        <div><dt>Output</dt><dd>{variant.usage.output}</dd></div>
-        <div><dt>Reasoning</dt><dd>{variant.usage.reasoning}</dd></div>
-        <div><dt>Cache read</dt><dd>{variant.usage.cachedRead}</dd></div>
-        <div><dt>Output cap</dt><dd>{variant.settings.maxOutputTokens}</dd></div>
-        <div><dt>Effort</dt><dd>{variant.settings.reasoningEffort}</dd></div>
-        <div><dt>Verbosity</dt><dd>{variant.settings.textVerbosity}</dd></div>
-      </dl>
+      <div><h3>{title}</h3>{revealed ? <strong>{variant.usage.total.toLocaleString()} tokens</strong> : <span className="blind-badge">Hidden</span>}</div>
       <pre>{variant.text}</pre>
+      {revealed ? (
+        <dl>
+          <div><dt>Input</dt><dd>{variant.usage.input}</dd></div>
+          <div><dt>Output</dt><dd>{variant.usage.output}</dd></div>
+          <div><dt>Reasoning</dt><dd>{variant.usage.reasoning}</dd></div>
+          <div><dt>Cache read</dt><dd>{variant.usage.cachedRead}</dd></div>
+          <div><dt>Output cap</dt><dd>{variant.settings.maxOutputTokens}</dd></div>
+          <div><dt>Effort</dt><dd>{variant.settings.reasoningEffort}</dd></div>
+          <div><dt>Verbosity</dt><dd>{variant.settings.textVerbosity}</dd></div>
+        </dl>
+      ) : null}
     </article>
   );
 }
