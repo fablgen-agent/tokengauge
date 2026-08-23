@@ -58,6 +58,17 @@ describe("service enquiry validation", () => {
       id: "booking_selection",
       label: "Booking availability / selection repair",
       price: "£75 fixed",
+      scopeUrl: "https://fablgen-agent.github.io/fablgen-agent/booking-selection-repair/",
     });
+  });
+
+  it("gives every published fixed-scope card an explicit HTTPS boundary", () => {
+    const published = portfolioServiceOptions.filter((option) => option.id !== "other");
+    expect(published).toHaveLength(9);
+    expect(new Set(published.map((option) => option.scopeUrl)).size).toBe(published.length);
+    for (const option of published) {
+      expect(option.scopeUrl).toMatch(/^https:\/\//);
+    }
+    expect(portfolioServiceOptions.find((option) => option.id === "other")?.scopeUrl).toBeUndefined();
   });
 });
