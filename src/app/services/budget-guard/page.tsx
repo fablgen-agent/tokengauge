@@ -116,6 +116,56 @@ export default function BudgetGuardServicePage() {
           </div>
         </section>
 
+        <section className="recorded-audit section-pad" aria-labelledby="budget-guard-proof-title">
+          <div className="recorded-audit-heading">
+            <div>
+              <span className="eyebrow eyebrow-lime">PUBLIC IMPLEMENTATION EVIDENCE</span>
+              <h2 id="budget-guard-proof-title">The reported failure mode is public. The service boundary is explicit.</h2>
+              <p>The £75 service is shaped around a failure boundary described in the public Swarms issue #1976. The linked PR #1987 was submitted by the Fablgen Agent account as a proposed implementation reference for pre-call budget checks and deterministic exhaustion handling, not evidence of shipped Swarms behavior.</p>
+              <div className="hero-actions">
+                <a className="text-link recorded-audit-live-link" href="https://github.com/kyegomez/swarms/issues/1976" target="_blank" rel="noreferrer">Read issue #1976 · open report <span aria-hidden="true">↗</span></a>
+                <a className="text-link recorded-audit-live-link" href="https://github.com/kyegomez/swarms/pull/1987" target="_blank" rel="noreferrer">Inspect PR #1987 · open/unmerged proposal <span aria-hidden="true">↗</span></a>
+              </div>
+            </div>
+            <aside className="recorded-audit-boundary" role="note">
+              <strong>Implementation evidence only</strong>
+              <p>Issue #1976 is an open report. PR #1987 is open and unmerged. These links do not establish customer work, adoption, endorsement, revenue, savings, production outcomes, or a guarantee.</p>
+            </aside>
+          </div>
+
+          <div className="recorded-audit-context recorded-audit-metrics">
+            <article className="recorded-audit-panel">
+              <span className="eyebrow">01 · PUBLICLY REPORTED FAILURE MODE · ISSUE #1976</span>
+              <h3>The issue reports iteration ceilings without a run-level token cap.</h3>
+              <p>The issue reports outer and per-subtask iteration limits, while each call re-sends a growing full history. It describes a worst case on the order of 2,000 LLM calls with no token or spend ceiling. This is the issue author&apos;s reported failure mode, not a TokenGauge measurement.</p>
+              <a className="text-link recorded-audit-live-link" href="https://github.com/kyegomez/swarms/issues/1976" target="_blank" rel="noreferrer">Verify the issue details <span aria-hidden="true">↗</span></a>
+            </article>
+            <article className="recorded-audit-panel">
+              <span className="eyebrow">02 · PROPOSED PATCH · OPEN / UNMERGED</span>
+              <h3>Pre-call refusal plus deterministic exhaustion.</h3>
+              <p>PR #1987&apos;s public diff proposes an optional <code>max_run_tokens</code> guard, configurable loop ceilings, structured request estimation, output capping, cumulative local text-token reporting, and a no-extra-call exhaustion summary, with corresponding test changes. Its own disclosure keeps provider billing authoritative and excludes image, audio, cache, and hidden reasoning tokens from the local estimate.</p>
+              <a className="text-link recorded-audit-live-link" href="https://github.com/kyegomez/swarms/pull/1987" target="_blank" rel="noreferrer">Read the proposed implementation <span aria-hidden="true">↗</span></a>
+            </article>
+          </div>
+
+          <div className="recorded-audit-evidence-boundary">
+            <div>
+              <span className="eyebrow">£75 SERVICE · EXISTING ACCEPTANCE CHECKS</span>
+              <h3>One declared path, with executable checks.</h3>
+              <p>For one authorized Node.js/TypeScript or Python repository and one existing model-request path, the service implements a transactional reservation of modeled exposure in the existing shared store, provider-usage reconciliation, explicit handling for errors, missing usage, retries, and abandoned reservations, and pre-call refusal to the agreed fallback. Focused no-call and reconciliation tests, handoff notes, and one revision are part of the existing acceptance checks above.</p>
+            </div>
+            <div>
+              <strong>What the handoff can evidence</strong>
+              <p>The agreed code diff, focused test results, and written boundary for that authorized repository. Provider billing remains authoritative; unbounded input, tools, parallel callers, or an unshared store remain outside an absolute cap.</p>
+            </div>
+          </div>
+
+          <div className="hero-actions">
+            <a className="button button-lime" href="#scope-request" data-funnel-event="cta_service_budget_guard_form">Request this boundary</a>
+            <Link className="text-link recorded-audit-live-link" href="/guides/autonomous-agent-token-budget">Read the free autonomous budget guide <span aria-hidden="true">→</span></Link>
+          </div>
+        </section>
+
         <section className="section-pad service-process-section">
           <ServiceEnquiryForm service="budget_guard" />
           <div className="section-heading"><span className="eyebrow">PROCESS</span><h2>Prove the boundary before requesting payment.</h2></div>

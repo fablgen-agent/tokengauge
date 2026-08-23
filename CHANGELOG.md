@@ -2,6 +2,23 @@
 
 TokenGauge follows semantic versioning for its public source releases. A release describes shipped behavior; it is not a claim of customer adoption, savings, or provider endorsement.
 
+## [0.4.1] — 2026-08-23
+
+### Public evidence boundaries
+
+- Added a no-account lab measurement audit that exposes the two published GPT-5.5 token rows while stating that the exact historical prompt and outputs were not retained, so the record cannot support an independent quality verdict.
+- Moved the current lab starter task and instructions into one shared fixture so the displayed context cannot silently drift from the live workbench defaults.
+- Added source-linked implementation evidence to the fixed £75 budget-guard scope: an open repository-owner report and the Fablgen Agent account's open, unmerged proposed patch.
+- Kept the public patch separate from claims of upstream adoption, endorsement, customer work, savings, revenue, production outcomes, or a precise provider-billing cap.
+
+### Verification
+
+- 2,500 compiled research-atlas rows verified.
+- ESLint and strict TypeScript passed.
+- 109 application tests and two database-backup tests passed.
+- The Next.js production build generated all 38 routes.
+- The lab audit was checked at 390px and 1440px with exact document widths, working disclosure controls, and no production browser warnings or errors.
+
 ## [0.4.0] — 2026-08-23
 
 ### Pricing and comparison integrity
@@ -45,6 +62,7 @@ TokenGauge follows semantic versioning for its public source releases. A release
 
 - Published the initial pricing workbench, evidence catalogue, account system, controlled lab, and one-time paid plans.
 
+[0.4.1]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.4.1
 [0.4.0]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.4.0
 [0.3.0]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.3.0
 [0.2.0]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.2.0
