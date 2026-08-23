@@ -3,12 +3,14 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { funnelMeasurementDisabled } from "@/lib/funnel-preference";
-import { portfolioServiceOptions, type ServiceEnquiryKind } from "@/lib/service-enquiry";
+import { portfolioServiceOptions, serviceEnquiryCopy, type ServiceEnquiryKind } from "@/lib/service-enquiry";
 
 export function WorkRequestForm({ initialService }: { initialService: ServiceEnquiryKind }) {
   const startedAt = useRef(0);
+  const [selectedService, setSelectedService] = useState(initialService);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
+  const copy = serviceEnquiryCopy[selectedService];
 
   useEffect(() => { startedAt.current = Date.now(); }, []);
 
@@ -38,13 +40,13 @@ export function WorkRequestForm({ initialService }: { initialService: ServiceEnq
 
   return <form className="work-request-form" onSubmit={submit}>
     <div className="work-request-fields">
-      <label>Requested scope<select name="service" defaultValue={initialService} required>{portfolioServiceOptions.map((option) => <option value={option.id} key={option.id}>{option.label} · {option.price}</option>)}</select></label>
+      <label>Requested scope<select name="service" value={selectedService} onChange={(event) => setSelectedService(event.target.value as ServiceEnquiryKind)} required>{portfolioServiceOptions.map((option) => <option value={option.id} key={option.id}>{option.label} · {option.price}</option>)}</select></label>
       <label>Reply email<input name="email" type="email" autoComplete="email" maxLength={254} required /></label>
       <label className="work-request-wide">Public repository, site, or product URL<input name="publicUrl" type="url" inputMode="url" placeholder="https://…" maxLength={500} required /></label>
-      <label>Platform, stack, or version<input name="stack" placeholder="For example, Publii 0.47.9 or WordPress" maxLength={120} required /></label>
-      <label>What happens now?<input name="provider" placeholder="Brief current behaviour or context" maxLength={120} required /></label>
-      <label className="work-request-wide">Requested outcome<textarea name="summary" minLength={40} maxLength={2000} required placeholder="Describe the smallest useful result. Keep credentials and private material out." /></label>
-      <label className="work-request-wide">Acceptance checks<textarea name="acceptanceChecks" minLength={20} maxLength={1000} required placeholder="What observable checks would prove the agreed result works?" /></label>
+      <label>{copy.stackLabel}<input name="stack" placeholder={copy.stackPlaceholder} maxLength={120} required /></label>
+      <label>{copy.providerLabel}<input name="provider" placeholder={copy.providerPlaceholder} maxLength={120} required /></label>
+      <label className="work-request-wide">{copy.summaryLabel}<textarea name="summary" minLength={40} maxLength={2000} required placeholder={copy.summaryPlaceholder} /></label>
+      <label className="work-request-wide">Acceptance checks<textarea name="acceptanceChecks" minLength={20} maxLength={1000} required placeholder={copy.acceptancePlaceholder.replace(/^Optional: /, "")} /></label>
       <label className="work-request-wide">Preferred timing <small>Optional</small><input name="timing" maxLength={120} /></label>
       <label className="service-enquiry-trap" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
     </div>
