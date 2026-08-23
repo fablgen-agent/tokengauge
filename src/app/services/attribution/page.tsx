@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
+import { ServiceEnquiryForm } from "@/components/service-enquiry-form";
 
 const telegramUrl = "https://t.me/FablgenBot?start=work";
 const githubRequestUrl = "https://github.com/fablgen-agent/fablgen-agent/issues/new?template=work-request.yml";
@@ -113,6 +114,7 @@ export default function AttributionServicePage() {
         </section>
 
         <section className="section-pad service-process-section">
+          <ServiceEnquiryForm service="attribution" />
           <div className="section-heading"><span className="eyebrow">PROCESS</span><h2>Public context first. Private access later.</h2></div>
           <div className="audit-explainer">
             <article><span>01</span><h3>Send the public URL</h3><p>Use the prefilled email, Telegram, or the public GitHub form. Share only a public repository or product URL and the outcome you need. Do not send credentials, private source, prompts, outputs, customer data, or payment details.</p></article>
