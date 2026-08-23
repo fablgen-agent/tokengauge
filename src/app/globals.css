@@ -611,6 +611,14 @@ input[type="range"] { accent-color: var(--ink); }
 .calculator-next-step > p { max-width: 620px; }
 .calculator-next-step > div { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
 .calculator-next-step .text-link { min-height: 44px; color: #d5dcda; }
+.audit-handoff { margin-top: 24px; padding: 22px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.045); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 24px; align-items: center; }
+.audit-handoff strong, .audit-service-path strong { display: block; margin-top: 8px; color: white; font-size: 20px; line-height: 1.25; letter-spacing: -.025em; }
+.audit-handoff p, .audit-service-path p { margin: 7px 0 0; }
+.audit-handoff-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 14px; }
+.audit-handoff-actions .text-button { min-height: 44px; color: #d5dcda; }
+.audit-report-status { grid-column: 1 / -1; margin: 0 !important; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.12); color: #c8ff46 !important; font-size: 13px; }
+.audit-service-path { margin-top: 18px; padding: 22px; border: 1px solid rgba(200,255,70,.38); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.audit-service-path > div { max-width: 650px; }
 .cache-episode-section { background: #e9eee7; }
 .cache-economics-summary > strong { display: block; margin-top: 9px; font-size: 20px; }
 .cache-economics-summary > p { margin-bottom: 0; }
@@ -848,6 +856,9 @@ input[type="range"] { accent-color: var(--ink); }
   .audit-explainer article:last-child { border-bottom: 0; }
   .audit-breakdown dl { grid-template-columns: 1fr; }
   .audit-breakdown dl div, .audit-breakdown dl div:nth-child(odd), .audit-breakdown dl div:nth-child(even) { padding-left: 0; padding-right: 0; border-left: 0; }
+  .audit-handoff { grid-template-columns: 1fr; padding: 20px; }
+  .audit-handoff-actions { justify-content: flex-start; }
+  .audit-service-path { align-items: flex-start; flex-direction: column; padding: 20px; }
   .ledger-hero { min-height: auto; padding-top: 60px; padding-bottom: 60px; }
   .cost-comparison { display: grid; grid-template-columns: 1fr; align-items: start; gap: 10px; }
   .cost-comparison > span { justify-self: start; margin: 0; transform: rotate(90deg); }

@@ -25,6 +25,14 @@ export type BillAuditResult = {
   cacheRatePublished: boolean;
 };
 
+export type BillAuditReportContext = {
+  providerLabel: string;
+  modelLabel: string;
+  tierLabel: string;
+  region: string;
+  snapshotDate: string;
+};
+
 function finite(value: number): number {
   return Number.isFinite(value) ? Math.max(value, 0) : 0;
 }
@@ -72,4 +80,54 @@ export function calculateBillAudit(price: ModelPrice, input: BillAuditInput): Bi
     dominantDriver,
     cacheRatePublished,
   };
+}
+
+export function buildBillAuditReport(
+  context: BillAuditReportContext,
+  input: BillAuditInput,
+  result: BillAuditResult,
+): string {
+  const acceptedAnswers = Math.min(Math.trunc(finite(input.acceptedAnswers)), Math.trunc(finite(input.attempts)));
+  const varianceDirection = result.invoiceVarianceUsd >= 0 ? "above" : "below";
+  const cacheTreatment = result.cacheRatePublished
+    ? "Published cache-read rate applied"
+    : "No published cache-read rate; cached input conservatively priced as ordinary input";
+
+  return [
+    "TokenGauge bill-audit handoff",
+    `Rate snapshot: ${context.snapshotDate}`,
+    `Rate card: ${context.providerLabel} · ${context.modelLabel} · ${context.tierLabel} · ${context.region}`,
+    "",
+    "Aggregate usage supplied",
+    `- Input tokens: ${Math.trunc(finite(input.inputTokens)).toLocaleString("en-GB")}`,
+    `- Cached input tokens: ${Math.min(Math.trunc(finite(input.cachedInputTokens)), Math.trunc(finite(input.inputTokens))).toLocaleString("en-GB")}`,
+    `- Output tokens: ${Math.trunc(finite(input.outputTokens)).toLocaleString("en-GB")}`,
+    `- Attempts: ${Math.trunc(finite(input.attempts)).toLocaleString("en-GB")}`,
+    `- Accepted answers: ${acceptedAnswers.toLocaleString("en-GB")}`,
+    `- Reported provider bill: ${formatReportUsd(finite(input.reportedBillUsd))}`,
+    "",
+    "Modeled result",
+    `- Token spend: ${formatReportUsd(result.modeledTokenCostUsd)}`,
+    `- Invoice gap: ${formatReportUsd(Math.abs(result.invoiceVarianceUsd))} ${varianceDirection} the token model`,
+    `- Largest modeled bucket: ${result.dominantDriver}`,
+    `- Cache share: ${result.cacheSharePercentage.toFixed(1)}%`,
+    `- Accepted-answer rate: ${result.acceptanceRatePercentage.toFixed(1)}%`,
+    `- Cost per accepted answer: ${result.costPerAcceptedAnswerUsd === null ? "unavailable" : formatReportUsd(result.costPerAcceptedAnswerUsd, 4)}`,
+    `- Non-accepted-attempt estimate: ${formatReportUsd(result.nonAcceptedAttemptCostUsd)}`,
+    `- Cache treatment: ${cacheTreatment}`,
+    "",
+    "Interpretation boundary",
+    "This browser-local rate-card model is not an invoice audit or proof of overbilling. Investigate mixed price bands, tools, cache writes or storage, media, regional or priority uplifts, taxes, credits, and rounding before drawing a conclusion. Retry cost is a uniform-attempt approximation unless retry-specific usage is available.",
+    "",
+    "Generated locally at https://tokengauge.enby.fish/audit",
+  ].join("\n");
+}
+
+function formatReportUsd(value: number, maximumFractionDigits = 2): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: value > 0 && value < .01 ? maximumFractionDigits : 2,
+    maximumFractionDigits,
+  }).format(value);
 }
