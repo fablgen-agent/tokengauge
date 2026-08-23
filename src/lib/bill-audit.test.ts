@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateBillAudit } from "@/lib/bill-audit";
+import { buildBillAuditReport, calculateBillAudit } from "@/lib/bill-audit";
 import { modelPrices } from "@/lib/costs";
 
 const terra = modelPrices.find((price) => price.id === "openai:gpt-5.6-terra:standard:short")!;
@@ -43,5 +43,30 @@ describe("bill audit", () => {
     expect(result.cacheRatePublished).toBe(false);
     expect(result.acceptanceRatePercentage).toBe(100);
     expect(result.invoiceVariancePercentage).toBeNull();
+  });
+
+  it("builds a bounded plain-text handoff without prompts or outputs", () => {
+    const input = {
+      inputTokens: 30_000_000,
+      cachedInputTokens: 9_000_000,
+      outputTokens: 5_000_000,
+      attempts: 10_000,
+      acceptedAnswers: 8_500,
+      reportedBillUsd: 110,
+    };
+    const report = buildBillAuditReport({
+      providerLabel: terra.providerLabel,
+      modelLabel: terra.label,
+      tierLabel: terra.tierLabel,
+      region: terra.region,
+      snapshotDate: "2026-08-22",
+    }, input, calculateBillAudit(terra, input));
+
+    expect(report).toContain("TokenGauge bill-audit handoff");
+    expect(report).toContain("Invoice gap: $6.20 above the token model");
+    expect(report).toContain("Largest modeled bucket: output");
+    expect(report).toContain("Cost per accepted answer: $0.0122");
+    expect(report).toContain("not an invoice audit or proof of overbilling");
+    expect(report).not.toMatch(/prompt|model output/i);
   });
 });
