@@ -14,6 +14,17 @@ The public site includes free, no-login browser-local tools. Paid one-time plans
 - [Provider comparison workbench](https://tokengauge.enby.fish/compare): Compare user-supplied workload, quality, retry, latency, and client-compatibility observations without invented provider benchmarks.
 - [Pricing change ledger](https://tokengauge.enby.fish/pricing/changes): Review effective dates, expiries, historical rows, and source-revalidation boundaries.
 
+## Machine-readable data contract
+
+- [Pricing Feed v1](https://tokengauge.enby.fish/pricing.json): Public GET/HEAD JSON with the dated USD-per-million-token snapshot, provider/model/card IDs, cache and context dimensions, effective intervals, and row-level source links.
+- [Pricing Feed v1 schema](https://tokengauge.enby.fish/schemas/pricing-v1.schema.json): The stable JSON Schema. `effectiveFrom` is inclusive; `effectiveUntil` is exclusive.
+- [Tagged v0.5.0 fixture](https://raw.githubusercontent.com/fablgen-agent/tokengauge/v0.5.0/public/fixtures/pricing-v1.json): Pin this release snapshot and verify its published checksum for reproducible historical tests.
+- [Tagged v0.5.0 schema](https://raw.githubusercontent.com/fablgen-agent/tokengauge/v0.5.0/public/schemas/pricing-v1.schema.json): Pin the tagged contract definition with the fixture.
+- [v0.5.0 SHA-256 manifest](https://github.com/fablgen-agent/tokengauge/releases/download/v0.5.0/SHA256SUMS): Verify the downloaded release fixture and schema against this published manifest.
+- [Dependency-free consumer example](https://github.com/fablgen-agent/tokengauge/blob/v0.5.0/examples/pricing-feed-consumer.mjs): Validates the schema and semantic invariants, resolves one exact card, and fails closed for unknown, expired, out-of-band, or unpublished rates.
+
+Rows can be current, future, or historical and must be selected by their effective interval. Omitted bounds mean no known bound, not a permanent-rate guarantee. Schedule-labelled cards require caller-side selection using the provider's documented day, time, and timezone. Missing cards and `null` rates are unknown, never zero. The feed covers only its explicit token-price fields; provider invoices remain authoritative and unmodelled media, tool, storage, tax, credit, or account-specific charges require separate handling.
+
 ## Product and methodology
 
 - [Product overview](https://tokengauge.enby.fish/): Current scope, controlled demonstration, plan boundaries, and one-time access options.

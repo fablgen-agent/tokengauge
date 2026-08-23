@@ -1,6 +1,6 @@
 {
   "name": "tokengauge",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "engines": {
     "node": ">=24.0.0"
@@ -13,13 +13,15 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "pricing:verify": "node scripts/verify-pricing-sources.mjs",
-    "pricing:refresh": "node scripts/verify-pricing-sources.mjs --write",
+    "pricing:refresh": "node scripts/verify-pricing-sources.mjs --write && node scripts/generate-pricing-contract.mjs",
+    "pricing:contract": "node scripts/generate-pricing-contract.mjs",
+    "pricing:contract:check": "node scripts/generate-pricing-contract.mjs --check",
     "catalogue:compile": "node scripts/compile-method-catalogue.mjs",
     "atlas:compile": "node scripts/compile-research-atlas.mjs",
     "atlas:verify": "node scripts/compile-research-atlas.mjs --check",
     "funnel:report": "node scripts/report-funnel.mjs",
     "backup:test": "node --test scripts/backup-database.test.mjs",
-    "check": "npm run atlas:verify && npm run lint && npm run typecheck && npm test && npm run backup:test && npm run build"
+    "check": "npm run atlas:verify && npm run pricing:contract:check && npm run lint && npm run typecheck && npm test && npm run backup:test && npm run build"
   },
   "dependencies": {
     "@ai-sdk/openai": "4.0.42",
