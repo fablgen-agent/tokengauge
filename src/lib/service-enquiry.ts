@@ -3,6 +3,7 @@ export const serviceEnquiryKinds = [
   "budget_guard",
   "static_form",
   "cms_form",
+  "booking_selection",
   "publii_theme",
   "publii_plugin",
   "private_room",
@@ -14,6 +15,7 @@ export type ServiceEnquiryKind = (typeof serviceEnquiryKinds)[number];
 export const portfolioServiceOptions: readonly { id: ServiceEnquiryKind; label: string; price: string }[] = [
   { id: "static_form", label: "Static contact-form repair", price: "£35 fixed" },
   { id: "cms_form", label: "CMS contact-form restoration", price: "£75 fixed" },
+  { id: "booking_selection", label: "Booking availability / selection repair", price: "£75 fixed" },
   { id: "publii_theme", label: "Publii theme customization", price: "£25 / £45 / £75 scopes" },
   { id: "publii_plugin", label: "Publii plugin repair or feature", price: "£45 / £75 fixed" },
   { id: "attribution", label: "AI cost-attribution setup", price: "£75 fixed" },
