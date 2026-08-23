@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { sendFunnelEvent } from "@/components/funnel-tracker";
 import { orderedArmKeys, qualityVerdict, type ExperimentArmKey, type QualityChoice } from "@/lib/experiment-review";
+import { labStarter } from "@/lib/lab-starter";
 
 type Usage = { input: number; cachedRead: number; cachedWrite: number; output: number; reasoning: number; total: number };
 type Variant = { text: string; usage: Usage; settings: { maxOutputTokens: number; reasoningEffort: string; textVerbosity: string } };
@@ -17,8 +18,8 @@ export function LabWorkbench({ strategies, sources }: { strategies: readonly Str
   const [providerId, setProviderId] = useState(sources[0]?.id ?? "chatgpt");
   const [strategyIds, setStrategyIds] = useState<string[]>([]);
   const [strategyId, setStrategyId] = useState(strategies[0]?.id ?? "");
-  const [task, setTask] = useState("Explain why prompt-prefix stability matters to an engineering manager in three concise bullets.");
-  const [baselineInstructions, setBaselineInstructions] = useState("You are a helpful AI assistant. Preserve every required fact.");
+  const [task, setTask] = useState<string>(labStarter.task);
+  const [baselineInstructions, setBaselineInstructions] = useState<string>(labStarter.instructions);
   const [result, setResult] = useState<ExperimentResult>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
