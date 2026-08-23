@@ -57,10 +57,10 @@ export default function AttributionServicePage() {
             <h1>Ship cost attribution into one AI workflow.</h1>
             <p>I instrument one authorized Node.js/TypeScript or Python codebase so each model call can be attributed to a project and workflow, reconciled to token usage, and exported into the free TokenGauge ledger.</p>
             <div className="hero-actions">
-              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_email">Email the public scope</a>
+              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_attribution_email">Email the public scope</a>
               <div className="service-contact-links" aria-label="Alternative enquiry channels">
-                <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Message on Telegram <span aria-hidden="true">→</span></a>
-                <a className="text-link" href={githubRequestUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Use the public work form <span aria-hidden="true">→</span></a>
+                <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution_telegram">Message on Telegram <span aria-hidden="true">→</span></a>
+                <a className="text-link" href={githubRequestUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution_github">Use the public work form <span aria-hidden="true">→</span></a>
               </div>
             </div>
             <p className="provider-snapshot">No account required · no payment before scope · no credentials in the enquiry</p>
@@ -122,8 +122,8 @@ export default function AttributionServicePage() {
           <div className="service-final-cta">
             <div><span className="eyebrow eyebrow-lime">START WITH NO SECRETS</span><h2>Describe the workflow and desired attribution.</h2><p>Replies are asynchronous. Suitable enquiries receive a written scope before any payment request. Need enforcement rather than reporting? <Link href="/services/budget-guard">See the budget guard →</Link></p></div>
             <div className="service-final-actions">
-              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_email">Email the public scope</a>
-              <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution">Message @FablgenBot <span aria-hidden="true">→</span></a>
+              <a className="button button-lime" href={emailUrl} data-funnel-event="cta_service_attribution_email">Email the public scope</a>
+              <a className="text-link" href={telegramUrl} target="_blank" rel="noreferrer" data-funnel-event="cta_service_attribution_telegram">Message @FablgenBot <span aria-hidden="true">→</span></a>
             </div>
           </div>
         </section>
