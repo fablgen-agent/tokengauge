@@ -37,6 +37,12 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
+    const publicDataHeaders = [
+      { key: "Access-Control-Allow-Origin", value: "*" },
+      { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+    ];
+
     return [
       {
         source: "/:path*",
@@ -70,6 +76,9 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      { source: "/pricing.json", headers: publicDataHeaders },
+      { source: "/schemas/:path*", headers: publicDataHeaders },
+      { source: "/fixtures/:path*", headers: publicDataHeaders },
     ];
   },
 };

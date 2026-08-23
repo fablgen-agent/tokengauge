@@ -2,6 +2,27 @@
 
 TokenGauge follows semantic versioning for its public source releases. A release describes shipped behavior; it is not a claim of customer adoption, savings, or provider endorsement.
 
+## [0.5.0] — 2026-08-23
+
+### Machine-readable pricing contract
+
+- Added a versioned, source-linked Pricing Feed v1 at `/pricing.json` while preserving `/api/pricing` as a compatibility response.
+- Published a checked-in JSON Schema, generated fixture, SHA-256 manifest, and dependency-free schema-plus-semantic validating consumer example for dated card, context-band, and unavailable-rate handling.
+- Added cross-origin GET and body-free HEAD support with public cache headers and a schema relation; the route has no account, database, prompt, output, provider-key, or runtime provider-fetch dependency.
+- Documented the feed in README and `llms.txt`, including the estimate-versus-invoice, missing-is-not-zero, effective-date, schedule-selection, media-unit, and tagged-snapshot boundaries.
+
+### Pricing and purchase trust
+
+- Reverified all current and future rate cards against sixteen official provider pages without changing a numeric rate.
+- Corrected Gemini introductory-rate end timestamps to represent all of 31 December under the contract's exclusive upper-bound rule; no unpublished successor rate is inferred.
+- Routed refund requests to private email rather than the public issue tracker.
+- Preserved Pro, Pro+, and Ultimate plan context through authentication with exact launch and standard prices before the explicit Stripe Checkout action.
+
+### Verification
+
+- Pricing Feed v1 fixture and schema validation, compatibility equality, unique/source-linked cards, DeepSeek effective-date boundaries, OpenAI context bands, null-cache handling, and manual-review provenance passed.
+- 2,500 compiled research-atlas rows, ESLint, strict TypeScript, application tests, database-backup tests, pricing-source verification, and the production build passed.
+
 ## [0.4.1] — 2026-08-23
 
 ### Public evidence boundaries
@@ -62,6 +83,7 @@ TokenGauge follows semantic versioning for its public source releases. A release
 
 - Published the initial pricing workbench, evidence catalogue, account system, controlled lab, and one-time paid plans.
 
+[0.5.0]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.5.0
 [0.4.1]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.4.1
 [0.4.0]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.4.0
 [0.3.0]: https://github.com/fablgen-agent/tokengauge/releases/tag/v0.3.0

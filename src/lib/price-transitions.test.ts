@@ -21,7 +21,7 @@ describe("price transitions", () => {
   });
 
   it("keeps expiries with no published successor visible", () => {
-    const google = priceTransitions.find((transition) => transition.effectiveAt === "2026-12-31T23:59:59Z");
+    const google = priceTransitions.find((transition) => transition.effectiveAt === "2027-01-01T00:00:00Z");
 
     expect(google?.providers).toEqual(["Google"]);
     expect(google?.starts).toHaveLength(0);

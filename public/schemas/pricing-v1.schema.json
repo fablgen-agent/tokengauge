@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tokengauge.enby.fish/schemas/pricing-v1.schema.json",
+  "title": "TokenGauge Pricing Feed v1",
+  "description": "A dated, source-linked LLM token-price snapshot. Missing cards and null rates are unknown, never zero. effectiveFrom is inclusive and effectiveUntil is exclusive.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "observedAt",
+    "currency",
+    "unitTokens",
+    "providers",
+    "models"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1"
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When TokenGauge observed and assembled this snapshot; it is not an invoice timestamp or a guarantee that an unbounded row will never change."
+    },
+    "currency": {
+      "const": "USD"
+    },
+    "unitTokens": {
+      "const": 1000000
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/provider"
+      }
+    },
+    "models": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/modelPrice"
+      }
+    }
+  },
+  "$defs": {
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_-]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "nonNegativeRate": {
+      "type": "number",
+      "minimum": 0
+    },
+    "tokenCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "httpsUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?(?::[0-9]+)?(?:[/?#](?:[A-Za-z0-9._~!$&'()*+,;=:@/?#\\[\\]-]|%[0-9A-Fa-f]{2})*)?$"
+    },
+    "modelPrice": {
+      "type": "object",
+      "description": "A pricing row validated by both this structural schema and TokenGauge semantic invariants for unique IDs, provider references, intervals, context bands, review notes, and credential-free sources.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "modelId",
+        "provider",
+        "providerLabel",
+        "label",
+        "tierLabel",
+        "inputPerMillionUsd",
+        "cachedInputPerMillionUsd",
+        "outputPerMillionUsd",
+        "region",
+        "sourceUrl",
+        "sourceLabel"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_-]*$"
+        },
+        "providerLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tierLabel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable billing tier. Schedule labels are not structured scheduling rules; callers must select the card that applies at the provider's documented time and timezone."
+        },
+        "inputPerMillionUsd": {
+          "$ref": "#/$defs/nonNegativeRate"
+        },
+        "cachedInputPerMillionUsd": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonNegativeRate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "USD per unitTokens for cached input. null means no separate published rate is available and must not be treated as zero."
+        },
+        "cacheWritePerMillionUsd": {
+          "$ref": "#/$defs/nonNegativeRate"
+        },
+        "cacheWriteOneHourPerMillionUsd": {
+          "$ref": "#/$defs/nonNegativeRate"
+        },
+        "explicitCacheReadPerMillionUsd": {
+          "$ref": "#/$defs/nonNegativeRate"
+        },
+        "explicitCacheStoragePerMillionTokenHourUsd": {
+          "$ref": "#/$defs/nonNegativeRate"
+        },
+        "outputPerMillionUsd": {
+          "$ref": "#/$defs/nonNegativeRate"
+        },
+        "contextWindowTokens": {
+          "$ref": "#/$defs/tokenCount"
+        },
+        "minInputTokensExclusive": {
+          "$ref": "#/$defs/tokenCount"
+        },
+        "minInputTokensInclusive": {
+          "$ref": "#/$defs/tokenCount"
+        },
+        "maxInputTokensExclusive": {
+          "$ref": "#/$defs/tokenCount"
+        },
+        "maxInputTokensInclusive": {
+          "$ref": "#/$defs/tokenCount"
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "sourceLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenanceUrls": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/httpsUrl"
+          }
+        },
+        "reviewStatus": {
+          "enum": ["verified", "manual-review"],
+          "description": "Optional TokenGauge review flag, not provider endorsement. manual-review requires a reviewNote under the contract's semantic invariants."
+        },
+        "reviewNote": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reason for a manual-review flag; semantic validation rejects manual-review without this note and rejects this note without that flag."
+        },
+        "effectiveFrom": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Inclusive lower bound. Omission means TokenGauge has no known lower bound for this row."
+        },
+        "effectiveUntil": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Exclusive upper bound. Omission means TokenGauge has no known upper bound, not a guarantee that the provider will never change the rate."
+        }
+      }
+    }
+  }
+}

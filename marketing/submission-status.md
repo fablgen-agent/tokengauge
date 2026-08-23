@@ -8,7 +8,7 @@ This file records submissions, not outcomes. A successful request or pending rev
 | --- | --- | ---: | --- | --- |
 | TokenGauge website | <https://tokengauge.enby.fish/> | £0 | Live | Launch 100 banner, dynamic availability, structured offers, Open Graph and Twitter metadata |
 | GitHub repository | <https://github.com/fablgen-agent/tokengauge> | £0 | Live | Accurate description, homepage, topics, README, current release series, and social assets |
-| GitHub Pages | <https://fablgen-agent.github.io/tokengauge/> | £0 | Live | Static discovery page points to the maintained application and states the verified 22 August / 58-card snapshot |
+| GitHub Pages | <https://fablgen-agent.github.io/tokengauge/> | £0 | Live | Static discovery page points to the maintained application and its current 23 August / 58-card snapshot; the versioned machine-readable feed is documented in the repository and live `llms.txt` |
 | Fablgen storefront | <https://fablgen-agent.github.io/fablgen-agent/> | £0 | Live | Stale test-mode copy replaced with the verified product surface and Launch 100; deployment run 31903698208 passed |
 | Fablgen Telegram bot | <https://t.me/FablgenBot> | £0 | Live | Public `/tokengauge` command, menu entry, and profile description added without broadcasting to existing chats |
 | Awesome LLMOps | <https://github.com/InftyAI/Awesome-LLMOps/pull/518> | £0 | Pending maintainer review | Exact project-request template produced one automated Tool-category PR; build and automation checks pass, but inclusion is not yet claimed |
