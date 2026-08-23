@@ -12,6 +12,8 @@ The public [pricing effective-date ledger](https://tokengauge.enby.fish/pricing/
 - Fixed-scope AI cost-attribution implementation: <https://tokengauge.enby.fish/services/attribution>
 - Fixed-scope application-side AI budget guard: <https://tokengauge.enby.fish/services/budget-guard>
 - Lightweight GitHub Pages mirror: <https://fablgen-agent.github.io/tokengauge/>
+- Current release: <https://github.com/fablgen-agent/tokengauge/releases/tag/v0.4.0>
+- Version history: [CHANGELOG.md](CHANGELOG.md)
 
 The project is independent software and is not affiliated with or endorsed by OpenAI.
 
