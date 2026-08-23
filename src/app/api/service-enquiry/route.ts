@@ -40,7 +40,9 @@ export async function POST(request: Request): Promise<Response> {
     const parsed = parseServiceEnquiry(JSON.parse(text));
     if (!parsed.success) return Response.json({ error: parsed.error }, { status: 400 });
     await sendServiceEnquiry(parsed.data);
-    recordFunnelEvent(parsed.data.service === "attribution" ? "service_attribution_enquiry_sent" : "service_budget_guard_enquiry_sent");
+    if (!parsed.data.measurementOff) {
+      recordFunnelEvent(parsed.data.service === "attribution" ? "service_attribution_enquiry_sent" : "service_budget_guard_enquiry_sent");
+    }
     return Response.json({ ok: true });
   } catch {
     console.error("TokenGauge service enquiry delivery failed.");

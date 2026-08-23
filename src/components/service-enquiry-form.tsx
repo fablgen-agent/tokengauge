@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import type { ServiceEnquiryKind } from "@/lib/service-enquiry";
+import { funnelMeasurementDisabled } from "@/lib/funnel-preference";
 
 export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind }) {
   const startedAt = useRef(0);
@@ -24,7 +25,7 @@ export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind })
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ ...payload, service, startedAt: startedAt.current }),
+        body: JSON.stringify({ ...payload, service, startedAt: startedAt.current, measurementOff: funnelMeasurementDisabled() }),
       });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error || "The request could not be sent.");

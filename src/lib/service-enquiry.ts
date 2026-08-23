@@ -11,6 +11,7 @@ export type ServiceEnquiry = {
   timing?: string;
   website: string;
   startedAt: number;
+  measurementOff: boolean;
 };
 
 type ParseResult = { success: true; data: ServiceEnquiry } | { success: false; error: string };
@@ -36,6 +37,7 @@ export function parseServiceEnquiry(value: unknown, now = Date.now()): ParseResu
   const timing = typeof body.timing === "string" && body.timing.trim() ? clean(body.timing, 120) : undefined;
   const website = typeof body.website === "string" ? body.website.trim() : "";
   const startedAt = typeof body.startedAt === "number" ? body.startedAt : Number.NaN;
+  const measurementOff = body.measurementOff === true;
 
   if (website) return { success: false, error: "Unable to send this request." };
   if (!service || !email || !publicUrl || !stack || !provider || !summary) {
@@ -52,5 +54,5 @@ export function parseServiceEnquiry(value: unknown, now = Date.now()): ParseResu
   if (!Number.isFinite(startedAt) || now - startedAt < 3_000 || now - startedAt > 86_400_000) {
     return { success: false, error: "Refresh the page and try again." };
   }
-  return { success: true, data: { service, email, publicUrl, stack, provider, summary, timing, website, startedAt } };
+  return { success: true, data: { service, email, publicUrl, stack, provider, summary, timing, website, startedAt, measurementOff } };
 }
