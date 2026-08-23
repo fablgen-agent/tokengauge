@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${origin}/guides/autonomous-agent-token-budget`, lastModified: new Date("2026-08-22T00:00:00Z"), changeFrequency: "monthly", priority: .9 },
     { url: `${origin}/services/attribution`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "monthly", priority: .82 },
     { url: `${origin}/services/budget-guard`, lastModified: new Date("2026-08-16T00:00:00Z"), changeFrequency: "monthly", priority: .82 },
+    { url: "https://work.enby.fish/", lastModified: new Date("2026-08-23T00:00:00Z"), changeFrequency: "monthly", priority: .85 },
     ...providerPageProfiles.map((provider) => ({ url: `${origin}/pricing/${provider.id}`, lastModified: pricingLastModified, changeFrequency: "weekly" as const, priority: .9 })),
     { url: `${origin}/compare`, lastModified: pricingLastModified, changeFrequency: "weekly", priority: .9 },
     ...providerComparisons.map((comparison) => ({ url: `${origin}/compare/${comparison.slug}`, lastModified: pricingLastModified, changeFrequency: "weekly" as const, priority: .88 })),

@@ -22,6 +22,7 @@ const routeEvents: Array<[string, FunnelEvent]> = [
   ["/guides/autonomous-agent-token-budget", "view_budget_guide"],
   ["/services/attribution", "view_service_attribution"],
   ["/services/budget-guard", "view_service_budget_guard"],
+  ["/work", "view_work_request"],
 ];
 
 function routeEvent(pathname: string): FunnelEvent | undefined {

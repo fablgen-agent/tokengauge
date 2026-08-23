@@ -440,6 +440,45 @@ input[type="range"] { accent-color: var(--ink); }
 .service-enquiry-submit { display: flex; gap: 18px; align-items: center; margin-top: 20px; }
 .service-enquiry-submit .form-notice { flex: 1; color: #dff2e7; background: #173b2d; border-color: #356c56; }
 .service-enquiry-submit .form-error { color: #ffb6aa; }
+.work-page { background: #f3f6f0; }
+.work-header { min-height: 76px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); background: #f3f6f0; }
+.work-header nav { display: flex; align-items: center; gap: 26px; font-size: 12px; font-weight: 700; }
+.work-header nav a { min-height: 44px; display: inline-flex; align-items: center; }
+.work-hero { min-height: 650px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(270px, .35fr); gap: 80px; align-items: center; color: white; background: var(--ink); }
+.work-hero h1 { max-width: 850px; margin: 22px 0; font-size: clamp(52px, 7vw, 98px); line-height: .93; letter-spacing: -.07em; }
+.work-hero p { max-width: 720px; color: #adb8b4; font-size: 17px; line-height: 1.7; }
+.work-hero .button { margin-top: 18px; }
+.work-hero aside { padding: 30px; border: 1px solid #46514d; }
+.work-hero aside strong { display: block; color: var(--lime); font-size: 72px; letter-spacing: -.07em; }
+.work-hero aside span { color: white; font-weight: 750; }
+.work-hero aside p { font-size: 12px; }
+.work-scope { padding-top: 90px; padding-bottom: 95px; }
+.work-scope-grid { margin-top: 40px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); }
+.work-scope-grid article { min-height: 150px; padding: 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: white; }
+.work-scope-grid article:nth-child(4n) { border-right: 0; }
+.work-scope-grid article:nth-last-child(-n+4) { border-bottom: 0; }
+.work-scope-grid span { color: #914633; font: 10px/1.4 var(--font-geist-mono), monospace; }
+.work-scope-grid h3 { margin: 34px 0 0; font-size: 20px; letter-spacing: -.035em; }
+.work-request { padding-top: 85px; padding-bottom: 90px; color: white; background: var(--ink); }
+.work-request-intro { max-width: 850px; margin-bottom: 38px; }
+.work-request-intro h2 { margin: 16px 0 10px; font-size: 50px; letter-spacing: -.055em; }
+.work-request-intro p { color: #aeb8b5; line-height: 1.7; }
+.work-request-form { padding: 34px; border: 1px solid #46514d; }
+.work-request-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.work-request-fields label { display: grid; gap: 8px; color: #dce4e1; font-size: 12px; font-weight: 750; }
+.work-request-fields label small { color: #9eaaa7; font-weight: 450; }
+.work-request-fields input, .work-request-fields select, .work-request-fields textarea { width: 100%; min-height: 48px; padding: 0 13px; color: var(--ink); background: white; border: 1px solid #65706c; border-radius: 7px; }
+.work-request-fields textarea { min-height: 120px; padding-top: 13px; resize: vertical; }
+.work-request-wide { grid-column: 1 / -1; }
+.work-request-privacy { color: #9eaaa7; font-size: 12px; line-height: 1.65; }
+.work-request-submit { display: flex; align-items: center; gap: 18px; }
+.work-request-submit .form-notice { flex: 1; color: #dff2e7; background: #173b2d; border-color: #356c56; }
+.work-request-submit .form-error { color: #ffb6aa; }
+.work-boundaries { padding-top: 85px; padding-bottom: 95px; display: grid; grid-template-columns: minmax(220px, .4fr) minmax(0, 1fr); gap: 70px; }
+.work-boundaries h2 { margin: 14px 0 0; font-size: 42px; letter-spacing: -.05em; }
+.work-boundaries ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.work-boundaries li { display: grid; grid-template-columns: 180px 1fr; gap: 22px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.work-boundaries li span { color: var(--muted); line-height: 1.6; }
 .ledger-service-bridge { padding-top: 52px; padding-bottom: 52px; display: grid; grid-template-columns: 1fr auto; gap: 45px; align-items: center; }
 .ledger-service-bridge h2 { margin: 13px 0 8px; font-size: 36px; letter-spacing: -.05em; }
 .ledger-service-bridge p { max-width: 760px; margin: 0; color: #a6b2af; line-height: 1.6; }
@@ -837,6 +876,14 @@ input[type="range"] { accent-color: var(--ink); }
   .guide-section { grid-template-columns: 1fr; gap: 25px; }
   .guide-section-label { padding-bottom: 15px; border-bottom: 1px solid var(--line); }
   .guide-faq { grid-template-columns: 1fr; gap: 35px; }
+  .work-hero { grid-template-columns: 1fr; gap: 38px; }
+  .work-hero aside { max-width: 520px; }
+  .work-scope-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .work-scope-grid article:nth-child(odd) { border-right: 1px solid var(--line); }
+  .work-scope-grid article:nth-child(even) { border-right: 0; }
+  .work-scope-grid article:nth-last-child(-n+4) { border-bottom: 1px solid var(--line); }
+  .work-scope-grid article:nth-last-child(-n+2) { border-bottom: 0; }
+  .work-boundaries { grid-template-columns: 1fr; gap: 35px; }
 }
 
 @media (max-width: 620px) {
@@ -918,6 +965,18 @@ input[type="range"] { accent-color: var(--ink); }
   .service-enquiry-wide { grid-column: auto; }
   .service-enquiry-submit { align-items: flex-start; flex-direction: column; }
   .service-enquiry-fields input, .service-enquiry-fields textarea { font-size: 16px; }
+  .work-header { min-height: 132px; align-items: flex-start; flex-direction: column; justify-content: center; gap: 8px; }
+  .work-header nav { width: 100%; justify-content: space-between; gap: 8px; }
+  .work-hero { min-height: auto; padding-top: 68px; padding-bottom: 68px; }
+  .work-hero h1 { font-size: 50px; }
+  .work-scope-grid, .work-request-fields { grid-template-columns: 1fr; }
+  .work-scope-grid article, .work-scope-grid article:nth-child(odd), .work-scope-grid article:nth-child(even), .work-scope-grid article:nth-last-child(-n+4) { border-right: 0; border-bottom: 1px solid var(--line); }
+  .work-scope-grid article:last-child { border-bottom: 0; }
+  .work-request-form { padding: 24px 20px; }
+  .work-request-wide { grid-column: auto; }
+  .work-request-fields input, .work-request-fields select, .work-request-fields textarea { font-size: 16px; }
+  .work-request-submit { align-items: flex-start; flex-direction: column; }
+  .work-boundaries li { grid-template-columns: 1fr; gap: 8px; }
   .guide-hero { min-height: auto; padding-top: 218px; padding-bottom: 62px; }
   .guide-hero h1 { font-size: 43px; }
   .guide-equation { padding: 25px; }

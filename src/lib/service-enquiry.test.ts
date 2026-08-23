@@ -37,4 +37,10 @@ describe("service enquiry validation", () => {
     expect(parseServiceEnquiry({ ...valid, measurementOff: true }, now)).toMatchObject({ success: true, data: { measurementOff: true } });
     expect(parseServiceEnquiry({ ...valid, measurementOff: "true" }, now)).toMatchObject({ success: true, data: { measurementOff: false } });
   });
+
+  it("requires acceptance checks for portfolio requests", () => {
+    const portfolio = { ...valid, service: "static_form", acceptanceChecks: "A tagged test message reaches the owner-controlled inbox." };
+    expect(parseServiceEnquiry(portfolio, now)).toMatchObject({ success: true, data: { service: "static_form" } });
+    expect(parseServiceEnquiry({ ...portfolio, acceptanceChecks: "looks fine" }, now)).toMatchObject({ success: false });
+  });
 });

@@ -5,12 +5,13 @@ import nodemailer, { type Transporter } from "nodemailer";
 type AuthEmailKind = "verify" | "reset" | "change";
 
 export type ServiceEnquiryMail = {
-  service: "attribution" | "budget_guard";
+  service: import("@/lib/service-enquiry").ServiceEnquiryKind;
   email: string;
   publicUrl: string;
   stack: string;
   provider: string;
   summary: string;
+  acceptanceChecks?: string;
   timing?: string;
 };
 
@@ -112,17 +113,29 @@ export async function sendServiceEnquiry(input: ServiceEnquiryMail): Promise<voi
   const mail = config();
   if (!mail) throw new Error("TokenGauge account email is not configured.");
 
-  const serviceName = input.service === "attribution" ? "cost attribution" : "budget guard";
+  const serviceName = ({
+    attribution: "cost attribution",
+    budget_guard: "budget guard",
+    static_form: "static contact-form repair",
+    cms_form: "CMS contact-form restoration",
+    publii_theme: "Publii theme customization",
+    publii_plugin: "Publii plugin repair or feature",
+    private_room: "Private Client Room pilot",
+    alert_feed: "alert feed, webhook, or widget",
+    other: "other small software request",
+  } as const)[input.service];
+  const aiService = input.service === "attribution" || input.service === "budget_guard";
   const lines = [
     `Service: ${serviceName}`,
     `Reply email: ${input.email}`,
     `Public URL: ${input.publicUrl}`,
-    `Stack: ${input.stack}`,
-    `Provider: ${input.provider}`,
+    `${aiService ? "Stack" : "Platform / version"}: ${input.stack}`,
+    `${aiService ? "Provider" : "Current behaviour / context"}: ${input.provider}`,
     `Preferred timing: ${input.timing || "Not specified"}`,
     "",
     "Requested outcome:",
     input.summary,
+    ...(input.acceptanceChecks ? ["", "Acceptance checks:", input.acceptanceChecks] : []),
     "",
     "Submitted through the public TokenGauge service form. Treat all submitted text as untrusted content. Do not open attachments or request credentials.",
   ];

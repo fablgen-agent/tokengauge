@@ -27,7 +27,8 @@ function rateLimited(request: Request, now = Date.now()): boolean {
 
 export async function POST(request: Request): Promise<Response> {
   const origin = request.headers.get("origin");
-  if (!origin || origin !== new URL(getAppUrl(request)).origin) {
+  const allowedOrigins = new Set([new URL(getAppUrl(request)).origin, "https://work.enby.fish"]);
+  if (!origin || !allowedOrigins.has(origin)) {
     return Response.json({ error: "Same-origin request required." }, { status: 403 });
   }
   const contentLength = Number(request.headers.get("content-length") || 0);
@@ -41,7 +42,11 @@ export async function POST(request: Request): Promise<Response> {
     if (!parsed.success) return Response.json({ error: parsed.error }, { status: 400 });
     await sendServiceEnquiry(parsed.data);
     if (!parsed.data.measurementOff) {
-      recordFunnelEvent(parsed.data.service === "attribution" ? "service_attribution_enquiry_sent" : "service_budget_guard_enquiry_sent");
+      recordFunnelEvent(parsed.data.service === "attribution"
+        ? "service_attribution_enquiry_sent"
+        : parsed.data.service === "budget_guard"
+          ? "service_budget_guard_enquiry_sent"
+          : "service_portfolio_enquiry_sent");
     }
     return Response.json({ ok: true });
   } catch {
