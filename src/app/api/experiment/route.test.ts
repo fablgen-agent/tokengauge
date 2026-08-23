@@ -179,4 +179,31 @@ describe("ChatGPT experiment account ownership", () => {
       error: "The model source completed without usable text. No result was stored; retry or choose another model.",
     });
   });
+
+  it("preserves the original stream status when the text promise loses it", async () => {
+    streamText.mockImplementationOnce((options: { onError?: (event: { error: unknown }) => void }) => {
+      options.onError?.({ error: { kind: "api", statusCode: 403 } });
+      return {
+        text: Promise.reject({ name: "AI_NoOutputGeneratedError" }),
+        usage: Promise.resolve(usage),
+      };
+    });
+
+    const response = await POST(new Request("https://tokengauge.enby.fish/api/experiment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        providerId: "chatgpt",
+        model: "gpt-test",
+        strategyId: "lower-reasoning-effort",
+        task: "Explain this request in a concise paragraph.",
+        baselineInstructions: "Preserve every required fact.",
+      }),
+    }));
+
+    expect(response.status).toBe(422);
+    await expect(response.json()).resolves.toEqual({
+      error: "The model source rejected this model or request setting. Refresh the model list or choose another model.",
+    });
+  });
 });

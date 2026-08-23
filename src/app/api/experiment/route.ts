@@ -158,6 +158,7 @@ export async function POST(request: Request): Promise<Response> {
       }
       const provider = createChatGPTProxyProvider({ fetch: handler.proxyFetch(request) });
       for (const variant of variants) {
+        let streamError: unknown;
         const result = streamText({
           model: provider(input.model),
           system: variant.instructions,
@@ -168,9 +169,19 @@ export async function POST(request: Request): Promise<Response> {
           // additional plan usage, and bound each arm so the UI cannot hang.
           maxRetries: 0,
           abortSignal: AbortSignal.timeout(120_000),
+          // streamText otherwise logs the provider error and later rejects
+          // `text` with a new NoOutputGeneratedError that has lost the HTTP
+          // status. Capture the original without logging its request body.
+          onError: ({ error }) => { streamError = error; },
           providerOptions: { openai: { reasoningEffort: variant.settings.reasoningEffort, textVerbosity: variant.settings.textVerbosity } },
         });
-        const [text, usage] = await Promise.all([result.text, result.usage]);
+        let text: string;
+        let usage: LanguageModelUsage;
+        try {
+          [text, usage] = await Promise.all([result.text, result.usage]);
+        } catch (error) {
+          throw streamError ?? error;
+        }
         results.set(variant.key, { text, usage: usageDto(usage), settings: variant.settings });
       }
     } else {
