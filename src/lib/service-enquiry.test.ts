@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseServiceEnquiry } from "./service-enquiry";
+import { parseServiceEnquiry, portfolioServiceOptions } from "./service-enquiry";
 
 const now = 1_800_000_000_000;
 const valid = {
@@ -42,5 +42,22 @@ describe("service enquiry validation", () => {
     const portfolio = { ...valid, service: "static_form", acceptanceChecks: "A tagged test message reaches the owner-controlled inbox." };
     expect(parseServiceEnquiry(portfolio, now)).toMatchObject({ success: true, data: { service: "static_form" } });
     expect(parseServiceEnquiry({ ...portfolio, acceptanceChecks: "looks fine" }, now)).toMatchObject({ success: false });
+  });
+
+  it("accepts the bounded booking-selection scope and publishes its fixed price", () => {
+    const booking = {
+      ...valid,
+      service: "booking_selection",
+      stack: "WordPress with an existing booking plugin",
+      provider: "The page says booking is unavailable while controls remain interactive.",
+      summary: "Restore one public availability and booking-selection step up to the existing checkout handoff.",
+      acceptanceChecks: "Valid dates progress; invalid dates stop honestly; no order or payment is placed.",
+    };
+    expect(parseServiceEnquiry(booking, now)).toMatchObject({ success: true, data: { service: "booking_selection" } });
+    expect(portfolioServiceOptions).toContainEqual({
+      id: "booking_selection",
+      label: "Booking availability / selection repair",
+      price: "£75 fixed",
+    });
   });
 });

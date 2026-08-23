@@ -118,6 +118,7 @@ export async function sendServiceEnquiry(input: ServiceEnquiryMail): Promise<voi
     budget_guard: "budget guard",
     static_form: "static contact-form repair",
     cms_form: "CMS contact-form restoration",
+    booking_selection: "booking availability or selection repair",
     publii_theme: "Publii theme customization",
     publii_plugin: "Publii plugin repair or feature",
     private_room: "Private Client Room pilot",
