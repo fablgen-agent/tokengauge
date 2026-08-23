@@ -27,6 +27,7 @@ The project is independent software and is not affiliated with or endorsed by Op
 - ChatGPT credentials stay encrypted in the server-side session store and raw-token export is disabled.
 - User-supplied API keys are encrypted per account with AES-256-GCM, never returned after storage, and used only for user-initiated lab requests.
 - Stripe billing identity is an HMAC-derived opaque identifier, separate from the ChatGPT account ID.
+- Anonymous funnel totals have no visitor identifier, and any browser can disable future page and action counts from the Privacy page. Automated verification uses the same browser-local `?measurement=off` preference so operator QA does not masquerade as demand.
 
 ## What is included
 

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import type { FunnelEvent } from "@/lib/funnel-events";
+import { funnelMeasurementDisabled } from "@/lib/funnel-preference";
 
 const routeEvents: Array<[string, FunnelEvent]> = [
   ["/pricing/changes", "view_pricing_changes"],
@@ -31,6 +32,7 @@ function routeEvent(pathname: string): FunnelEvent | undefined {
 }
 
 export function sendFunnelEvent(event: FunnelEvent): void {
+  if (funnelMeasurementDisabled()) return;
   void fetch("/api/funnel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -44,8 +46,14 @@ export function FunnelTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Apply an explicit browser preference even on routes that have no view counter.
+    funnelMeasurementDisabled();
+  }, [pathname]);
+
+  useEffect(() => {
     const event = routeEvent(pathname);
     if (!event) return;
+    if (funnelMeasurementDisabled()) return;
     const marker = `tokengauge:funnel:${event}`;
     try {
       if (sessionStorage.getItem(marker)) return;
