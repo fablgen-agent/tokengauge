@@ -2,10 +2,11 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 
-import type { ServiceEnquiryKind } from "@/lib/service-enquiry";
+import { serviceEnquiryCopy, type ServiceEnquiryKind } from "@/lib/service-enquiry";
 import { funnelMeasurementDisabled } from "@/lib/funnel-preference";
 
 export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind }) {
+  const copy = serviceEnquiryCopy[service];
   const startedAt = useRef(0);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -44,9 +45,10 @@ export function ServiceEnquiryForm({ service }: { service: ServiceEnquiryKind })
     <div className="service-enquiry-fields">
       <label>Reply email<input name="email" type="email" autoComplete="email" maxLength={254} required /></label>
       <label>Public repository or product URL<input name="publicUrl" type="url" inputMode="url" placeholder="https://…" maxLength={500} required /></label>
-      <label>Stack<input name="stack" placeholder="Node.js/TypeScript or Python" maxLength={120} required /></label>
-      <label>Model provider<input name="provider" placeholder="For example, OpenAI" maxLength={120} required /></label>
-      <label className="service-enquiry-wide">Requested outcome<textarea name="summary" minLength={40} maxLength={2000} required placeholder={service === "attribution" ? "Which workflow should be attributed, and what must the export prove?" : "Which request path needs a budget boundary, and what should happen when the allowance is insufficient?"} /></label>
+      <label>{copy.stackLabel}<input name="stack" placeholder={copy.stackPlaceholder} maxLength={120} required /></label>
+      <label>{copy.providerLabel}<input name="provider" placeholder={copy.providerPlaceholder} maxLength={120} required /></label>
+      <label className="service-enquiry-wide">{copy.summaryLabel}<textarea name="summary" minLength={40} maxLength={2000} required placeholder={copy.summaryPlaceholder} /></label>
+      <label className="service-enquiry-wide">Acceptance checks {!copy.acceptanceRequired ? <small>Optional</small> : null}<textarea name="acceptanceChecks" minLength={copy.acceptanceRequired ? 20 : undefined} maxLength={1000} required={copy.acceptanceRequired} placeholder={copy.acceptancePlaceholder} /></label>
       <label className="service-enquiry-wide">Preferred timing <small>Optional</small><input name="timing" maxLength={120} /></label>
       <label className="service-enquiry-trap" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
     </div>
